@@ -2,21 +2,29 @@
 
 ## 🏃‍♂️ 팀원 소개
 <markdown-accessiblity-table data-catalyst=""><table>
-  <tbody><tr height="130px">
+  <tbody>
+    <tr>
+    <td align="center" width="130px">FE</td>
+    <td align="center" width="130px">FE</td>
+    <td align="center" width="130px">BE</td>
+    <td align="center" width="130px">BE</td>
+    <td align="center" width="130px">BE</td>
+  </tr>
+    <tr height="130px">
     <td align="center" width="130px">
-      <a href="https://github.com/9eunwoo"><img src="https://avatars.githubusercontent.com/u/80266418?v=4" style="max-width: 100%;"></a>
+      <a href="https://github.com/9eunwoo"><img src="https://avatars.githubusercontent.com/u/148485694?v=4" style="max-width: 100%;"></a>
     </td>
     <td align="center" width="130px">
-      <a href="https://github.com/suhyun-00"><img src="https://avatars.githubusercontent.com/u/35567292?v=4" style="max-width: 100%;"></a>
+      <a href="https://github.com/suhyun-00"><img src="https://avatars.githubusercontent.com/u/173233901?v=4" style="max-width: 100%;"></a>
     </td>
     <td align="center" width="130px">
-      <a href="https://github.com/solyrion"><img src="https://avatars.githubusercontent.com/u/138586629?v=4" style="max-width: 100%;"></a>
+      <a href="https://github.com/solyrion"><img src="https://avatars.githubusercontent.com/u/70051475?v=4" style="max-width: 100%;"></a>
     </td>
     <td align="center" width="130px">
-      <a href="https://github.com/stupidJoon"><img src="https://avatars.githubusercontent.com/u/101378867?v=4" style="max-width: 100%;"></a>
+      <a href="https://github.com/stupidJoon"><img src="https://avatars.githubusercontent.com/u/35032401?v=4" style="max-width: 100%;"></a>
     </td>
 <td align="center" width="130px">
-      <a href="https://github.com/Choi-JY1107"><img src="https://avatars.githubusercontent.com/u/78800560?v=4" style="max-width: 100%;"></a>
+      <a href="https://github.com/Choi-JY1107"><img src="https://avatars.githubusercontent.com/u/52996979?v=4" style="max-width: 100%;"></a>
     </td>
   </tr>
   <tr height="50px">
