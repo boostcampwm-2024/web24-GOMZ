@@ -1,7 +1,7 @@
 ---
-name: "<FE/BE> task 요약 10 ~ 15자 이내"
+name: 'GOMZ_ISSUE_TEMPLATE'
 about: task
-title: ''
+title: '<FE/BE> task 요약 10 ~ 15자 이내'
 labels: ''
 assignees: ''
 
