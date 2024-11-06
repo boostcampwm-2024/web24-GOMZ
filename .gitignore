@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+/dist
+/build
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# IDE - VSCode
+.vscode/*
+
+# IDE - IntelliJ
+.idea/*
+
+# OS generated files
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
