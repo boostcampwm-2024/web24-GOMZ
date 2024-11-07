@@ -30,11 +30,18 @@ function Demo() {
 
       const observableMap = new Map();
       const set = observableMap.set.bind(observableMap);
+      const del = observableMap.delete.bind(observableMap);
 
       observableMap.set = (key: string | undefined, value: MediaStream) => {
         set(key, value);
         forceUpdate({});
         return observableMap;
+      };
+
+      observableMap.delete = (key: string | undefined) => {
+        const result = del(key);
+        forceUpdate({});
+        return result;
       };
 
       remoteStreamMap.current = observableMap;
