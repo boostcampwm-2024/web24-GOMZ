@@ -29,16 +29,17 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     @MessageBody('offer') offer: RTCSessionDescriptionInit,
     @MessageBody('oldId') oldId: string,
   ) {
-    this.server.to(oldId).emit('answerRequest', { newId: client.id, offer });
+    this.server.to(oldId).emit('answerRequest', JSON.stringify({ newId: client.id, offer }));
   }
 
   // 3. 기존 참가자들은 신규 참가자에게 answer를 보낸다.
   @SubscribeMessage('sendAnswer')
   handleSendAnswer(
+    @ConnectedSocket() client: Socket,
     @MessageBody('answer') answer: RTCSessionDescriptionInit,
     @MessageBody('newId') newId: string
   ) {
-    this.server.to(newId).emit('completeConnection', { answer });
+    this.server.to(newId).emit('completeConnection', JSON.stringify({ oldId: client.id, answer }));
   }
 
   @SubscribeMessage('sendIcecandidate')
@@ -47,6 +48,6 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     @MessageBody('targetId') targetId: string,
     @MessageBody('iceCandidate') candidate: RTCIceCandidateInit,
   ) {
-    this.server.to(targetId).emit('setIcecandidate', { senderId: client.id, iceCandidate: candidate });
+    this.server.to(targetId).emit('setIcecandidate', JSON.stringify({ senderId: client.id, iceCandidate: candidate }));
   }
 }
