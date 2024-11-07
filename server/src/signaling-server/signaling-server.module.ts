@@ -4,4 +4,4 @@ import { SignalingServerGateway } from './signaling-server.gateway';
 @Module({
   providers: [SignalingServerGateway],
 })
-export class SignalingServerModule { }
+export class SignalingServerModule {}

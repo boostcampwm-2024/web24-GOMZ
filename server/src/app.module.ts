@@ -8,7 +8,7 @@ import { SignalingServerModule } from './signaling-server/signaling-server.modul
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
 
 /*
 # 프로젝트 생성
