@@ -56,6 +56,18 @@ export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, 
           socket.emit('sendIceCandidate', { targetId: oldId, iceCandidate: event.candidate });
         }
       };
+
+      peerConnection.onconnectionstatechange = () => {
+        if (
+          peerConnection.connectionState === 'disconnected' ||
+          peerConnection.connectionState === 'failed' ||
+          peerConnection.connectionState === 'closed'
+        ) {
+          remoteStreamMap.delete(oldId);
+          peerConnectionMap.delete(oldId);
+          peerConnection.close();
+        }
+      };
     }
   });
 
@@ -92,6 +104,18 @@ export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, 
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
         socket.emit('sendIceCandidate', { targetId: newId, iceCandidate: event.candidate });
+      }
+    };
+
+    peerConnection.onconnectionstatechange = () => {
+      if (
+        peerConnection.connectionState === 'disconnected' ||
+        peerConnection.connectionState === 'failed' ||
+        peerConnection.connectionState === 'closed'
+      ) {
+        remoteStreamMap.delete(newId);
+        peerConnectionMap.delete(newId);
+        peerConnection.close();
       }
     };
   });
