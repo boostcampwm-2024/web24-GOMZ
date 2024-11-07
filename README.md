@@ -1,8 +1,11 @@
 # web24-GOMZ
+
 <img src="https://github.com/user-attachments/assets/e5589b03-5daa-45a0-97c0-9ad477adf3f0" width="500px">
 
 ## 🏃‍♂️ 팀원 소개
+
 <markdown-accessiblity-table data-catalyst=""><table>
+
   <tbody>
     <tr>
     <td align="center" width="130px">FE</td>
