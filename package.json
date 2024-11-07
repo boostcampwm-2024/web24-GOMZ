@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint --debug .",
-    "prettier": "prettier --check --write '**/*.{js,jsx,ts,tsx}'"
+    "prettier": "prettier --check ."
   },
   "workspaces": [
     "client",
