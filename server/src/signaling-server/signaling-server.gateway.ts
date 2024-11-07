@@ -45,8 +45,8 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
   handleSendIcecandidate(
     @ConnectedSocket() client: Socket,
     @MessageBody('targetId') targetId: string,
-    @MessageBody('candidate') candidate: RTCIceCandidateInit,
+    @MessageBody('iceCandidate') candidate: RTCIceCandidateInit,
   ) {
-    this.server.to(targetId).emit('setIcecandidate', { id: client.id, iceCandidate: candidate });
+    this.server.to(targetId).emit('setIcecandidate', { senderId: client.id, iceCandidate: candidate });
   }
 }
