@@ -42,12 +42,12 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     this.server.to(newId).emit('completeConnection', JSON.stringify({ oldId: client.id, answer }));
   }
 
-  @SubscribeMessage('sendIcecandidate')
+  @SubscribeMessage('sendIceCandidate')
   handleSendIcecandidate(
     @ConnectedSocket() client: Socket,
     @MessageBody('targetId') targetId: string,
     @MessageBody('iceCandidate') candidate: RTCIceCandidateInit,
   ) {
-    this.server.to(targetId).emit('setIcecandidate', JSON.stringify({ senderId: client.id, iceCandidate: candidate }));
+    this.server.to(targetId).emit('setIceCandidate', JSON.stringify({ senderId: client.id, iceCandidate: candidate }));
   }
 }
