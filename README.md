@@ -1,10 +1,50 @@
-# web24-GOMZ
+<br/>
+<br/>
+<br/>
 
-<img src="https://github.com/user-attachments/assets/e5589b03-5daa-45a0-97c0-9ad477adf3f0" width="500px">
+<div align="center">
+ <img src="https://github.com/user-attachments/assets/da5961a6-5726-49a1-82ce-afb6d520822e" width="700">
+</div>
 
-## 🏃‍♂️ 팀원 소개
+<br/>
+<br/>
+<br/>
 
-<markdown-accessiblity-table data-catalyst=""><table>
+<div align="center">
+  
+  [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fboostcampwm-2024%2Fweb24-GOMZ&count_bg=%23A5DD42&title_bg=%231E1E1E&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+  
+</div>
+
+<br/>
+<br/>
+
+<div align="center">
+ <p><b>혼자만의 공부</b>가 지루하고 <b>동기부여</b>가 힘들 때!</p>
+ <p>캠을 켜고 <b>언제, 어디서나</b> 함께</p>
+ <p>공부한 <b>시간</b>을 기록하고 공유하며</p>
+ <p>효율적이고 즐거운 공부를!</p>
+</div>
+
+<br/>
+
+<h1 align="center">🐻 GOMZ 🐻</h1>
+<br/>
+<p align="center">캠을 켜고 다른 사람들과 함께 공부하는 시간을 기록할 수 있는 온라인 학습 플랫폼 <b>GOMZ</b></p>
+<br/>
+
+<div align="center">
+  
+[팀 노션](https://www.notion.so/GOMZ-128fab6ff8a7807e9f85ee7da4ed2344) | [디자인](https://www.figma.com/design/WUBVqHUPPmhxxHw2aHtOfF/GOMZ) | [프로젝트](https://github.com/orgs/boostcampwm-2024/projects/3) | [위키](https://github.com/boostcampwm-2024/web24-GOMZ/wiki)
+
+</div>
+
+<br/>
+<br/>
+
+<h2 align="center">🐻 팀원 소개 🐻</h2>
+
+<markdown-accessiblity-table data-catalyst=""><table align="center">
 
   <tbody>
     <tr>
