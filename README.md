@@ -73,7 +73,6 @@
   </tr>
   <tr height="50px">
     <td align="center" width="130px">
-      J025 김근우 <br/>
       <a href="https://github.com/9eunwoo">J025 김근우</a>
     </td>
     <td align="center" width="130px">
