@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import 'dotenv/config';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
@@ -16,5 +17,8 @@ export default defineConfig({
       '@socket': resolve(dirname, 'src/socket'),
       '@components': resolve(dirname, 'src/components'),
     },
+  },
+  test: {
+    globals: true,
   },
 });
