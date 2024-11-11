@@ -10,9 +10,7 @@ import {
 import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({ cors: { origin: '*' } })
-export class SignalingServerGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // 방에 들어있는 사용자의 소켓 정보
   users = [];
 
@@ -39,9 +37,7 @@ export class SignalingServerGateway
     @MessageBody('offer') offer: RTCSessionDescriptionInit,
     @MessageBody('oldId') oldId: string,
   ) {
-    this.server
-      .to(oldId)
-      .emit('answerRequest', JSON.stringify({ newId: client.id, offer }));
+    this.server.to(oldId).emit('answerRequest', JSON.stringify({ newId: client.id, offer }));
   }
 
   // 3. 기존 참가자들은 신규 참가자에게 answer를 보낸다.
@@ -51,9 +47,7 @@ export class SignalingServerGateway
     @MessageBody('answer') answer: RTCSessionDescriptionInit,
     @MessageBody('newId') newId: string,
   ) {
-    this.server
-      .to(newId)
-      .emit('completeConnection', JSON.stringify({ oldId: client.id, answer }));
+    this.server.to(newId).emit('completeConnection', JSON.stringify({ oldId: client.id, answer }));
   }
 
   @SubscribeMessage('sendIceCandidate')
@@ -64,9 +58,6 @@ export class SignalingServerGateway
   ) {
     this.server
       .to(targetId)
-      .emit(
-        'setIceCandidate',
-        JSON.stringify({ senderId: client.id, iceCandidate: candidate }),
-      );
+      .emit('setIceCandidate', JSON.stringify({ senderId: client.id, iceCandidate: candidate }));
   }
 }
