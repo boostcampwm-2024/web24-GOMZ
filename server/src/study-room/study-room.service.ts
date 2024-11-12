@@ -1,27 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { MockStudyRoomRepository } from './mock.repository';
 
 @Injectable()
 export class StudyRoomsService {
-    private rooms: { [key: string]: string[] } = {};
+    constructor(private readonly roomRepository: MockStudyRoomRepository) { }
 
     addUserToRoom(room: string, clientId: string) {
-        if (!this.rooms[room]) {
-            this.rooms[room] = [];
-        }
-        this.rooms[room].push(clientId);
+        this.roomRepository.addUserToRoom(room, clientId);
     }
 
     removeUserFromRoom(room: string, clientId: string) {
-        this.rooms[room] = this.rooms[room]?.filter((id) => id !== clientId);
+        this.roomRepository.removeUserFromRoom(room, clientId);
     }
 
     getRoomUsers(room: string): string[] {
-        return this.rooms[room] || [];
+        return this.roomRepository.getRoomUsers(room);
     }
 
     leaveAllRooms(clientId: string) {
-        Object.keys(this.rooms).forEach((room) => {
-            this.rooms[room] = this.rooms[room]?.filter((id) => id !== clientId);
-        });
+        this.roomRepository.leaveAllRooms(clientId);
     }
 }
