@@ -1,10 +1,9 @@
 ---
-name: GOMZ_ISSUE_TEMPLATE
+name: 'GOMZ_ISSUE_TEMPLATE'
 about: task
-title: "<FE/BE> task 요약 10 ~ 15자 이내"
+title: '<FE/BE> task 요약 10 ~ 15자 이내'
 labels: ''
 assignees: ''
-
 ---
 
 ## story
