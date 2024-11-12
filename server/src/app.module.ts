@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { SignalingServerModule } from './signaling-server/signaling-server.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from '../winston.config';
+import { StudyRoomModule } from './study-room/study-room.module';
 
 @Module({
-  imports: [SignalingServerModule, WinstonModule.forRoot(winstonConfig)],
+  imports: [SignalingServerModule, WinstonModule.forRoot(winstonConfig), StudyRoomModule],
   controllers: [AppController],
   providers: [AppService],
 })
