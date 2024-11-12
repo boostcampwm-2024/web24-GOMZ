@@ -5,13 +5,14 @@ import { SignalingServerModule } from './signaling-server/signaling-server.modul
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from '../winston.config';
 import { StudyRoomModule } from './study-room/study-room.module';
+import { ChattingServerModule } from './chatting-server/chatting-server.module';
 
 @Module({
-  imports: [SignalingServerModule, WinstonModule.forRoot(winstonConfig), StudyRoomModule],
+  imports: [SignalingServerModule, WinstonModule.forRoot(winstonConfig), StudyRoomModule, ChattingServerModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
 
 /*
 # 프로젝트 생성
