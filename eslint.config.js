@@ -7,4 +7,7 @@ export default tseslint.config(
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    ...(await import('./client/eslint.config.js').then((m) => m.default)),
+  },
 );
