@@ -2,7 +2,7 @@
 name: GOMZ_HOT_FIX_TEMPLATE
 about: hotfix
 title: "<FE/BE/Common> 핫픽스 내용 요약 10 ~ 15자 이내"
-labels: ''
+labels: hotfix
 assignees: ''
 
 ---
@@ -14,7 +14,3 @@ assignees: ''
 ## 스크린샷(생략 가능)
 
 문제를 설명하는 데 도움이 될 만한 스크린샷을 추가해주세요.
-
-## 핫픽스 내용
-
-핫픽스한 내용에 대한 명확하고 간결한 설명을 적어주세요.
