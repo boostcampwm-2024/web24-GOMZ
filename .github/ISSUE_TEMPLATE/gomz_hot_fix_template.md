@@ -1,10 +1,9 @@
 ---
 name: GOMZ_HOT_FIX_TEMPLATE
 about: hotfix
-title: "<FE/BE/Common> 핫픽스 내용 요약 10 ~ 15자 이내"
+title: '<FE/BE/Common> 핫픽스 내용 요약 10 ~ 15자 이내'
 labels: hotfix
 assignees: ''
-
 ---
 
 ## 문제 상황
