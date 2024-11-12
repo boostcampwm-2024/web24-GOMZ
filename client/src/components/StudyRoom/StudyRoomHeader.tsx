@@ -2,6 +2,7 @@ import Header from '@components/common/Header';
 import Icon from '@components/common/Icon';
 
 interface StudyRoomHeaderProps {
+  className?: string;
   title: string;
   curParticipant: number;
   maxParticipant: number;
@@ -9,6 +10,7 @@ interface StudyRoomHeaderProps {
 }
 
 const StudyRoomHeader = ({
+  className,
   title,
   curParticipant,
   maxParticipant,
@@ -16,6 +18,7 @@ const StudyRoomHeader = ({
 }: StudyRoomHeaderProps) => {
   return (
     <Header
+      className={className}
       title={
         <div className="flex items-baseline gap-3">
           <h1 className="text-xl font-bold">{title}</h1>
