@@ -1,4 +1,5 @@
 import StudyRoomHeader from './StudyRoomHeader';
+import VideoGrid from './VideoGrid';
 import ControlBar from './ControlBar';
 
 const StudyRoom = () => {
@@ -11,6 +12,7 @@ const StudyRoom = () => {
         maxParticipant={10}
         timer="01 : 49 : 29"
       />
+      <VideoGrid />
       <ControlBar
         className="mb-10"
         toggleVideo={() => {}}
