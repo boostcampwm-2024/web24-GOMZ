@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SignalingServerModule } from './signaling-server/signaling-server.module';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from '../winston.config';
 
 @Module({
-  imports: [SignalingServerModule],
+  imports: [SignalingServerModule, WinstonModule.forRoot(winstonConfig)],
   controllers: [AppController],
   providers: [AppService],
 })
