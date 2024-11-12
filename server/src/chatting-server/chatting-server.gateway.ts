@@ -15,7 +15,9 @@ export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisc
   server: Server;
 
   // 각 방에 있는 사용자들의 소켓 정보
-  rooms: { [key: string]: string[] } = {};
+  rooms: { [key: string]: string[] } = {
+    '1': [],
+  };
 
   // 사용자가 접속했을 때
   handleConnection(client: Socket) {
@@ -35,9 +37,7 @@ export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisc
     @MessageBody('room') room: string,
   ) {
     client.join(room);
-    if (!this.rooms[room]) {
-      this.rooms[room] = [];
-    }
+
     this.rooms[room].push(client.id);
     console.log(`${client.id}님이 방 ${room}에 입장했습니다.`);
 
@@ -59,15 +59,28 @@ export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisc
     this.server.to(room).emit('userLeft', JSON.stringify({ userId: client.id }));
   }
 
-  // 특정 방에 메시지 전송
   @SubscribeMessage('sendMessage')
   handleSendMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody('room') room: string,
     @MessageBody('message') message: string,
   ) {
-    console.log(`방 ${room}에서 ${client.id}가 메시지를 보냄: ${message}`);
-    this.server.to(room).emit('receiveMessage', JSON.stringify({ userId: client.id, message }));
+    // 사용자가 속한 방 찾기
+    const userRoom = Object.keys(this.rooms).find((room) =>
+      this.rooms[room].includes(client.id)
+    );
+
+    if (!userRoom) {
+      console.log(`사용자 ${client.id}가 속한 방이 없습니다.`);
+      return;
+    }
+
+    console.log(`방 ${userRoom}에서 ${client.id}가 메시지를 보냄: ${message}`);
+
+    // 방에 있는 다른 사용자들에게만 메시지 전송 (자신 제외)
+    client.broadcast.to(userRoom).emit(
+      'receiveMessage',
+      JSON.stringify({ userId: client.id, message })
+    );
   }
 
   // 사용자가 모든 방에서 나가기
