@@ -39,4 +39,14 @@ export class MockStudyRoomRepository {
       room.users = room.users.filter((id) => id !== clientId);
     });
   }
+
+  getAllRooms(): { [key: string]: string[] } {
+    const allRooms: { [key: string]: string[] } = {};
+
+    this.rooms.forEach((room, roomId) => {
+      allRooms[roomId] = room.users;
+    });
+
+    return allRooms;
+  }
 }
