@@ -4,7 +4,8 @@ import { StudyRoom } from './study-room.entity';
 
 @Injectable()
 export class StudyRoomsService {
-  constructor(private readonly roomRepository: MockStudyRoomRepository) {}
+  constructor(private readonly roomRepository: MockStudyRoomRepository) {
+  }
 
   /**
    * 새로운 방을 생성합니다.
@@ -57,5 +58,12 @@ export class StudyRoomsService {
    */
   leaveAllRooms(clientId: string) {
     this.roomRepository.leaveAllRooms(clientId);
+  }
+
+  /**
+   * 존재하는 모든 방을 조회합니다.
+   */
+  getAllRoom(): Record<string, StudyRoom> {
+    return this.roomRepository.getAllRoom();
   }
 }

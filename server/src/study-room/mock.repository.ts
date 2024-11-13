@@ -39,4 +39,8 @@ export class MockStudyRoomRepository {
       room.users = room.users.filter((id) => id !== clientId);
     });
   }
+
+  getAllRoom(): Record<string, StudyRoom> {
+    return Object.fromEntries(this.rooms);
+  }
 }
