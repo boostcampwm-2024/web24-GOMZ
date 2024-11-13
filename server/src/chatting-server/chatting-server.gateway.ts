@@ -8,86 +8,75 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { StudyRoomsService } from '../study-room/study-room.service';
+import { Inject } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER)
+    private readonly logger: Logger,
+    private readonly studyRoomsService: StudyRoomsService,
+  ) {}
+
   @WebSocketServer()
   server: Server;
 
-  // 각 방에 있는 사용자들의 소켓 정보
-  rooms: { [key: string]: string[] } = {
-    '1': [],
-  };
-
-  // 사용자가 접속했을 때
+  // 신규 참가자가 접속을 요청한다.
+  // 현재는 signalling-server, chatting-server 연결 시 소켓을 분리하여 생각하고 있습니다.
   handleConnection(client: Socket) {
-    console.log(`${client.id} 접속!`);
+    this.logger.info(`${client.id} 접속!`);
   }
 
   // 사용자가 접속을 해제했을 때
   handleDisconnect(client: Socket) {
-    console.log(`${client.id} 접속 해제!`);
-    this.leaveAllRooms(client);
+    this.logger.info(`${client.id} 접속 해제!`);
+    this.studyRoomsService.leaveAllRooms(client.id);
   }
 
   // 특정 방에 참가 요청을 받음
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('room') room: string,
-  ) {
-    client.join(room);
+  handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody('room') roomId: string) {
+    const room = this.studyRoomsService.findRoom(roomId);
 
-    this.rooms[room].push(client.id);
-    console.log(`${client.id}님이 방 ${room}에 입장했습니다.`);
+    if (!room) {
+      // 방이 존재하지 않으면 생성
+      this.studyRoomsService.createRoom(roomId);
+    }
+
+    client.join(roomId);
+    this.studyRoomsService.addUserToRoom(roomId, client.id);
+    this.logger.info(`${client.id}님이 방 ${roomId}에 입장했습니다.`);
 
     // 방에 있는 다른 사용자들에게 알림
-    this.server.to(room).emit('userJoined', JSON.stringify({ userId: client.id }));
+    this.server.to(roomId).emit('userJoined', JSON.stringify({ userId: client.id }));
   }
 
   // 특정 방에서 퇴장 요청을 받음
   @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('room') room: string,
-  ) {
-    client.leave(room);
-    this.rooms[room] = this.rooms[room]?.filter((userId) => userId !== client.id);
-    console.log(`${client.id}님이 방 ${room}에서 나갔습니다.`);
+  handleLeaveRoom(@ConnectedSocket() client: Socket, @MessageBody('room') roomId: string) {
+    client.leave(roomId);
+    this.studyRoomsService.removeUserFromRoom(roomId, client.id);
+    this.logger.info(`${client.id}님이 방 ${roomId}에서 나갔습니다.`);
 
     // 방에 있는 다른 사용자들에게 알림
-    this.server.to(room).emit('userLeft', JSON.stringify({ userId: client.id }));
+    this.server.to(roomId).emit('userLeft', JSON.stringify({ userId: client.id }));
   }
 
+  // 메시지 전송
   @SubscribeMessage('sendMessage')
-  handleSendMessage(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('message') message: string,
-  ) {
-    // 사용자가 속한 방 찾기
-    const userRoom = Object.keys(this.rooms).find((room) =>
-      this.rooms[room].includes(client.id)
-    );
-
+  handleSendMessage(@ConnectedSocket() client: Socket, @MessageBody('message') message: string) {
+    const userRoom = this.studyRoomsService.findUserRoom(client.id);
     if (!userRoom) {
-      console.log(`사용자 ${client.id}가 속한 방이 없습니다.`);
+      this.logger.info(`사용자 ${client.id}가 속한 방이 없습니다.`);
       return;
     }
 
-    console.log(`방 ${userRoom}에서 ${client.id}가 메시지를 보냄: ${message}`);
-
-    // 방에 있는 다른 사용자들에게만 메시지 전송 (자신 제외)
-    client.broadcast.to(userRoom).emit(
-      'receiveMessage',
-      JSON.stringify({ userId: client.id, message })
-    );
-  }
-
-  // 사용자가 모든 방에서 나가기
-  private leaveAllRooms(client: Socket) {
-    Object.keys(this.rooms).forEach((room) => {
-      this.rooms[room] = this.rooms[room]?.filter((userId) => userId !== client.id);
-      this.server.to(room).emit('userLeft', JSON.stringify({ userId: client.id }));
+    client.broadcast.to(userRoom).emit('receiveMessage', {
+      userId: client.id,
+      message,
     });
   }
 }
