@@ -1,9 +1,9 @@
 export class StudyRoom {
-    roomId: string;
-    users: string[];
+  roomId: string;
+  users: string[];
 
-    constructor(roomId: string) {
-        this.roomId = roomId;
-        this.users = [];
-    }
+  constructor(roomId: string) {
+    this.roomId = roomId;
+    this.users = [];
+  }
 }
