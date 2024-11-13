@@ -134,4 +134,6 @@ export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, 
     // RemoteDescription 설정
     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
   });
+
+  return peerConnectionMap;
 };
