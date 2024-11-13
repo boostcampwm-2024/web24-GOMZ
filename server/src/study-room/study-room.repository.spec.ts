@@ -1,6 +1,6 @@
 import { MockStudyRoomRepository } from './mock.repository';
 
-describe('MockStudyRoomRepository', () => {
+describe('Study Room 레포지토리 테스트', () => {
   let repository: MockStudyRoomRepository;
 
   beforeEach(() => {
