@@ -56,7 +56,7 @@ describe('ChattingServerGateway 테스트', () => {
       broadcast: {
         to: jest.fn().mockReturnThis(),
         emit: jest.fn(),
-      } as any,
+      } as unknown as Socket['broadcast'],
       emit: jest.fn(),
     };
   });
