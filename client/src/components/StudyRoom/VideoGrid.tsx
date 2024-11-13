@@ -1,69 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
-import signalingClient from '@socket/signalingClient';
-
 const RATIO = 4 / 3;
 const MAX_HEIGHT = 600;
 const MAX_WIDTH = MAX_HEIGHT * RATIO;
 const GAP = 8;
 
-const VideoGrid = () => {
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteStreamMap = useRef<Map<string | undefined, MediaStream>>(new Map());
-  const localStream = useRef<MediaStream | null>(null);
-  const [grid, setGrid] = useState({ cols: 1, rows: 1 });
+interface Grid {
+  cols: number;
+  rows: number;
+}
 
-  const openUserMedia = async () => {
-    if (localVideoRef.current) {
-      localVideoRef.current.srcObject = localStream.current;
-    }
-  };
+interface VideoGridProps {
+  localVideoRef: React.RefObject<HTMLVideoElement>;
+  remoteStreamMap: React.MutableRefObject<Map<string | undefined, MediaStream>>;
+  grid: Grid;
+}
 
-  // const closeUserMedia = async () => {
-  //   if (localVideoRef.current) {
-  //     localVideoRef.current.srcObject = null;
-  //   }
-  // };
-
-  const calculateGrid = () => {
-    const totalVideos = remoteStreamMap.current.size + 1;
-    const cols = Math.ceil(Math.sqrt(totalVideos));
-    const rows = Math.ceil(totalVideos / cols);
-    setGrid({ cols, rows });
-  };
-
-  useEffect(() => {
-    const initStream = async () => {
-      localStream.current = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false,
-      });
-
-      openUserMedia();
-
-      const observableMap = new Map();
-      const set = observableMap.set.bind(observableMap);
-      const del = observableMap.delete.bind(observableMap);
-
-      observableMap.set = (key: string | undefined, value: MediaStream) => {
-        set(key, value);
-        calculateGrid();
-        return observableMap;
-      };
-
-      observableMap.delete = (key: string | undefined) => {
-        const result = del(key);
-        calculateGrid();
-        return result;
-      };
-
-      remoteStreamMap.current = observableMap;
-
-      signalingClient(localStream.current, remoteStreamMap.current);
-    };
-
-    initStream();
-  }, []);
-
+const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => {
   return (
     <section
       className="flex flex-wrap items-center justify-center"
@@ -74,7 +25,7 @@ const VideoGrid = () => {
       }}
     >
       <div
-        className={`border-gomz-black rounded-2xl border bg-white`}
+        className={`border-gomz-black rounded-2xl border bg-black`}
         style={{
           height: `${MAX_HEIGHT / grid.cols}px`,
           width: `${MAX_WIDTH / grid.cols}px`,
@@ -92,7 +43,7 @@ const VideoGrid = () => {
       {[...remoteStreamMap.current].map(([id, stream]) => (
         <div
           key={String(id)}
-          className={`border-gomz-black rounded-2xl border bg-white`}
+          className={`border-gomz-black rounded-2xl border bg-black`}
           style={{
             height: `${MAX_HEIGHT / grid.cols}px`,
             width: `${MAX_WIDTH / grid.cols}px`,
@@ -115,4 +66,5 @@ const VideoGrid = () => {
     </section>
   );
 };
+
 export default VideoGrid;
