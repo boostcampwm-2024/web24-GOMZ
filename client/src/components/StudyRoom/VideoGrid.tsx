@@ -4,13 +4,13 @@ import signalingClient from '@socket/signalingClient';
 const RATIO = 4 / 3;
 const MAX_HEIGHT = 600;
 const MAX_WIDTH = MAX_HEIGHT * RATIO;
+const GAP = 8;
 
 const VideoGrid = () => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteStreamMap = useRef<Map<string | undefined, MediaStream>>(new Map());
   const localStream = useRef<MediaStream | null>(null);
-  const [cols, setCols] = useState(1);
-  // const [, forceUpdate] = useState({});
+  const [grid, setGrid] = useState({ cols: 1, rows: 1 });
 
   const openUserMedia = async () => {
     if (localVideoRef.current) {
@@ -25,8 +25,10 @@ const VideoGrid = () => {
   // };
 
   const calculateGrid = () => {
-    const newCols = Math.ceil(Math.sqrt(remoteStreamMap.current.size + 1));
-    setCols(newCols);
+    const totalVideos = remoteStreamMap.current.size + 1;
+    const cols = Math.ceil(Math.sqrt(totalVideos));
+    const rows = Math.ceil(totalVideos / cols);
+    setGrid({ cols, rows });
   };
 
   useEffect(() => {
@@ -45,14 +47,12 @@ const VideoGrid = () => {
       observableMap.set = (key: string | undefined, value: MediaStream) => {
         set(key, value);
         calculateGrid();
-        // forceUpdate({});
         return observableMap;
       };
 
       observableMap.delete = (key: string | undefined) => {
         const result = del(key);
         calculateGrid();
-        // forceUpdate({});
         return result;
       };
 
@@ -65,25 +65,25 @@ const VideoGrid = () => {
   }, []);
 
   return (
-    // <section className="flex flex-wrap justify-center gap-1">
     <section
-      className={`grid`}
+      className="flex flex-wrap items-center justify-center"
       style={{
-        gridTemplateColumns: `repeat(${cols}, 1fr)`,
-        gridTemplateRows: `repeat(${cols}, 1fr)`,
+        height: `${(MAX_HEIGHT / grid.cols) * grid.rows + GAP * (grid.rows - 1)}px`,
+        width: `${MAX_WIDTH + GAP * (grid.cols - 1)}px`,
+        gap: `${GAP}px`,
       }}
     >
       <div
         className={`border-gomz-black rounded-2xl border bg-white`}
         style={{
-          height: `${MAX_HEIGHT / cols}px`,
-          width: `${MAX_WIDTH / cols}px`,
+          height: `${MAX_HEIGHT / grid.cols}px`,
+          width: `${MAX_WIDTH / grid.cols}px`,
         }}
       >
         <video
           className="rounded-2xl"
-          width={MAX_WIDTH / cols}
-          height={MAX_HEIGHT / cols}
+          width="100%"
+          height="100%"
           ref={localVideoRef}
           autoPlay
           playsInline
@@ -94,14 +94,14 @@ const VideoGrid = () => {
           key={String(id)}
           className={`border-gomz-black rounded-2xl border bg-white`}
           style={{
-            height: `${MAX_HEIGHT / cols}px`,
-            width: `${MAX_WIDTH / cols}px`,
+            height: `${MAX_HEIGHT / grid.cols}px`,
+            width: `${MAX_WIDTH / grid.cols}px`,
           }}
         >
           <video
             className="rounded-2xl"
-            width={MAX_WIDTH / cols}
-            height={MAX_HEIGHT / cols}
+            width="100%"
+            height="100%"
             ref={(element) => {
               if (element) {
                 element.srcObject = stream;
