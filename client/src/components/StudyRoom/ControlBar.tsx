@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import Icon from '@components/common/Icon';
 
 interface ControlBarProps {
   className?: string;
-  toggleVideo: () => void;
-  toggleMic: () => void;
+  toggleVideo: () => boolean;
+  toggleMic: () => boolean;
   toggleChat: () => void;
   exitRoom: () => void;
 }
@@ -15,19 +16,33 @@ const ControlBar = ({
   toggleChat,
   exitRoom,
 }: ControlBarProps) => {
+  const [isVideoOn, setIsVideoOn] = useState(false);
+  const [isMicOn, setIsMicOn] = useState(false);
+  // const [isChatOn, setIsChatOn] = useState(false);
+
   return (
     <div className={`flex gap-12 ${className}`}>
       <button
-        onClick={toggleVideo}
+        onClick={() => {
+          setIsVideoOn(toggleVideo());
+        }}
         className="bg-gomz-black flex h-10 w-10 items-center justify-center rounded-full"
       >
-        <Icon id="video" className="text-gomz-white h-5 w-5 fill-current"></Icon>
+        <Icon
+          id={isVideoOn ? 'video' : 'video-off'}
+          className="text-gomz-white h-5 w-5 fill-current"
+        ></Icon>
       </button>
       <button
-        onClick={toggleMic}
+        onClick={() => {
+          setIsMicOn(toggleMic());
+        }}
         className="bg-gomz-black flex h-10 w-10 items-center justify-center rounded-full"
       >
-        <Icon id="mic" className="text-gomz-white h-6 w-6 fill-current"></Icon>
+        <Icon
+          id={isMicOn ? 'mic' : 'mic-off'}
+          className="text-gomz-white h-6 w-6 fill-current"
+        ></Icon>
       </button>
       <button
         onClick={toggleChat}
