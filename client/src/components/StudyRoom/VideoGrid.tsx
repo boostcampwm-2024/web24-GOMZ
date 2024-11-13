@@ -38,6 +38,7 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => 
           ref={localVideoRef}
           autoPlay
           playsInline
+          muted
         />
       </div>
       {[...remoteStreamMap.current].map(([id, stream]) => (
@@ -60,6 +61,7 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => 
             }}
             autoPlay
             playsInline
+            muted={false}
           />
         </div>
       ))}

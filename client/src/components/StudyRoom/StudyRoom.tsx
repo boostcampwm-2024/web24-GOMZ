@@ -13,8 +13,12 @@ const StudyRoom = () => {
   const peerConnectionMap = useRef<Map<SocketId, RTCPeerConnection>>(new Map());
   const [grid, setGrid] = useState({ cols: 1, rows: 1 });
 
-  const toggleUserMedia = async () => {
+  const toggleVideo = () => {
     localStream.current?.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
+  };
+
+  const toggleMic = () => {
+    localStream.current?.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
   };
 
   const calculateGrid = () => {
@@ -28,14 +32,15 @@ const StudyRoom = () => {
     const initStream = async () => {
       localStream.current = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: false,
+        audio: true,
       });
 
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = localStream.current;
       }
 
-      toggleUserMedia();
+      toggleVideo();
+      toggleMic();
 
       const observableMap = new Map();
       const set = observableMap.set.bind(observableMap);
@@ -73,8 +78,8 @@ const StudyRoom = () => {
       <VideoGrid localVideoRef={localVideoRef} remoteStreamMap={remoteStreamMap} grid={grid} />
       <ControlBar
         className="mb-10"
-        toggleVideo={toggleUserMedia}
-        toggleMic={() => {}}
+        toggleVideo={toggleVideo}
+        toggleMic={toggleMic}
         toggleChat={() => {}}
         exitRoom={() => {}}
       />
