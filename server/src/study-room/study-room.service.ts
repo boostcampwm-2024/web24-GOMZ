@@ -58,4 +58,14 @@ export class StudyRoomsService {
   leaveAllRooms(clientId: string) {
     this.roomRepository.leaveAllRooms(clientId);
   }
+
+  /**
+   * 사용자가 속한 방 찾기
+   * @param clientId 클라이언트 ID
+   * @returns 사용자가 속한 방 ID 또는 undefined
+   */
+  findUserRoom(clientId: string): string | undefined {
+    const rooms = this.roomRepository.getAllRooms();
+    return Object.keys(rooms).find((roomId) => rooms[roomId].includes(clientId));
+  }
 }
