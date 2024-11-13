@@ -9,13 +9,11 @@ export class StudyRoomController {
   ) {
   }
 
-  /**
-   * @param roomId 방 ID
-   * @returns 생성된 방
-   */
   @Post('/create')
-  creatRoom(@Body('roomId') roomId: string) {
-    this.studyRoomService.createRoom(roomId);
+  creatRoom(
+    @Body('roomId') roomId: string,
+    @Body('clientId') clientId: string): StudyRoom {
+    return this.studyRoomService.createRoom(roomId, clientId);
   }
 
   @Get('/rooms')

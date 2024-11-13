@@ -5,8 +5,8 @@ import { StudyRoom } from './study-room.entity';
 export class MockStudyRoomRepository {
   private rooms: Map<string, StudyRoom> = new Map();
 
-  createRoom(roomId: string): StudyRoom {
-    const newRoom = new StudyRoom(roomId);
+  createRoom(roomId: string, clientId: string): StudyRoom {
+    const newRoom = new StudyRoom(roomId, clientId);
     this.rooms.set(roomId, newRoom);
     return newRoom;
   }
@@ -18,7 +18,7 @@ export class MockStudyRoomRepository {
   addUserToRoom(roomId: string, clientId: string) {
     const room = this.rooms.get(roomId);
     if (!room) {
-      this.createRoom(roomId);
+      this.createRoom(roomId, clientId);
     }
     this.rooms.get(roomId)?.users.push(clientId);
   }

@@ -10,10 +10,11 @@ export class StudyRoomsService {
   /**
    * 새로운 방을 생성합니다.
    * @param roomId 방 ID
+   * @param clientId 생성자 ID
    * @returns 생성된 방
    */
-  createRoom(roomId: string): StudyRoom {
-    return this.roomRepository.createRoom(roomId);
+  createRoom(roomId: string, clientId: string): StudyRoom {
+    return this.roomRepository.createRoom(roomId, clientId);
   }
 
   /**
