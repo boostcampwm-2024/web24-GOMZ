@@ -19,7 +19,7 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     @Inject(WINSTON_MODULE_PROVIDER)
     private readonly logger: Logger,
     private readonly studyRoomsService: StudyRoomsService,
-  ) { }
+  ) {}
 
   @WebSocketServer()
   server: Server;
@@ -67,6 +67,8 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     @MessageBody('iceCandidate') candidate: RTCIceCandidateInit,
   ) {
     this.logger.info(`user: ${client.id} sends ICE candidate to user: ${targetId}`);
-    this.server.to(targetId).emit('setIceCandidate', JSON.stringify({ senderId: client.id, iceCandidate: candidate }));
+    this.server
+      .to(targetId)
+      .emit('setIceCandidate', JSON.stringify({ senderId: client.id, iceCandidate: candidate }));
   }
 }

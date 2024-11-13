@@ -6,4 +6,4 @@ import { StudyRoomModule } from 'src/study-room/study-room.module';
   imports: [StudyRoomModule],
   providers: [SignalingServerGateway],
 })
-export class SignalingServerModule { }
+export class SignalingServerModule {}
