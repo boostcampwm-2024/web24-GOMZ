@@ -1,5 +1,6 @@
 import { StudyRoomsService } from './study-room.service';
 import { MockStudyRoomRepository } from './mock.repository';
+import { StudyRoom } from './study-room.entity';
 
 describe('StudyRoomsService', () => {
   let service: StudyRoomsService;
@@ -8,6 +9,19 @@ describe('StudyRoomsService', () => {
   beforeEach(() => {
     mockRepository = new MockStudyRoomRepository();
     service = new StudyRoomsService(mockRepository);
+  });
+
+  describe('사용자가 방을 생성했을 때', () => {
+    it('사용자가 방을 생성한다', () => {
+      service.createRoom('room1', 'user1');
+      service.createRoom('room2', 'user2');
+      const allRoom = service.getAllRoom();
+      const expectedResult = {
+        room1: new StudyRoom('room1', 'user1'),
+        room2: new StudyRoom('room2', 'user2'),
+      };
+      expect(allRoom).toEqual(expectedResult);
+    });
   });
 
   describe('사용자가 방에 접속했을 때', () => {
