@@ -15,10 +15,12 @@ const StudyRoom = () => {
 
   const toggleVideo = () => {
     localStream.current?.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
+    return localStream.current!.getVideoTracks().every((track) => track.enabled);
   };
 
   const toggleMic = () => {
     localStream.current?.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
+    return localStream.current!.getAudioTracks().every((track) => track.enabled);
   };
 
   const calculateGrid = () => {
