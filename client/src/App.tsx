@@ -1,9 +1,9 @@
-import StudyRoom from '@components/StudyRoom/StudyRoom';
+import Home from '@components/Home';
 
 function App() {
   return (
-    <div className="font-pretendard text-gomz-black bg-gomz-white flex h-screen w-screen justify-center">
-      <StudyRoom />
+    <div className="font-pretendard text-gomz-black flex min-h-screen w-screen justify-center">
+      <Home />
     </div>
   );
 }
