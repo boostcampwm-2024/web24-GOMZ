@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Header from '@components/common/Header';
 import Icon from '@components/common/Icon';
 import StopWatch from '@components/common/StopWatch';
+
 interface StudyRoomHeaderProps {
   className?: string;
   title: string;
