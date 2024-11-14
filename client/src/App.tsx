@@ -1,10 +1,10 @@
-import Demo from '@components/Demo';
+import StudyRoom from '@components/StudyRoom/StudyRoom';
 
 function App() {
   return (
-    <>
-      <Demo />
-    </>
+    <div className="font-pretendard text-gomz-black bg-gomz-white flex h-screen w-screen justify-center">
+      <StudyRoom />
+    </div>
   );
 }
 
