@@ -10,6 +10,19 @@ describe('StudyRoomsService', () => {
     service = new StudyRoomsService(mockRepository);
   });
 
+  describe('사용자가 방을 생성했을 때', () => {
+    it('사용자가 방을 생성한다', () => {
+      service.createRoom('room1', 'user1');
+      service.createRoom('room2', 'user2');
+      const allRoom = service.getAllRoom();
+      const expectedResult = {
+        room1: ['user1'],
+        room2: ['user2'],
+      };
+      expect(allRoom).toEqual(expectedResult);
+    });
+  });
+
   describe('사용자가 방에 접속했을 때', () => {
     it('사용자가 방에 추가된다', () => {
       service.addUserToRoom('room1', 'user1');
