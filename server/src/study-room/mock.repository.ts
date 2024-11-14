@@ -40,7 +40,13 @@ export class MockStudyRoomRepository {
     });
   }
 
-  getAllRoom(): Record<string, StudyRoom> {
-    return Object.fromEntries(this.rooms);
+  getAllRooms(): { [key: string]: string[] } {
+    const allRooms: { [key: string]: string[] } = {};
+
+    this.rooms.forEach((room, roomId) => {
+      allRooms[roomId] = room.users;
+    });
+
+    return allRooms;
   }
 }
