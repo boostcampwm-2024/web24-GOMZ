@@ -73,7 +73,11 @@ export class StudyRoomsService {
   /**
    * 존재하는 모든 방을 조회합니다.
    */
-  getAllRoom(): Record<string, string[]> {
-    return this.roomRepository.getAllRooms();
+  getAllRoom(): { roomId: string; users: string[] }[] {
+    const allRooms = this.roomRepository.getAllRooms();
+    return Object.keys(allRooms).map((roomId) => ({
+      roomId,
+      users: allRooms[roomId],
+    }));
   }
 }
