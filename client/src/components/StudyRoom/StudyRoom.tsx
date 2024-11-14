@@ -69,22 +69,24 @@ const StudyRoom = () => {
   }, []);
 
   return (
-    <div className="flex h-[56.25rem] w-[90rem] flex-col items-center justify-between">
-      <StudyRoomHeader
-        className="mt-1"
-        title="부스트 캠프 공부방"
-        curParticipant={remoteStreamMap.current.size + 1}
-        maxParticipant={16}
-        timer="01 : 49 : 29"
-      />
-      <VideoGrid localVideoRef={localVideoRef} remoteStreamMap={remoteStreamMap} grid={grid} />
-      <ControlBar
-        className="mb-10"
-        toggleVideo={toggleVideo}
-        toggleMic={toggleMic}
-        toggleChat={() => {}}
-        exitRoom={() => {}}
-      />
+    <div className="flex h-screen w-screen justify-center">
+      <div className="flex h-[56.25rem] w-[90rem] flex-col items-center justify-between">
+        <StudyRoomHeader
+          className="mt-1"
+          title="부스트 캠프 공부방"
+          curParticipant={remoteStreamMap.current.size + 1}
+          maxParticipant={16}
+          timer="01 : 49 : 29"
+        />
+        <VideoGrid localVideoRef={localVideoRef} remoteStreamMap={remoteStreamMap} grid={grid} />
+        <ControlBar
+          className="mb-10"
+          toggleVideo={toggleVideo}
+          toggleMic={toggleMic}
+          toggleChat={() => {}}
+          exitRoom={() => {}}
+        />
+      </div>
     </div>
   );
 };
