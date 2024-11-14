@@ -9,10 +9,11 @@ export class StudyRoomsService {
   /**
    * 새로운 방을 생성합니다.
    * @param roomId 방 ID
+   * @param clientId 생성자 ID
    * @returns 생성된 방
    */
-  createRoom(roomId: string): StudyRoom {
-    return this.roomRepository.createRoom(roomId);
+  createRoom(roomId: string, clientId: string): StudyRoom {
+    return this.roomRepository.createRoom(roomId, clientId);
   }
 
   /**
@@ -67,5 +68,12 @@ export class StudyRoomsService {
   findUserRoom(clientId: string): string | undefined {
     const rooms = this.roomRepository.getAllRooms();
     return Object.keys(rooms).find((roomId) => rooms[roomId].includes(clientId));
+  }
+
+  /**
+   * 존재하는 모든 방을 조회합니다.
+   */
+  getAllRoom(): { [key: string]: string[] } {
+    return this.roomRepository.getAllRooms();
   }
 }
