@@ -1,12 +1,12 @@
+import { useState } from 'react';
 import Header from '@components/common/Header';
 import Icon from '@components/common/Icon';
-
+import StopWatch from '@components/common/StopWatch';
 interface StudyRoomHeaderProps {
   className?: string;
   title: string;
   curParticipant: number;
   maxParticipant: number;
-  timer: string;
 }
 
 const StudyRoomHeader = ({
@@ -14,8 +14,9 @@ const StudyRoomHeader = ({
   title,
   curParticipant,
   maxParticipant,
-  timer,
 }: StudyRoomHeaderProps) => {
+  const [isStopWatchRunning, setIsStopWatchRunning] = useState(false);
+
   return (
     <Header
       className={className}
@@ -27,11 +28,15 @@ const StudyRoomHeader = ({
           </span>
         </div>
       }
-      timer={
+      stopWatch={
         <div className="flex translate-x-[1.125rem] gap-3 text-xl font-normal">
-          <div>{timer}</div>
-          <button>
-            <Icon id="pause" className="h-6 w-6"></Icon>
+          <StopWatch isRunning={isStopWatchRunning} />
+          <button
+            onClick={() => {
+              setIsStopWatchRunning(!isStopWatchRunning);
+            }}
+          >
+            <Icon id={isStopWatchRunning ? 'pause' : 'play'} className="h-6 w-6"></Icon>
           </button>
         </div>
       }

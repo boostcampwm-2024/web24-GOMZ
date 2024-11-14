@@ -76,7 +76,6 @@ const StudyRoom = () => {
           title="부스트 캠프 공부방"
           curParticipant={remoteStreamMap.current.size + 1}
           maxParticipant={16}
-          timer="01 : 49 : 29"
         />
         <VideoGrid localVideoRef={localVideoRef} remoteStreamMap={remoteStreamMap} grid={grid} />
         <ControlBar
