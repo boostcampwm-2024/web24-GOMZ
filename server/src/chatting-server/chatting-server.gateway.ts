@@ -1,11 +1,11 @@
 import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  MessageBody,
-  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { StudyRoomsService } from '../study-room/study-room.service';
@@ -43,7 +43,7 @@ export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisc
 
     if (!room) {
       // 방이 존재하지 않으면 생성
-      this.studyRoomsService.createRoom(roomId);
+      this.studyRoomsService.createRoom(roomId, client.id);
     }
 
     client.join(roomId);
