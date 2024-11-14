@@ -1,4 +1,13 @@
+import { useNavigate } from 'react-router-dom';
+
 const Home = () => {
+  const navigate = useNavigate();
+
+  const handleGuestLogin = () => {
+    localStorage.setItem('userId', 'Guest');
+    navigate('/studyroom');
+  };
+
   return (
     <div className="flex h-screen w-screen items-center justify-center">
       <div className="flex h-[32rem] w-[68.5rem] items-center justify-between">
@@ -11,7 +20,10 @@ const Home = () => {
             <button className="font- bg-gomz-black h-[5rem] w-[20rem] rounded-full text-3xl font-semibold text-white">
               로그인
             </button>
-            <button className="border-gomz-black h-[5rem] w-[20rem] rounded-full border bg-white text-3xl font-semibold">
+            <button
+              onClick={handleGuestLogin}
+              className="border-gomz-black h-[5rem] w-[20rem] rounded-full border bg-white text-3xl font-semibold"
+            >
               로그인없이 이용하기
             </button>
           </div>
