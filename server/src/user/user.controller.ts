@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('home')
-export class HomeController {
+@Controller('user')
+export class UserController {
   @Get('/random')
   getRandom() {}
 }

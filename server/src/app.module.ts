@@ -6,7 +6,7 @@ import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from '../winston.config';
 import { StudyRoomModule } from './study-room/study-room.module';
 import { ChattingServerModule } from './chatting-server/chatting-server.module';
-import { HomeModule } from './home/home.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { HomeModule } from './home/home.module';
     WinstonModule.forRoot(winstonConfig),
     StudyRoomModule,
     ChattingServerModule,
-    HomeModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
