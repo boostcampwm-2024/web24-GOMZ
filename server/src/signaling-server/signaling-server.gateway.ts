@@ -44,9 +44,12 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     @ConnectedSocket() client: Socket,
     @MessageBody('offer') offer: RTCSessionDescriptionInit,
     @MessageBody('oldId') oldId: string,
+    @MessageBody('newRandomId') newRandomId: string,
   ) {
-    this.logger.info(`new user: ${client.id} sends an offer to old user: ${oldId}`);
-    this.server.to(oldId).emit('answerRequest', JSON.stringify({ newId: client.id, offer }));
+    this.logger.info(`new user: ${client.id}(${newRandomId}) sends an offer to old user: ${oldId}`);
+    this.server
+      .to(oldId)
+      .emit('answerRequest', JSON.stringify({ newId: client.id, offer, newRandomId }));
   }
 
   // 3. 기존 참가자들은 신규 참가자에게 answer를 보낸다.
@@ -55,9 +58,14 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     @ConnectedSocket() client: Socket,
     @MessageBody('answer') answer: RTCSessionDescriptionInit,
     @MessageBody('newId') newId: string,
+    @MessageBody('oldRandomId') oldRandomId: string,
   ) {
-    this.logger.info(`old user: ${client.id} sends an answer to new user: ${newId}`);
-    this.server.to(newId).emit('completeConnection', JSON.stringify({ oldId: client.id, answer }));
+    this.logger.info(
+      `old user: ${client.id}(${oldRandomId}) sends an answer to new user: ${newId}`,
+    );
+    this.server
+      .to(newId)
+      .emit('completeConnection', JSON.stringify({ oldId: client.id, answer, oldRandomId }));
   }
 
   @SubscribeMessage('sendIceCandidate')
