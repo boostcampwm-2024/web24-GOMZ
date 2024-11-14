@@ -12,7 +12,7 @@ export class StudyRoomController {
   }
 
   @Get('/rooms')
-  getAllRooms(): Record<string, string[]> {
+  getAllRooms(): { roomId: string; users: string[] }[] {
     return this.studyRoomService.getAllRoom();
   }
 }
