@@ -67,9 +67,15 @@ describe('시그널링 서버 e2e 테스트', () => {
         newClient.connect();
       });
       oldClient.on('answerRequest', (data) => {
-        const { newId, offer }: { newId: string; offer: string } = JSON.parse(data);
+        const { newId, offer, newRandomId }: { newId: string; offer: string; newRandomId: string } =
+          JSON.parse(data);
         expect(offer).toBe('TestSDPOffer'); // 신규 참가자가 보낸 Offer여야함
-        oldClient.emit('sendAnswer', { newId, answer: 'TestSDPAnswer' });
+        expect(newRandomId).toBe('NewRandomId'); // 신규 참가자의 랜덤 ID여야함
+        oldClient.emit('sendAnswer', {
+          newId,
+          answer: 'TestSDPAnswer',
+          oldRandomId: 'OldRandomId',
+        });
         oldClient.emit('sendIceCandidate', { targetId: newId, iceCandidate: 'OldIceCandidate' });
       });
       oldClient.on('setIceCandidate', (data) => {
@@ -84,11 +90,20 @@ describe('시그널링 서버 e2e 테스트', () => {
       newClient.on('offerRequest', (data) => {
         const { users }: { users: string[] } = JSON.parse(data);
         expect(users.length).toBe(1); // 참가자 1명 있어야함
-        newClient.emit('sendOffer', { oldId: users[0], offer: 'TestSDPOffer' });
+        newClient.emit('sendOffer', {
+          oldId: users[0],
+          offer: 'TestSDPOffer',
+          newRandomId: 'NewRandomId',
+        });
       });
       newClient.on('completeConnection', (data) => {
-        const { oldId, answer }: { oldId: string; answer: string } = JSON.parse(data);
+        const {
+          oldId,
+          answer,
+          oldRandomId,
+        }: { oldId: string; answer: string; oldRandomId: string } = JSON.parse(data);
         expect(answer).toBe('TestSDPAnswer'); // 기존 참가자가 보낸 Answer여야함
+        expect(oldRandomId).toBe('OldRandomId'); // 기존 참가자의 랜덤 ID여야함
         newClient.emit('sendIceCandidate', { targetId: oldId, iceCandidate: 'NewIceCandidate' });
       });
       newClient.on('setIceCandidate', (data) => {
