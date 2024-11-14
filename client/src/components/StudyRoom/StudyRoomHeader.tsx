@@ -21,14 +21,14 @@ const StudyRoomHeader = ({
       className={className}
       title={
         <div className="flex items-baseline gap-3">
-          <h1 className="text-xl font-bold">{title}</h1>
-          <span className="text-gomz-gray-800 font-medium">
+          <h1 className="text-xl font-semibold">{title}</h1>
+          <span className="text-gomz-gray-800 font-normal">
             {curParticipant} / {maxParticipant}
           </span>
         </div>
       }
       timer={
-        <div className="flex translate-x-[1.125rem] gap-3 text-xl font-medium">
+        <div className="flex translate-x-[1.125rem] gap-3 text-xl font-normal">
           <div>{timer}</div>
           <button>
             <Icon id="pause" className="h-6 w-6"></Icon>
