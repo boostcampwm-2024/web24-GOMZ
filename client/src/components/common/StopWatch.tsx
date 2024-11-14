@@ -14,7 +14,6 @@ const StopWatch = ({ isRunning }: StopWatchProps) => {
 
     const step = () => {
       const diffTime = Date.now() - startTimeRef.current;
-      console.log(accumulatedTime);
       setElapsedSeconds(Math.floor(diffTime / 1000));
       animationFrameId = requestAnimationFrame(step);
     };
