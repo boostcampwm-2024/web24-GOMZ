@@ -76,4 +76,5 @@ export class StudyRoomsService {
   getAllRoom(): { [key: string]: string[] } {
     return this.roomRepository.getAllRooms();
   }
+
 }
