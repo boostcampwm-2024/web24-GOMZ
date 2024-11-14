@@ -40,8 +40,8 @@ export class MockStudyRoomRepository {
     });
   }
 
-  getAllRooms(): { [key: string]: string[] } {
-    const allRooms: { [key: string]: string[] } = {};
+  getAllRooms(): Record<string, string[]> {
+    const allRooms: Record<string, string[]> = {};
 
     this.rooms.forEach((room, roomId) => {
       allRooms[roomId] = room.users;

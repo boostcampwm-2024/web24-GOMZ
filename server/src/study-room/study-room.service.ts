@@ -73,7 +73,7 @@ export class StudyRoomsService {
   /**
    * 존재하는 모든 방을 조회합니다.
    */
-  getAllRoom(): { [key: string]: string[] } {
+  getAllRoom(): Record<string, string[]> {
     return this.roomRepository.getAllRooms();
   }
 }
