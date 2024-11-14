@@ -4,7 +4,9 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleGuestLogin = () => {
-    localStorage.setItem('userId', 'Guest');
+    if (!localStorage.getItem('userId')) {
+      localStorage.setItem('userId', 'Guest');
+    }
     navigate('/studyroom');
   };
 
