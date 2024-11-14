@@ -82,7 +82,7 @@ describe('ChattingServerGateway 테스트', () => {
 
       gateway.handleJoinRoom(mockSocket as Socket, 'room1');
 
-      expect(studyRoomsService.createRoom).toHaveBeenCalledWith('room1');
+      expect(studyRoomsService.createRoom).toHaveBeenCalledWith('room1', 'socket1');
       expect(studyRoomsService.addUserToRoom).toHaveBeenCalledWith('room1', 'socket1');
       expect(mockSocket.join).toHaveBeenCalledWith('room1');
       expect(logger.info).toHaveBeenCalledWith('socket1님이 방 room1에 입장했습니다.');
