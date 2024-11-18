@@ -1,8 +1,5 @@
 import { io } from 'socket.io-client';
 
-const SIGNALING_SERVER_URL = import.meta.env.VITE_SIGNALING_SERVER_URL;
-const SIGNALING_SERVER_PORT = import.meta.env.VITE_SIGNALING_SERVER_PORT;
-
 type SocketId = string | undefined;
 
 const configuration = {
@@ -16,11 +13,16 @@ const configuration = {
         'stun:stun4.l.google.com:19302',
       ],
     },
+    {
+      urls: import.meta.env.VITE_TURN_SERVER_URL,
+      username: import.meta.env.VITE_TURN_SERVER_USERNAME,
+      credential: import.meta.env.VITE_TURN_SERVER_CREDENTIAL,
+    },
   ],
 };
 
 export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, MediaStream>) => {
-  const socket = io(`${SIGNALING_SERVER_URL}:${SIGNALING_SERVER_PORT}`);
+  const socket = io(import.meta.env.VITE_SIGNALING_SERVER_URL);
   const peerConnectionMap = new Map<SocketId, RTCPeerConnection>();
 
   // ICE candidate 수신 및 추가
