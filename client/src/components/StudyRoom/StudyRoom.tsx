@@ -76,6 +76,8 @@ const StudyRoom = () => {
     };
 
     initStream();
+
+    return () => exitRoom();
   }, []);
 
   return (
