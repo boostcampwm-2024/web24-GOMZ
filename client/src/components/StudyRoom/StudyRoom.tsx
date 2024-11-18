@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import signalingClient from '@socket/signalingClient';
 import StudyRoomHeader from './StudyRoomHeader';
 import VideoGrid from './VideoGrid';
@@ -7,6 +8,7 @@ import ControlBar from './ControlBar';
 type SocketId = string | undefined;
 
 const StudyRoom = () => {
+  const navigate = useNavigate();
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteStreamMap = useRef<Map<SocketId, MediaStream>>(new Map());
   const localStream = useRef<MediaStream | null>(null);
@@ -21,6 +23,14 @@ const StudyRoom = () => {
   const toggleMic = () => {
     localStream.current?.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
     return localStream.current!.getAudioTracks().every((track) => track.enabled);
+  };
+
+  const exitRoom = () => {
+    peerConnectionMap.current.forEach((connection) => {
+      connection.close();
+    });
+    localStream.current?.getTracks().forEach((track) => track.stop());
+    navigate('/');
   };
 
   const calculateGrid = () => {
@@ -83,7 +93,7 @@ const StudyRoom = () => {
           toggleVideo={toggleVideo}
           toggleMic={toggleMic}
           toggleChat={() => {}}
-          exitRoom={() => {}}
+          exitRoom={exitRoom}
         />
       </div>
     </div>
