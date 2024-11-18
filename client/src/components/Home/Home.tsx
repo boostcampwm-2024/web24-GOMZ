@@ -1,11 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = import.meta.env.DEV ? 'api' : '';
+
 const Home = () => {
   const navigate = useNavigate();
 
-  const handleGuestLogin = () => {
-    if (!localStorage.getItem('userId')) {
-      localStorage.setItem('userId', 'Guest');
+  const handleGuestLogin = async () => {
+    if (!localStorage.getItem('nickName')) {
+      const res = await fetch(`${API_BASE_URL}/user/random-name`);
+      const { nickName } = await res.json();
+      localStorage.setItem('nickName', nickName);
     }
     navigate('/studyroom');
   };
