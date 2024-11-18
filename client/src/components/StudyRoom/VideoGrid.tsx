@@ -25,7 +25,7 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => 
       }}
     >
       <div
-        className={`border-gomz-black rounded-2xl border bg-black`}
+        className="relative rounded-2xl border border-black bg-black"
         style={{
           height: `${MAX_HEIGHT / grid.cols}px`,
           width: `${MAX_WIDTH / grid.cols}px`,
@@ -38,11 +38,37 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => 
           playsInline
           muted
         />
+        <div
+          className="bg-gomz-black absolute left-0 top-full flex w-full items-center justify-between rounded-b-2xl text-white opacity-85"
+          style={{
+            height: `${Math.max(5 / Math.sqrt(grid.cols), 2)}rem`,
+            transform: `translateY(-${Math.max(5 / Math.sqrt(grid.cols), 2)}rem)`,
+            padding: `0 ${Math.max(3 / Math.sqrt(grid.cols), 1)}rem`,
+          }}
+        >
+          <div
+            className="truncate font-normal"
+            style={{
+              fontSize: `${Math.max(1.75 / Math.sqrt(grid.cols), 0.625)}rem`,
+              maxWidth: `${MAX_WIDTH / grid.cols / 2.5}px`,
+            }}
+          >
+            {localStorage.getItem('nickName')}
+          </div>
+          <div
+            className="truncate font-normal tabular-nums"
+            style={{
+              fontSize: `${Math.max(1.75 / Math.sqrt(grid.cols), 0.625)}rem`,
+            }}
+          >
+            01 : 23 : 45
+          </div>
+        </div>
       </div>
       {[...remoteStreamMap.current].map(([id, stream]) => (
         <div
           key={String(id)}
-          className={`border-gomz-black rounded-2xl border bg-black`}
+          className="relative rounded-2xl border border-black bg-black"
           style={{
             height: `${MAX_HEIGHT / grid.cols}px`,
             width: `${MAX_WIDTH / grid.cols}px`,
@@ -61,6 +87,32 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => 
             playsInline
             muted={false}
           />
+          <div
+            className="bg-gomz-black absolute left-0 top-full flex w-full items-center justify-between rounded-b-2xl text-white opacity-85"
+            style={{
+              height: `${Math.max(5 / Math.sqrt(grid.cols), 2)}rem`,
+              transform: `translateY(-${Math.max(5 / Math.sqrt(grid.cols), 2)}rem)`,
+              padding: `0 ${Math.max(3 / Math.sqrt(grid.cols), 1)}rem`,
+            }}
+          >
+            <div
+              className="truncate font-normal"
+              style={{
+                fontSize: `${Math.max(1.75 / Math.sqrt(grid.cols), 0.625)}rem`,
+                maxWidth: `${MAX_WIDTH / grid.cols / 2.5}px`,
+              }}
+            >
+              요정 해파리 요정 해파리 요정 해파리
+            </div>
+            <div
+              className="truncate font-normal tabular-nums"
+              style={{
+                fontSize: `${Math.max(1.75 / Math.sqrt(grid.cols), 0.625)}rem`,
+              }}
+            >
+              01 : 23 : 45
+            </div>
+          </div>
         </div>
       ))}
     </section>
