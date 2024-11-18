@@ -32,9 +32,7 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => 
         }}
       >
         <video
-          className="rounded-2xl"
-          width="100%"
-          height="100%"
+          className="h-full w-full rounded-2xl"
           ref={localVideoRef}
           autoPlay
           playsInline
