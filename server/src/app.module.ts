@@ -7,9 +7,28 @@ import { winstonConfig } from '../winston.config';
 import { StudyRoomModule } from './study-room/study-room.module';
 import { ChattingServerModule } from './chatting-server/chatting-server.module';
 import { UserModule } from './user/user.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }), // TypeORM 설정
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get('DATABASE_LOCAL_HOST'),
+        port: parseInt(configService.get('DATABASE_LOCAL_PORT'), 10),
+        username: configService.get('DATABASE_LOCAL_USER'),
+        password: configService.get('DATABASE_LOCAL_PASSWORD'),
+        database: configService.get('DATABASE_LOCAL_NAME'),
+        entities: [__dirname + '/**/*.entity.{js,ts}'],
+        synchronize: true, // 배포 시 false로 변경
+      }),
+      inject: [ConfigService],
+    }),
     SignalingServerModule,
     WinstonModule.forRoot(winstonConfig),
     StudyRoomModule,
@@ -20,12 +39,3 @@ import { UserModule } from './user/user.module';
   providers: [AppService],
 })
 export class AppModule {}
-
-/*
-# 프로젝트 생성
-$ nest new chat-project
-# events 모듈 생성
-$ nest g mo events
-# events 게이트웨이 생성
-$ nest g ga signaling-server
-*/
