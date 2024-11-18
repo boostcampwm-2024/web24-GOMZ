@@ -11,10 +11,11 @@ interface Grid {
 interface VideoGridProps {
   localVideoRef: React.RefObject<HTMLVideoElement>;
   remoteStreamMap: React.MutableRefObject<Map<string | undefined, MediaStream>>;
+  nickNameMap: React.MutableRefObject<Map<string | undefined, string>>;
   grid: Grid;
 }
 
-const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => {
+const VideoGrid = ({ localVideoRef, remoteStreamMap, grid, nickNameMap }: VideoGridProps) => {
   return (
     <section
       className="flex flex-wrap items-center justify-center"
@@ -102,7 +103,7 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid }: VideoGridProps) => 
                 maxWidth: `${MAX_WIDTH / grid.cols / 2.5}px`,
               }}
             >
-              요정 해파리 요정 해파리 요정 해파리
+              {nickNameMap.current.get(id)}
             </div>
             <div
               className="truncate font-normal tabular-nums"
