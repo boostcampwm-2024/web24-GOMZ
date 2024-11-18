@@ -21,7 +21,11 @@ const configuration = {
   ],
 };
 
-export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, MediaStream>) => {
+export default (
+  localStream: MediaStream | null,
+  remoteStreamMap: Map<SocketId, MediaStream>,
+  nickNameMap: Map<SocketId, string>,
+) => {
   const socket = io(import.meta.env.VITE_SIGNALING_SERVER_URL);
   const peerConnectionMap = new Map<SocketId, RTCPeerConnection>();
 
@@ -47,7 +51,7 @@ export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, 
       // offer 생성
       const offer = await peerConnection.createOffer();
 
-      socket.emit('sendOffer', { oldId, offer });
+      socket.emit('sendOffer', { oldId, offer, newRandomId: localStorage.getItem('nickName') });
 
       // LocalDescription 설정
       await peerConnection.setLocalDescription(offer);
@@ -74,7 +78,9 @@ export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, 
   });
 
   socket.on('answerRequest', async (data) => {
-    const { newId, offer } = JSON.parse(data);
+    const { newId, offer, newRandomId } = JSON.parse(data);
+
+    nickNameMap.set(newId, newRandomId);
 
     // RTCPeerConnection 생성
     const peerConnection = new RTCPeerConnection(configuration);
@@ -97,7 +103,7 @@ export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, 
     // Answer 생성
     const answer = await peerConnection.createAnswer();
 
-    socket.emit('sendAnswer', { newId, answer });
+    socket.emit('sendAnswer', { newId, answer, oldRandomId: localStorage.getItem('nickName') });
 
     // LocalDescription 설정
     await peerConnection.setLocalDescription(answer);
@@ -123,7 +129,9 @@ export default (localStream: MediaStream | null, remoteStreamMap: Map<SocketId, 
   });
 
   socket.on('completeConnection', async (data) => {
-    const { oldId, answer } = JSON.parse(data);
+    const { oldId, answer, oldRandomId } = JSON.parse(data);
+
+    nickNameMap.set(oldId, oldRandomId);
 
     // RTCPeerConnection 완료
     const peerConnection = peerConnectionMap.get(oldId)!;

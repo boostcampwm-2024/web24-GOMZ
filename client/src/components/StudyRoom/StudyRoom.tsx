@@ -13,6 +13,7 @@ const StudyRoom = () => {
   const remoteStreamMap = useRef<Map<SocketId, MediaStream>>(new Map());
   const localStream = useRef<MediaStream | null>(null);
   const peerConnectionMap = useRef<Map<SocketId, RTCPeerConnection>>(new Map());
+  const nickNameMap = useRef<Map<SocketId, string>>(new Map());
   const [grid, setGrid] = useState({ cols: 1, rows: 1 });
 
   const toggleVideo = () => {
@@ -72,7 +73,11 @@ const StudyRoom = () => {
 
       remoteStreamMap.current = observableMap;
 
-      peerConnectionMap.current = signalingClient(localStream.current, remoteStreamMap.current);
+      peerConnectionMap.current = signalingClient(
+        localStream.current,
+        remoteStreamMap.current,
+        nickNameMap.current,
+      );
     };
 
     initStream();
@@ -89,7 +94,12 @@ const StudyRoom = () => {
           curParticipant={remoteStreamMap.current.size + 1}
           maxParticipant={16}
         />
-        <VideoGrid localVideoRef={localVideoRef} remoteStreamMap={remoteStreamMap} grid={grid} />
+        <VideoGrid
+          localVideoRef={localVideoRef}
+          remoteStreamMap={remoteStreamMap}
+          grid={grid}
+          nickNameMap={nickNameMap}
+        />
         <ControlBar
           className="mb-10"
           toggleVideo={toggleVideo}
