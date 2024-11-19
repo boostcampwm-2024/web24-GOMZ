@@ -8,17 +8,18 @@ export class StudyRoomController {
 
   // 지금은 로그인 기능 구현 전이라서 nickname도 같이 넘겨줘야 돼요.
   @Post('/create')
-  creatRoom(
+  async creatRoom(
     @Body('roomId') roomId: string,
     @Body('clientId') clientId: string,
     @Body('nickname') nickname: string,
-  ): StudyRoom {
-    return this.studyRoomService.createRoom(roomId, clientId, nickname);
+  ): Promise<StudyRoom> {
+    return await this.studyRoomService.createRoom(roomId, clientId, nickname);
   }
 
-  // 비동기 걸어야함
   @Get('/rooms')
-  getAllRooms(): { roomId: string; users: string[] }[] {
-    return this.studyRoomService.getAllRoom();
+  async getAllRooms(): Promise<
+    { roomId: string; users: { socketId: string; nickname: string }[] }[]
+  > {
+    return await this.studyRoomService.getAllRoom();
   }
 }
