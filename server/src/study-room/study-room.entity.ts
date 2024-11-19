@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert } from 'typeorm';
 
 @Entity('study_room')
 export class StudyRoom {
@@ -14,6 +14,8 @@ export class StudyRoom {
   @Column({ type: 'int', nullable: false })
   category_id: number;
 
-  @Column({ type: 'int', nullable: false })
-  creator_id: number;
+  @BeforeInsert()
+  setCreatedAt() {
+    this.created_at = new Date();
+  }
 }
