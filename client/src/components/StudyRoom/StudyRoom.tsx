@@ -4,6 +4,7 @@ import signalingClient from '@socket/signalingClient';
 import StudyRoomHeader from './StudyRoomHeader';
 import VideoGrid from './VideoGrid';
 import ControlBar from './ControlBar';
+import { io } from 'socket.io-client';
 
 type SocketId = string | undefined;
 
@@ -14,7 +15,9 @@ const StudyRoom = () => {
   const localStream = useRef<MediaStream | null>(null);
   const peerConnectionMap = useRef<Map<SocketId, RTCPeerConnection>>(new Map());
   const nickNameMap = useRef<Map<SocketId, string>>(new Map());
+  const stopWatchMap = useRef<Map<SocketId, RTCDataChannel>>(new Map());
   const [grid, setGrid] = useState({ cols: 1, rows: 1 });
+  const socket = useRef(io());
 
   const toggleVideo = () => {
     localStream.current?.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
@@ -30,7 +33,9 @@ const StudyRoom = () => {
     peerConnectionMap.current.forEach((connection) => {
       connection.close();
     });
+
     localStream.current?.getTracks().forEach((track) => track.stop());
+    socket.current.close();
     navigate('/');
   };
 
@@ -73,11 +78,15 @@ const StudyRoom = () => {
 
       remoteStreamMap.current = observableMap;
 
-      peerConnectionMap.current = signalingClient(
+      const { peerConnectionMap: temp, socket: temp2 } = signalingClient(
         localStream.current,
         remoteStreamMap.current,
         nickNameMap.current,
+        stopWatchMap.current,
       );
+
+      peerConnectionMap.current = temp;
+      socket.current = temp2;
     };
 
     initStream();
@@ -97,8 +106,8 @@ const StudyRoom = () => {
         <VideoGrid
           localVideoRef={localVideoRef}
           remoteStreamMap={remoteStreamMap}
-          grid={grid}
           nickNameMap={nickNameMap}
+          grid={grid}
         />
         <ControlBar
           className="mb-10"

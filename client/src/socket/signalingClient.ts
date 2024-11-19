@@ -25,6 +25,7 @@ export default (
   localStream: MediaStream | null,
   remoteStreamMap: Map<SocketId, MediaStream>,
   nickNameMap: Map<SocketId, string>,
+  stopWatchMap: Map<SocketId, RTCDataChannel>,
 ) => {
   const socket = io(import.meta.env.VITE_SIGNALING_SERVER_URL);
   const peerConnectionMap = new Map<SocketId, RTCPeerConnection>();
@@ -41,6 +42,30 @@ export default (
       // RTCPeerConnection 생성
       const peerConnection = new RTCPeerConnection(configuration);
       peerConnectionMap.set(oldId, peerConnection);
+
+      const dataChannel = peerConnection.createDataChannel('stopWatch');
+      let interval: NodeJS.Timeout;
+      dataChannel.onopen = () => {
+        console.log(`Data channel from ${oldId} is open`);
+        console.log(`Socket Id is ${socket.id}`);
+
+        // 채널이 열린 후에 메시지 전송 시작
+        interval = setInterval(() => {
+          console.log('interval');
+          dataChannel.send('22:56:00');
+        }, 1000);
+      };
+
+      dataChannel.onmessage = ({ data }) => {
+        console.log('Received:', data);
+      };
+
+      dataChannel.onclose = () => {
+        console.log('DataChannel closed');
+        clearInterval(interval);
+      };
+
+      stopWatchMap.set(oldId, dataChannel);
 
       // 미디어 스트림 트랙 전송
       if (!localStream) {
@@ -71,6 +96,7 @@ export default (
         ) {
           remoteStreamMap.delete(oldId);
           peerConnectionMap.delete(oldId);
+          stopWatchMap.delete(oldId);
           peerConnection.close();
         }
       };
@@ -85,6 +111,25 @@ export default (
     // RTCPeerConnection 생성
     const peerConnection = new RTCPeerConnection(configuration);
     peerConnectionMap.set(newId, peerConnection);
+
+    peerConnection.ondatachannel = ({ channel }) => {
+      // 채널 상태 핸들러 설정
+      channel.onopen = () => {
+        console.log(`Data channel from ${newId} is open`);
+        console.log(`Socket Id is ${socket.id}`);
+      };
+
+      channel.onmessage = (event) => {
+        console.log(`Message from ${newId}:`, event.data);
+      };
+
+      channel.onclose = () => {
+        console.log(`Data channel from ${newId} closed`);
+        stopWatchMap.delete(newId);
+      };
+
+      stopWatchMap.set(newId, channel);
+    };
 
     // 미디어 스트림 트랙 수신
     peerConnection.ontrack = (event) => {
@@ -123,6 +168,7 @@ export default (
       ) {
         remoteStreamMap.delete(newId);
         peerConnectionMap.delete(newId);
+        stopWatchMap.delete(newId);
         peerConnection.close();
       }
     };
@@ -145,5 +191,5 @@ export default (
     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
   });
 
-  return peerConnectionMap;
+  return { peerConnectionMap, socket };
 };
