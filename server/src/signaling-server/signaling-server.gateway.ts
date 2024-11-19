@@ -25,16 +25,23 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
   server: Server;
 
   // 1. 신규 참가자가 접속을 요청한다. 그리고 방에 있는 기존 참가자들 소켓 정보를 반환한다.
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
+    this.logger.info(`${client.id} 접속!!!`);
     const defaultRoom = '1';
-    this.studyRoomsService.addUserToRoom(defaultRoom, client.id);
-    const users = this.studyRoomsService.getRoomUsers(defaultRoom).filter((id) => id !== client.id);
-    this.logger.info(`${client.id} 접속!!! [${users}]`);
-    client.emit('offerRequest', JSON.stringify({ users }));
+
+    // 방에 사용자 추가
+    await this.studyRoomsService.addUserToRoom(defaultRoom, client.id, 'defaultNickname');
+
+    // 기존 사용자 정보 가져오기
+    const users = (await this.studyRoomsService.getRoomUsers(defaultRoom)).filter(
+      (id) => id.socketId !== client.id,
+    );
+
+    // 기존 사용자 목록 전송
+    client.emit('offerRequest', { users });
   }
 
-  handleDisconnect(client: Socket) {
-    const defaultRoom = '1';
+  async handleDisconnect(client: Socket) {
     this.logger.info(`${client.id} 접속해제!!!`);
     this.studyRoomsService.leaveAllRooms(client.id);
     const users = this.studyRoomsService.getRoomUsers(defaultRoom);
@@ -70,13 +77,15 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     this.logger.silly(
       `old user: ${client.id}(${oldRandomId}) sends an answer to new user: ${newId}`,
     );
-    this.server
-      .to(newId)
-      .emit('completeConnection', JSON.stringify({ oldId: client.id, answer, oldRandomId }));
+    this.server.to(newId).emit('completeConnection', {
+      oldId: client.id,
+      answer,
+      oldRandomId,
+    });
   }
 
   @SubscribeMessage('sendIceCandidate')
-  handleSendIcecandidate(
+  handleSendIceCandidate(
     @ConnectedSocket() client: Socket,
     @MessageBody('targetId') targetId: string,
     @MessageBody('iceCandidate') candidate: RTCIceCandidateInit,
