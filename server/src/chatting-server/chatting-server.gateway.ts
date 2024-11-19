@@ -24,19 +24,29 @@ export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisc
   @WebSocketServer()
   server: Server;
 
-  handleConnection() {}
+  async handleConnection(client: Socket) {
+    this.logger.info(`Client connected: ${client.id}`);
+  }
 
-  handleDisconnect() {}
+  async handleDisconnect(client: Socket) {
+    this.logger.info(`Client disconnected: ${client.id}`);
+    await this.studyRoomsService.leaveAllRooms(client.id);
+  }
 
   // 메시지 전송
   @SubscribeMessage('sendMessage')
-  handleSendMessage(@ConnectedSocket() client: Socket, @MessageBody('message') message: string) {
-    const userRoom = this.studyRoomsService.findUserRoom(client.id);
+  async handleSendMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('message') message: string,
+  ) {
+    const userRoom = await this.studyRoomsService.findUserRoom(client.id);
+
     if (!userRoom) {
       this.logger.info(`사용자 ${client.id}가 속한 방이 없습니다.`);
       return;
     }
 
+    this.logger.info(`Message from ${client.id} in room ${userRoom}: ${message}`);
     client.broadcast.to(userRoom).emit('receiveMessage', {
       userId: client.id,
       message,
