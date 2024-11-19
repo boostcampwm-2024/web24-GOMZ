@@ -37,19 +37,22 @@ export class StudyRoomsService {
   /**
    * 사용자를 방에 추가합니다.
    * @param roomId 방 ID
-   * @param clientId 클라이언트 ID
+   * @param socketId 소켓 ID
    */
-  addUserToRoom(roomId: string, clientId: string) {
-    this.roomRepository.addUserToRoom(roomId, clientId);
+  async addUserToRoom(roomId: string, socketId: string, nickname: string) {
+    this.isValidRoom(roomId);
+    this.participantRepository.addUserToRoom(parseInt(roomId, 10), socketId, nickname);
   }
 
   /**
    * 사용자를 방에서 제거합니다.
    * @param roomId 방 ID
-   * @param clientId 클라이언트 ID
+   * @param socketId 소켓 ID
    */
-  removeUserFromRoom(roomId: string, clientId: string) {
-    this.roomRepository.removeUserFromRoom(roomId, clientId);
+  removeUserFromRoom(roomId: string, socketId: string) {
+    this.isValidRoom(roomId);
+    this.isValidParticipant(socketId);
+    this.participantRepository.removeUserFromRoom(parseInt(roomId, 10), socketId);
   }
 
   /**
@@ -57,16 +60,17 @@ export class StudyRoomsService {
    * @param roomId 방 ID
    * @returns 방에 있는 사용자의 목록
    */
-  getRoomUsers(roomId: string): string[] {
-    return this.roomRepository.getRoomUsers(roomId);
+  async getRoomUsers(roomId: string): Promise<{ socketId: string; nickname: string }[]> {
+    const roomUsers = await this.participantRepository.getRoomUsers(parseInt(roomId, 10));
+    return roomUsers;
   }
 
   /**
    * 특정 사용자를 모든 방에서 제거합니다.
    * @param clientId 클라이언트 ID
    */
-  leaveAllRooms(clientId: string) {
-    this.roomRepository.leaveAllRooms(clientId);
+  leaveAllRooms(socketId: string) {
+    this.participantRepository.leaveAllRooms(socketId);
   }
 
   /**
@@ -75,7 +79,7 @@ export class StudyRoomsService {
    * @returns 사용자가 속한 방 ID 또는 undefined
    */
   findUserRoom(clientId: string): string | undefined {
-    const rooms = this.roomRepository.getAllRooms();
+    const rooms = this.participantRepository.getAllRooms();
     return Object.keys(rooms).find((roomId) => rooms[roomId].includes(clientId));
   }
 
@@ -83,10 +87,24 @@ export class StudyRoomsService {
    * 존재하는 모든 방을 조회합니다.
    */
   getAllRoom(): { roomId: string; users: string[] }[] {
-    const allRooms = this.roomRepository.getAllRooms();
+    const allRooms = this.participantRepository.getAllRooms();
     return Object.keys(allRooms).map((roomId) => ({
       roomId,
       users: allRooms[roomId],
     }));
+  }
+
+  isValidRoom(roomId: string) {
+    const room = this.roomRepository.findRoom(parseInt(roomId, 10));
+    if (!room) {
+      throw new Error('Room not found');
+    }
+  }
+
+  isValidParticipant(socketId: string) {
+    const room = this.participantRepository.findParticipant(socketId);
+    if (!room) {
+      throw new Error('participant not found');
+    }
   }
 }

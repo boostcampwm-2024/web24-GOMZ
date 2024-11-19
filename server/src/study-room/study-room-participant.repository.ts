@@ -12,12 +12,6 @@ export class StudyRoomParticipantRepository {
 
   // 방에 사용자 추가
   async addUserToRoom(roomId: number, socketId: string, nickname: string): Promise<void> {
-    // 이건 서비스 로직의 영역
-    // const room = await this.findRoom(roomId);
-    // if (!room) {
-    //   throw new Error('Room not found');
-    // }
-
     const participant = this.repository.create({
       socket_id: socketId,
       nickname: nickname,
@@ -25,6 +19,11 @@ export class StudyRoomParticipantRepository {
     });
 
     await this.repository.save(participant);
+  }
+
+  // 특정 사용자 조회
+  async findParticipant(socketId: string): Promise<StudyRoomParticipant | undefined> {
+    return await this.repository.findOne({ where: { socket_id: socketId } });
   }
 
   // 방에서 사용자 제거
@@ -57,10 +56,6 @@ export class StudyRoomParticipantRepository {
     const participants = await this.repository.find({
       where: { socket_id: socketId },
     });
-
-    if (participants.length === 0) {
-      throw new Error('Participant not found in any room');
-    }
 
     await this.repository.remove(participants);
   }
