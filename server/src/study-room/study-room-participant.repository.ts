@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StudyRoomParticipant } from './study-room-participant.entity';
@@ -23,7 +23,7 @@ export class StudyRoomParticipantRepository {
 
   // 특정 사용자 조회
   async findParticipant(socketId: string): Promise<StudyRoomParticipant | undefined> {
-    return await this.repository.findOne({ where: { socket_id: socketId } });
+    return this.repository.findOne({ where: { socket_id: socketId } });
   }
 
   // 방에서 사용자 제거
@@ -33,7 +33,7 @@ export class StudyRoomParticipantRepository {
     });
 
     if (!participant) {
-      throw new Error('Participant not found in the room');
+      throw new NotFoundException('Participant not found in the room');
     }
 
     await this.repository.remove(participant);
@@ -57,7 +57,9 @@ export class StudyRoomParticipantRepository {
       where: { socket_id: socketId },
     });
 
-    await this.repository.remove(participants);
+    if (participants.length > 0) {
+      await this.repository.remove(participants);
+    }
   }
 
   // 모든 방 정보 조회
@@ -65,7 +67,7 @@ export class StudyRoomParticipantRepository {
     const participants = await this.repository.find();
     const rooms: Record<string, { socketId: string; nickname: string }[]> = {};
 
-    participants.forEach((participant) => {
+    for (const participant of participants) {
       if (!rooms[participant.room_id]) {
         rooms[participant.room_id] = [];
       }
@@ -74,7 +76,7 @@ export class StudyRoomParticipantRepository {
         socketId: participant.socket_id,
         nickname: participant.nickname,
       });
-    });
+    }
 
     return rooms;
   }

@@ -11,18 +11,17 @@ export class StudyRoomRepository {
   ) {}
 
   // 방 생성
-  createRoom(roomName: string, categoryId: number): StudyRoom {
+  async createRoom(roomName: string, categoryId: number): Promise<StudyRoom> {
     const newRoom = this.repository.create({
       room_name: roomName,
       category_id: categoryId,
     });
-    this.repository.save(newRoom);
 
-    return newRoom;
+    return await this.repository.save(newRoom);
   }
 
   // 특정 방 조회
-  async findRoom(roomId: number): Promise<StudyRoom | undefined> {
-    return await this.repository.findOne({ where: { room_id: roomId } });
+  findRoom(roomId: number): Promise<StudyRoom | undefined> {
+    return this.repository.findOne({ where: { room_id: roomId } });
   }
 }
