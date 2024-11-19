@@ -11,12 +11,14 @@ export class StudyRoomRepository {
   ) {}
 
   // 방 생성
-  async createRoom(roomName: string, categoryId: number): Promise<StudyRoom> {
+  createRoom(roomName: string, categoryId: number): StudyRoom {
     const newRoom = this.repository.create({
       room_name: roomName,
       category_id: categoryId,
     });
-    return await this.repository.save(newRoom);
+    this.repository.save(newRoom);
+
+    return newRoom;
   }
 
   // 특정 방 조회
