@@ -1,43 +1,89 @@
-import { MockStudyRoomRepository } from './mock.repository';
+import { Test, TestingModule } from '@nestjs/testing';
+import { StudyRoomRepository } from './study-room.repository';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { StudyRoom } from './study-room.entity';
 
 describe('Study Room 레포지토리 테스트', () => {
-  let repository: MockStudyRoomRepository;
+  let studyRoomRepository: StudyRoomRepository;
+  let repository: Repository<StudyRoom>;
 
-  beforeEach(() => {
-    repository = new MockStudyRoomRepository();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        StudyRoomRepository, // 1. 대조군
+        {
+          // 2. 비교군
+          provide: getRepositoryToken(StudyRoom),
+          useClass: Repository,
+        },
+      ],
+    }).compile();
+
+    studyRoomRepository = module.get<StudyRoomRepository>(StudyRoomRepository);
+    repository = module.get<Repository<StudyRoom>>(getRepositoryToken(StudyRoom));
   });
 
-  describe('사용자가 특정 방에 연결되었을 때', () => {
-    it('사용자가 방에 추가된다', () => {
-      repository.addUserToRoom('room1', 'user1');
-      const users = repository.getRoomUsers('room1');
-      expect(users).toContain('user1');
+  describe('사용자가 방을 생성할 때', () => {
+    it('방이 성공적으로 생성된다.', async () => {
+      const roomName = 'Math Study Room';
+      const categoryId = 1;
+
+      const mockStudyRoom: StudyRoom = {
+        room_id: 1,
+        room_name: roomName,
+        category_id: categoryId,
+        created_at: new Date(),
+        setCreatedAt: function (): void {
+          throw new Error('Function not implemented.');
+        },
+      };
+
+      jest.spyOn(repository, 'create').mockReturnValue(mockStudyRoom);
+      jest.spyOn(repository, 'save').mockResolvedValue(mockStudyRoom);
+
+      const result = await studyRoomRepository.createRoom(roomName, categoryId);
+
+      expect(repository.create).toHaveBeenCalledWith({
+        room_name: roomName,
+        category_id: categoryId,
+      });
+      expect(repository.save).toHaveBeenCalledWith(mockStudyRoom);
+      expect(result).toEqual(mockStudyRoom);
     });
   });
 
-  describe('사용자가 방에서 나갔을 때', () => {
-    it('사용자가 방에서 제거된다', () => {
-      repository.addUserToRoom('room1', 'user1');
-      repository.removeUserFromRoom('room1', 'user1');
-      const users = repository.getRoomUsers('room1');
-      expect(users).not.toContain('user1');
-    });
-  });
+  describe('방 ID로 방을 찾을 때', () => {
+    it('방이 존재하면 방을 반환한다.', async () => {
+      const roomId = 1;
 
-  describe('존재하지 않는 방에 접근했을 때', () => {
-    it('빈 배열이 반환된다', () => {
-      const users = repository.getRoomUsers('nonExistentRoom');
-      expect(users).toEqual([]);
-    });
-  });
+      const mockStudyRoom: StudyRoom = {
+        room_id: roomId,
+        room_name: 'Math Study Room',
+        category_id: 1,
+        created_at: new Date(),
+        setCreatedAt: function (): void {
+          throw new Error('Function not implemented.');
+        },
+      };
 
-  describe('사용자가 모든 방에서 나갔을 때', () => {
-    it('모든 방에서 해당 사용자가 제거된다', () => {
-      repository.addUserToRoom('room1', 'user1');
-      repository.addUserToRoom('room2', 'user1');
-      repository.leaveAllRooms('user1');
-      expect(repository.getRoomUsers('room1')).not.toContain('user1');
-      expect(repository.getRoomUsers('room2')).not.toContain('user1');
+      jest.spyOn(repository, 'findOne').mockResolvedValue(mockStudyRoom);
+
+      const result = await studyRoomRepository.findRoom(roomId);
+
+      expect(repository.findOne).toHaveBeenCalledWith({ where: { room_id: roomId } });
+      expect(result).toEqual(mockStudyRoom);
+    });
+
+    it('방이 존재하지 않으면 undefined를 반환한다.', async () => {
+      const roomId = 999;
+
+      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+
+      const result = await studyRoomRepository.findRoom(roomId);
+
+      expect(repository.findOne).toHaveBeenCalledWith({ where: { room_id: roomId } });
+      expect(result).toBeUndefined();
     });
   });
 });
