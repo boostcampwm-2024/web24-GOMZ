@@ -24,16 +24,9 @@ export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisc
   @WebSocketServer()
   server: Server;
 
-  // 신규 참가자가 접속을 요청한다.
-  // 현재는 signalling-server, chatting-server 연결 시 소켓을 분리하여 생각하고 있습니다.
-  handleConnection(client: Socket) {
-    this.logger.info(`${client.id} 접속!`);
-  }
+  handleConnection() {}
 
-  // 사용자가 접속을 해제했을 때
-  handleDisconnect(client: Socket) {
-    this.logger.info(`${client.id} 접속 해제!`);
-  }
+  handleDisconnect() {}
 
   // 메시지 전송
   @SubscribeMessage('sendMessage')
