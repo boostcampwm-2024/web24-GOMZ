@@ -1,29 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
 import * as ioClient from 'socket.io-client';
 import { SignalingServerGateway } from '../src/signaling-server/signaling-server.gateway';
 import { StudyRoomsService } from '../src/study-room/study-room.service';
 import { MockStudyRoomRepository } from '../src/study-room/mock.repository';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-
-describe('AppController (e2e)', () => {
-  let app: INestApplication;
-
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-  });
-
-  it('/ (GET)', () => {
-    return request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
-  });
-});
 
 describe('시그널링 서버 e2e 테스트', () => {
   let app: INestApplication;
@@ -35,6 +16,7 @@ describe('시그널링 서버 e2e 테스트', () => {
       info: jest.fn(),
       error: jest.fn(),
       warn: jest.fn(),
+      silly: jest.fn(),
     };
 
     const moduleRef = await Test.createTestingModule({
@@ -81,10 +63,7 @@ describe('시그널링 서버 e2e 테스트', () => {
       oldClient.on('setIceCandidate', (data) => {
         const { iceCandidate }: { iceCandidate: string } = JSON.parse(data);
         expect(iceCandidate).toBe('NewIceCandidate'); // 신규 참가자가 보낸 icecandidate여야함
-
         oldClient.disconnect();
-        newClient.disconnect();
-        resolve();
       });
 
       newClient.on('offerRequest', (data) => {
@@ -109,6 +88,13 @@ describe('시그널링 서버 e2e 테스트', () => {
       newClient.on('setIceCandidate', (data) => {
         const { iceCandidate }: { iceCandidate: string } = JSON.parse(data);
         expect(iceCandidate).toBe('OldIceCandidate'); // 기존 참가자가 보낸 icecandidate여야함
+      });
+      newClient.on('userDisconnected', (data) => {
+        const { targetId }: { targetId: string } = JSON.parse(data);
+        expect(typeof targetId).toBe('string');
+        expect(targetId).not.toBe(newClient.id);
+        newClient.disconnect();
+        resolve();
       });
     }));
 });
