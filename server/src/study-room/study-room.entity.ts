@@ -15,5 +15,5 @@ export class StudyRoom {
   category_id: number;
 
   @Column({ type: 'int', nullable: false })
-  user_id: number;
+  creator_id: number;
 }
