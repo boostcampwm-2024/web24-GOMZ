@@ -13,7 +13,9 @@ export class StudyRoomsService {
    * @returns 생성된 방
    */
   createRoom(roomId: string, clientId: string): StudyRoom {
-    return this.roomRepository.createRoom(roomId, clientId);
+    const studyRoom = this.roomRepository.createRoom(roomId);
+    this.roomRepository.addUserToRoom(roomId, clientId);
+    return studyRoom;
   }
 
   /**

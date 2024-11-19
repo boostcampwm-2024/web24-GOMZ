@@ -2,8 +2,8 @@ export class StudyRoom {
   roomId: string;
   users: string[];
 
-  constructor(roomId: string, clientId: string) {
+  constructor(roomId: string) {
     this.roomId = roomId;
-    this.users = [clientId];
+    this.users = [];
   }
 }
