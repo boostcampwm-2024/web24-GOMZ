@@ -18,7 +18,7 @@ export class StudyRoomsService {
    */
   // TODO 생성된 방 entity를 그대로 주는 것보다 방 생성 성공 여부를 가르는 것은 어떤가요.
   // TODO 나중에는 카테고리 ID도 필요해요.
-  createRoom(roomId: string, clientId: string, nickname: string): StudyRoom {
+  async createRoom(roomId: string, clientId: string, nickname: string): Promise<StudyRoom> {
     const studyRoom = this.roomRepository.createRoom(roomId, 0);
     this.participantRepository.addUserToRoom(parseInt(roomId, 10), clientId, nickname);
     return studyRoom;
@@ -39,9 +39,9 @@ export class StudyRoomsService {
    * @param roomId 방 ID
    * @param socketId 소켓 ID
    */
-  async addUserToRoom(roomId: string, socketId: string, nickname: string) {
-    this.isValidRoom(roomId);
-    this.participantRepository.addUserToRoom(parseInt(roomId, 10), socketId, nickname);
+  async addUserToRoom(roomId: string, socketId: string, nickname: string): Promise<void> {
+    await this.isValidRoom(roomId);
+    await this.participantRepository.addUserToRoom(parseInt(roomId, 10), socketId, nickname);
   }
 
   /**
@@ -49,10 +49,10 @@ export class StudyRoomsService {
    * @param roomId 방 ID
    * @param socketId 소켓 ID
    */
-  removeUserFromRoom(roomId: string, socketId: string) {
-    this.isValidRoom(roomId);
-    this.isValidParticipant(socketId);
-    this.participantRepository.removeUserFromRoom(parseInt(roomId, 10), socketId);
+  async removeUserFromRoom(roomId: string, socketId: string): Promise<void> {
+    await this.isValidRoom(roomId);
+    await this.isValidParticipant(socketId);
+    await this.participantRepository.removeUserFromRoom(parseInt(roomId, 10), socketId);
   }
 
   /**
@@ -61,16 +61,15 @@ export class StudyRoomsService {
    * @returns 방에 있는 사용자의 목록
    */
   async getRoomUsers(roomId: string): Promise<{ socketId: string; nickname: string }[]> {
-    const roomUsers = await this.participantRepository.getRoomUsers(parseInt(roomId, 10));
-    return roomUsers;
+    return await this.participantRepository.getRoomUsers(parseInt(roomId, 10));
   }
 
   /**
    * 특정 사용자를 모든 방에서 제거합니다.
    * @param clientId 클라이언트 ID
    */
-  leaveAllRooms(socketId: string) {
-    this.participantRepository.leaveAllRooms(socketId);
+  async leaveAllRooms(socketId: string): Promise<void> {
+    await this.participantRepository.leaveAllRooms(socketId);
   }
 
   /**
@@ -78,32 +77,36 @@ export class StudyRoomsService {
    * @param clientId 클라이언트 ID
    * @returns 사용자가 속한 방 ID 또는 undefined
    */
-  findUserRoom(clientId: string): string | undefined {
-    const rooms = this.participantRepository.getAllRooms();
-    return Object.keys(rooms).find((roomId) => rooms[roomId].includes(clientId));
+  async findUserRoom(clientId: string): Promise<string | undefined> {
+    const rooms = await this.participantRepository.getAllRooms();
+    return Object.keys(rooms).find((roomId) =>
+      rooms[roomId].some((user) => user.socketId === clientId),
+    );
   }
 
   /**
    * 존재하는 모든 방을 조회합니다.
    */
-  getAllRoom(): { roomId: string; users: string[] }[] {
-    const allRooms = this.participantRepository.getAllRooms();
+  async getAllRoom(): Promise<
+    { roomId: string; users: { socketId: string; nickname: string }[] }[]
+  > {
+    const allRooms = await this.participantRepository.getAllRooms();
     return Object.keys(allRooms).map((roomId) => ({
       roomId,
       users: allRooms[roomId],
     }));
   }
 
-  isValidRoom(roomId: string) {
-    const room = this.roomRepository.findRoom(parseInt(roomId, 10));
+  private async isValidRoom(roomId: string): Promise<void> {
+    const room = await this.roomRepository.findRoom(parseInt(roomId, 10));
     if (!room) {
       throw new Error('Room not found');
     }
   }
 
-  isValidParticipant(socketId: string) {
-    const room = this.participantRepository.findParticipant(socketId);
-    if (!room) {
+  private async isValidParticipant(socketId: string): Promise<void> {
+    const participant = await this.participantRepository.findParticipant(socketId);
+    if (!participant) {
       throw new Error('participant not found');
     }
   }
