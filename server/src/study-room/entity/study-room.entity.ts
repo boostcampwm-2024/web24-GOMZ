@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert } from 'typeorm';
+import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('study_room')
 export class StudyRoom {
@@ -18,4 +18,7 @@ export class StudyRoom {
   setCreatedAt() {
     this.created_at = new Date();
   }
+
+  @Column({ type: 'varchar', length: 45 })
+  password: string;
 }
