@@ -30,7 +30,7 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     const defaultRoom = '1';
 
     // 방에 사용자 추가
-    await this.studyRoomsService.addUserToRoom(defaultRoom, client.id, 'defaultNickname');
+    await this.studyRoomsService.addUserToRoom(defaultRoom, client.id);
 
     // 기존 사용자 정보 가져오기
     const users = (await this.studyRoomsService.getRoomUsers(defaultRoom)).filter(
