@@ -26,6 +26,7 @@ const StudyRoom = () => {
           title="부스트 캠프 공부방"
           curParticipant={participantCount}
           maxParticipant={16}
+          webRTCMap={webRTCMap}
         />
         <VideoGrid localVideoRef={localVideoRef} webRTCMap={webRTCMap} grid={grid} />
         <ControlBar
