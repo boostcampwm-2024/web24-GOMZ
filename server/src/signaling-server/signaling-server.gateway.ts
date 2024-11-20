@@ -1,7 +1,6 @@
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
@@ -14,7 +13,7 @@ import { Logger } from 'winston';
 import { StudyRoomsService } from '../study-room/study-room.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
-export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class SignalingServerGateway implements OnGatewayDisconnect {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER)
     private readonly logger: Logger,
@@ -24,33 +23,26 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
   @WebSocketServer()
   server: Server;
 
-  // 1. 신규 참가자가 접속을 요청한다. 그리고 방에 있는 기존 참가자들 소켓 정보를 반환한다.
-  async handleConnection(client: Socket) {
-    this.logger.info(`${client.id} 접속!!!`);
-    const defaultRoom = '1';
-
-    // 방에 사용자 추가
-    await this.studyRoomsService.addUserToRoom(defaultRoom, client.id);
-
-    // 기존 사용자 정보 가져오기
-    const users = (await this.studyRoomsService.getRoomUsers(defaultRoom)).filter(
-      (id) => id.socketId !== client.id,
-    );
-
-    // 기존 사용자 목록 전송
-    client.emit('offerRequest', JSON.stringify({ users }));
-  }
-
+  // 5. 참가자가 공부방을 나갔을 때 방에 있는 참가자들에게 퇴장인원 소켓 정보를 전달한다
   async handleDisconnect(client: Socket) {
-    const defaultRoom = '1';
-    this.logger.info(`${client.id} 접속해제!!!`);
-    this.studyRoomsService.leaveAllRooms(client.id);
-    const users = await this.studyRoomsService.getRoomUsers(defaultRoom);
+    const roomId = await this.studyRoomsService.findUserRoom(client.id);
+    this.studyRoomsService.removeUserFromRoom(roomId, client.id);
+    const users = await this.studyRoomsService.getRoomUsers(roomId);
     for (const userId of users) {
       this.server
         .to(userId.socketId)
         .emit('userDisconnected', JSON.stringify({ targetId: client.id }));
     }
+    this.logger.info(`${client.id} 접속해제!!!`);
+  }
+
+  // 1. 신규 참가자가 공부방 입장을 요청한다. 그리고 방에 있는 기존 참가자들 소켓 정보를 반환한다.
+  @SubscribeMessage('joinRoom')
+  async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody('roomId') roomId: string) {
+    const users = await this.studyRoomsService.getRoomUsers(roomId);
+    await this.studyRoomsService.addUserToRoom(roomId, client.id);
+    client.emit('offerRequest', { users });
+    this.logger.info(`${client.id} 접속, [${users}]`);
   }
 
   // 2. 신규 참가자가 기존 참가자들에게 offer를 보낸다.
@@ -90,6 +82,7 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     );
   }
 
+  // 4. 참가자들간에 icecandidate를 주고 받는다.
   @SubscribeMessage('sendIceCandidate')
   handleSendIceCandidate(
     @ConnectedSocket() client: Socket,
