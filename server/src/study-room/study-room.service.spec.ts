@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudyRoomsService } from './study-room.service';
-import { StudyRoomRepository } from './study-room.repository';
-import { StudyRoomParticipantRepository } from './study-room-participant.repository';
-import { StudyRoom } from './study-room.entity';
-import { StudyRoomParticipant } from './study-room-participant.entity';
+import { StudyRoomRepository } from './repository/study-room.repository';
+import { StudyRoomParticipantRepository } from './repository/study-room-participant.repository';
+import { StudyRoom } from './entity/study-room.entity';
+import { StudyRoomParticipant } from './entity/study-room-participant.entity';
 
 describe('Study Room 서비스 테스트', () => {
   let service: StudyRoomsService;
