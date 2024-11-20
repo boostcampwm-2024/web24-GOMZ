@@ -12,7 +12,7 @@ export class StudyRoomsService {
 
   /**
    * 새로운 방을 생성합니다.
-   * @param roomId 방 ID
+   * @param roomName 방 ID
    * @param clientId 생성자 ID
    * @returns 생성된 방
    */
@@ -66,7 +66,7 @@ export class StudyRoomsService {
 
   /**
    * 특정 사용자를 모든 방에서 제거합니다.
-   * @param clientId 클라이언트 ID
+   * @param socketId 클라이언트 ID
    */
   async leaveAllRooms(socketId: string): Promise<void> {
     await this.participantRepository.leaveAllRooms(socketId);
