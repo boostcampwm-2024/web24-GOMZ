@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudyRoomController } from './study-room.controller';
 import { StudyRoomsService } from './study-room.service';
-import { StudyRoom } from './study-room.entity';
+import { StudyRoom } from './entity/study-room.entity';
 
 describe('Study Room 컨트롤러 테스트', () => {
   let controller: StudyRoomController;

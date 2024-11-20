@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { StudyRoomRepository } from './study-room.repository';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { StudyRoom } from './study-room.entity';
+import { StudyRoom } from '../entity/study-room.entity';
 
 describe('Study Room 레포지토리 테스트', () => {
   let studyRoomRepository: StudyRoomRepository;
