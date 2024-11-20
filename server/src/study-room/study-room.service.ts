@@ -123,7 +123,7 @@ export class StudyRoomsService {
     }
 
     // 비밀번호 체크
-    if (password !== studyRoom.password) {
+    if (studyRoom.password && password !== studyRoom.password) {
       throw new UnauthorizedException('Passwords do not match');
     }
 
