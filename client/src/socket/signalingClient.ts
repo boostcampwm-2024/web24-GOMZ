@@ -40,16 +40,18 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     }
   };
 
-  const handlePeerDisconnection = (peerConnection: RTCPeerConnection, targetId: string) => {
-    if (
+  const isDisconnected = (peerConnection: RTCPeerConnection) => {
+    return (
       peerConnection.connectionState === 'disconnected' ||
       peerConnection.connectionState === 'failed' ||
       peerConnection.connectionState === 'closed'
-    ) {
-      webRTCMap.delete(targetId);
-      pendingConnectionsMap.delete(targetId);
-      peerConnection.close();
-    }
+    );
+  };
+
+  const handlePeerDisconnection = (peerConnection: RTCPeerConnection, targetId: string) => {
+    webRTCMap.delete(targetId);
+    pendingConnectionsMap.delete(targetId);
+    peerConnection.close();
   };
 
   socket.on('offerRequest', async (data: string) => {
@@ -72,7 +74,9 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
       };
 
       peerConnection.onconnectionstatechange = () => {
-        handlePeerDisconnection(peerConnection, oldId);
+        if (isDisconnected(peerConnection)) {
+          handlePeerDisconnection(peerConnection, oldId);
+        }
       };
 
       socket.emit('sendOffer', { oldId, offer, newRandomId: localStorage.getItem('nickName') });
@@ -109,7 +113,9 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     };
 
     peerConnection.onconnectionstatechange = () => {
-      handlePeerDisconnection(peerConnection, newId);
+      if (isDisconnected(peerConnection)) {
+        handlePeerDisconnection(peerConnection, newId);
+      }
     };
 
     socket.emit('sendAnswer', { newId, answer, oldRandomId: localStorage.getItem('nickName') });
