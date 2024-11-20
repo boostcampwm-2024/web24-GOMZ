@@ -18,9 +18,9 @@ export class StudyRoomsService {
    */
   // TODO 생성된 방 entity를 그대로 주는 것보다 방 생성 성공 여부를 가르는 것은 어떤가요.
   // TODO 나중에는 카테고리 ID도 필요해요.
-  async createRoom(roomId: string, clientId: string): Promise<StudyRoom> {
-    const studyRoom = this.roomRepository.createRoom(roomId, 0);
-    this.participantRepository.addUserToRoom(parseInt(roomId, 10), clientId);
+  async createRoom(roomName: string, clientId: string): Promise<StudyRoom> {
+    const studyRoom = await this.roomRepository.createRoom(roomName, 0);
+    this.participantRepository.addUserToRoom(studyRoom.room_id, clientId);
     return studyRoom;
   }
 
@@ -39,9 +39,9 @@ export class StudyRoomsService {
    * @param roomId 방 ID
    * @param socketId 소켓 ID
    */
-  async addUserToRoom(roomId: string, socketId: string): Promise<void> {
+  async addUserToRoom(roomId: string, socketId: string, nickname: string): Promise<void> {
     await this.isValidRoom(roomId);
-    await this.participantRepository.addUserToRoom(parseInt(roomId, 10), socketId);
+    await this.participantRepository.addUserToRoom(parseInt(roomId, 10), socketId, nickname);
   }
 
   /**
@@ -60,7 +60,7 @@ export class StudyRoomsService {
    * @param roomId 방 ID
    * @returns 방에 있는 사용자의 목록
    */
-  async getRoomUsers(roomId: string): Promise<{ socketId: string }[]> {
+  async getRoomUsers(roomId: string): Promise<{ socketId: string; nickname: string }[]> {
     return await this.participantRepository.getRoomUsers(parseInt(roomId, 10));
   }
 
@@ -87,7 +87,9 @@ export class StudyRoomsService {
   /**
    * 존재하는 모든 방을 조회합니다.
    */
-  async getAllRoom(): Promise<{ roomId: string; users: { socketId: string }[] }[]> {
+  async getAllRoom(): Promise<
+    { roomId: string; users: { socketId: string; nickname: string }[] }[]
+  > {
     const allRooms = await this.participantRepository.getAllRooms();
     return Object.keys(allRooms).map((roomId) => ({
       roomId,
