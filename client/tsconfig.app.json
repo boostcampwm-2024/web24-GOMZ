@@ -5,6 +5,7 @@
       "@/*": ["src/*"],
       "@hooks/*": ["src/hooks/*"],
       "@socket/*": ["src/socket/*"],
+      "@constants/*": ["src/constants/*"],
       "@components/*": ["src/components/*"]
     },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
