@@ -11,10 +11,9 @@ export class StudyRoomParticipantRepository {
   ) {}
 
   // 방에 사용자 추가
-  async addUserToRoom(roomId: number, socketId: string, nickname: string): Promise<void> {
+  async addUserToRoom(roomId: number, socketId: string): Promise<void> {
     const participant = this.repository.create({
       socket_id: socketId,
-      nickname: nickname,
       room_id: roomId,
     });
 
@@ -40,14 +39,13 @@ export class StudyRoomParticipantRepository {
   }
 
   // 특정 방의 모든 사용자 조회
-  async getRoomUsers(roomId: number): Promise<{ socketId: string; nickname: string }[]> {
+  async getRoomUsers(roomId: number): Promise<{ socketId: string }[]> {
     const participants = await this.repository.find({
       where: { room_id: roomId },
     });
 
     return participants.map((participant) => ({
       socketId: participant.socket_id,
-      nickname: participant.nickname,
     }));
   }
 
@@ -63,9 +61,9 @@ export class StudyRoomParticipantRepository {
   }
 
   // 모든 방 정보 조회
-  async getAllRooms(): Promise<Record<string, { socketId: string; nickname: string }[]>> {
+  async getAllRooms(): Promise<Record<string, { socketId: string }[]>> {
     const participants = await this.repository.find();
-    const rooms: Record<string, { socketId: string; nickname: string }[]> = {};
+    const rooms: Record<string, { socketId: string }[]> = {};
 
     for (const participant of participants) {
       if (!rooms[participant.room_id]) {
@@ -74,7 +72,6 @@ export class StudyRoomParticipantRepository {
 
       rooms[participant.room_id].push({
         socketId: participant.socket_id,
-        nickname: participant.nickname,
       });
     }
 
