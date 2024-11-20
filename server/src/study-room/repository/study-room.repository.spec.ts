@@ -1,101 +1,93 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudyRoomRepository } from './study-room.repository';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { StudyRoom } from '../entity/study-room.entity';
+import { Repository } from 'typeorm';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.test' });
 
 describe('Study Room 레포지토리 테스트', () => {
   let studyRoomRepository: StudyRoomRepository;
-  let mockRepository: jest.Mocked<Repository<StudyRoom>>;
+  let repository: Repository<StudyRoom>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        StudyRoomRepository,
-        {
-          provide: getRepositoryToken(StudyRoom),
-          useValue: {
-            create: jest.fn(),
-            save: jest.fn(),
-            findOne: jest.fn(),
-          },
-        },
+      imports: [
+        // 테스트를 위한 MySQL 데이터베이스 사용
+        TypeOrmModule.forRoot({
+          type: 'mysql',
+          host: process.env.DATABASE_TEST_HOST,
+          port: Number(process.env.DATABASE_TEST_PORT),
+          username: process.env.DATABASE_TEST_USER,
+          password: process.env.DATABASE_TEST_PASSWORD,
+          database: process.env.DATABASE_TEST_NAME,
+          entities: [StudyRoom],
+          synchronize: true,
+        }),
+        TypeOrmModule.forFeature([StudyRoom]),
       ],
+      providers: [StudyRoomRepository],
     }).compile();
 
     studyRoomRepository = module.get<StudyRoomRepository>(StudyRoomRepository);
-    mockRepository = module.get<Repository<StudyRoom>>(
-      getRepositoryToken(StudyRoom),
-    ) as jest.Mocked<Repository<StudyRoom>>;
+    repository = module.get<Repository<StudyRoom>>(getRepositoryToken(StudyRoom));
+  });
+
+  afterAll(async () => {
+    await repository.query('DROP TABLE study_room;');
+    await repository.manager.connection.destroy();
   });
 
   describe('사용자가 방을 생성할 때', () => {
     it('방이 성공적으로 생성된다.', async () => {
-      const roomName = 'Math Study Room';
+      const roomName = '테스트 스터디 그룹입니다.';
       const categoryId = 1;
 
-      const mockStudyRoom: StudyRoom = {
-        room_id: 1,
-        room_name: roomName,
-        category_id: categoryId,
-        created_at: new Date(),
-        setCreatedAt: jest.fn(),
-        password: '',
-      };
-
-      // 모킹 동작 설정
-      mockRepository.create.mockReturnValue(mockStudyRoom);
-      mockRepository.save.mockResolvedValue(mockStudyRoom);
-
-      // 실행
+      // 방 생성
       const result = await studyRoomRepository.createRoom(roomName, categoryId);
 
       // 검증
-      expect(mockRepository.create).toHaveBeenCalledWith({
-        room_name: roomName,
-        category_id: categoryId,
-      });
-      expect(mockRepository.save).toHaveBeenCalledWith(mockStudyRoom);
-      expect(result).toEqual(mockStudyRoom);
+      expect(result).toBeDefined();
+      expect(result.room_id).toBeDefined();
+      expect(result.room_name).toEqual(roomName);
+      expect(result.category_id).toEqual(categoryId);
+      expect(result.created_at).toBeDefined();
+
+      // 데이터베이스에 방이 존재하는지 확인
+      const foundRoom = await repository.findOne({ where: { room_id: result.room_id } });
+      expect(foundRoom).toBeDefined();
+      expect(foundRoom.room_name).toEqual(roomName);
+      expect(foundRoom.category_id).toEqual(categoryId);
     });
   });
 
   describe('방 ID로 방을 찾을 때', () => {
     it('방이 존재하면 방을 반환한다.', async () => {
-      const roomId = 1;
+      const roomName = 'Math Study Room';
+      const categoryId = 1;
 
-      const mockStudyRoom: StudyRoom = {
-        room_id: roomId,
-        room_name: 'Math Study Room',
-        category_id: 1,
-        created_at: new Date(),
-        setCreatedAt: jest.fn(),
-        password: '',
-      };
-
-      // 모킹 동작 설정
-      mockRepository.findOne.mockResolvedValue(mockStudyRoom);
+      // 생성된 방 추가
+      const expectedRoom = await studyRoomRepository.createRoom(roomName, categoryId);
 
       // 실행
-      const result = await studyRoomRepository.findRoom(roomId);
+      const result = await studyRoomRepository.findRoom(expectedRoom.room_id);
 
       // 검증
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { room_id: roomId } });
-      expect(result).toEqual(mockStudyRoom);
+      expect(result).toBeDefined();
+      expect(result.room_id).toEqual(expectedRoom.room_id);
+      expect(result.room_name).toEqual(roomName);
+      expect(result.category_id).toEqual(categoryId);
     });
 
     it('방이 존재하지 않으면 undefined를 반환한다.', async () => {
       const roomId = 999;
 
-      // 모킹 동작 설정
-      mockRepository.findOne.mockResolvedValue(undefined);
-
       // 실행
       const result = await studyRoomRepository.findRoom(roomId);
 
       // 검증
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { room_id: roomId } });
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
   });
 });

@@ -21,7 +21,7 @@ export class StudyRoomRepository {
   }
 
   // 특정 방 조회
-  findRoom(roomId: number): Promise<StudyRoom | undefined> {
+  findRoom(roomId: number): Promise<StudyRoom | null> {
     return this.repository.findOne({ where: { room_id: roomId } });
   }
 }
