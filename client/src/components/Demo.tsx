@@ -1,15 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import signalingClient from '@/socket/signalingClient';
+import signalingClient from '@socket/signalingClient';
+
+interface WebRTCData {
+  peerConnection: RTCPeerConnection;
+  remoteStream: MediaStream;
+  dataChannel: RTCDataChannel;
+  nickName: string;
+}
 
 function Demo() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteStreamMap = useRef<Map<string | undefined, MediaStream>>(new Map());
-  const localStream = useRef<MediaStream | null>(null);
+  const webRTCMap = useRef(new Map<string, WebRTCData>());
+  const localStreamRef = useRef(new MediaStream());
   const [, forceUpdate] = useState({});
 
   const openUserMedia = async () => {
     if (localVideoRef.current) {
-      localVideoRef.current.srcObject = localStream.current;
+      localVideoRef.current.srcObject = localStreamRef.current;
     }
   };
 
@@ -21,7 +28,7 @@ function Demo() {
 
   useEffect(() => {
     const initStream = async () => {
-      localStream.current = await navigator.mediaDevices.getUserMedia({
+      localStreamRef.current = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false,
       });
@@ -44,9 +51,9 @@ function Demo() {
         return result;
       };
 
-      remoteStreamMap.current = observableMap;
+      webRTCMap.current = observableMap;
 
-      signalingClient(localStream.current, remoteStreamMap.current);
+      signalingClient(localStreamRef.current, webRTCMap.current);
     };
 
     initStream();
@@ -88,7 +95,7 @@ function Demo() {
             <video width={480} height={360} ref={localVideoRef} autoPlay playsInline />
           </div>
 
-          {[...remoteStreamMap.current].map(([id, stream]) => (
+          {[...webRTCMap.current].map(([id, { remoteStream }]) => (
             <div
               key={String(id)}
               style={{ border: '1px solid black', width: '480px', height: '360px' }}
@@ -96,7 +103,7 @@ function Demo() {
               <video
                 ref={(element) => {
                   if (element) {
-                    element.srcObject = stream;
+                    element.srcObject = remoteStream;
                   }
                 }}
                 autoPlay
