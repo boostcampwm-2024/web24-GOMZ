@@ -6,22 +6,27 @@ import { StudyRoom } from '../entity/study-room.entity';
 
 describe('Study Room 레포지토리 테스트', () => {
   let studyRoomRepository: StudyRoomRepository;
-  let repository: Repository<StudyRoom>;
+  let mockRepository: jest.Mocked<Repository<StudyRoom>>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        StudyRoomRepository, // 1. 대조군
+        StudyRoomRepository,
         {
-          // 2. 비교군
           provide: getRepositoryToken(StudyRoom),
-          useClass: Repository,
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            findOne: jest.fn(),
+          },
         },
       ],
     }).compile();
 
     studyRoomRepository = module.get<StudyRoomRepository>(StudyRoomRepository);
-    repository = module.get<Repository<StudyRoom>>(getRepositoryToken(StudyRoom));
+    mockRepository = module.get<Repository<StudyRoom>>(
+      getRepositoryToken(StudyRoom),
+    ) as jest.Mocked<Repository<StudyRoom>>;
   });
 
   describe('사용자가 방을 생성할 때', () => {
@@ -34,21 +39,23 @@ describe('Study Room 레포지토리 테스트', () => {
         room_name: roomName,
         category_id: categoryId,
         created_at: new Date(),
-        setCreatedAt: function (): void {
-          throw new Error('Function not implemented.');
-        },
+        setCreatedAt: jest.fn(),
+        password: '',
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(mockStudyRoom);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockStudyRoom);
+      // 모킹 동작 설정
+      mockRepository.create.mockReturnValue(mockStudyRoom);
+      mockRepository.save.mockResolvedValue(mockStudyRoom);
 
+      // 실행
       const result = await studyRoomRepository.createRoom(roomName, categoryId);
 
-      expect(repository.create).toHaveBeenCalledWith({
+      // 검증
+      expect(mockRepository.create).toHaveBeenCalledWith({
         room_name: roomName,
         category_id: categoryId,
       });
-      expect(repository.save).toHaveBeenCalledWith(mockStudyRoom);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockStudyRoom);
       expect(result).toEqual(mockStudyRoom);
     });
   });
@@ -62,27 +69,32 @@ describe('Study Room 레포지토리 테스트', () => {
         room_name: 'Math Study Room',
         category_id: 1,
         created_at: new Date(),
-        setCreatedAt: function (): void {
-          throw new Error('Function not implemented.');
-        },
+        setCreatedAt: jest.fn(),
+        password: '',
       };
 
-      jest.spyOn(repository, 'findOne').mockResolvedValue(mockStudyRoom);
+      // 모킹 동작 설정
+      mockRepository.findOne.mockResolvedValue(mockStudyRoom);
 
+      // 실행
       const result = await studyRoomRepository.findRoom(roomId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { room_id: roomId } });
+      // 검증
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { room_id: roomId } });
       expect(result).toEqual(mockStudyRoom);
     });
 
     it('방이 존재하지 않으면 undefined를 반환한다.', async () => {
       const roomId = 999;
 
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
+      // 모킹 동작 설정
+      mockRepository.findOne.mockResolvedValue(undefined);
 
+      // 실행
       const result = await studyRoomRepository.findRoom(roomId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { room_id: roomId } });
+      // 검증
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { room_id: roomId } });
       expect(result).toBeUndefined();
     });
   });
