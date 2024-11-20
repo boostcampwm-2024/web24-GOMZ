@@ -21,7 +21,7 @@ export class StudyRoomParticipantRepository {
   }
 
   // 특정 사용자 조회
-  async findParticipant(socketId: string): Promise<StudyRoomParticipant | undefined> {
+  async findParticipant(socketId: string): Promise<StudyRoomParticipant | null> {
     return this.repository.findOne({ where: { socket_id: socketId } });
   }
 

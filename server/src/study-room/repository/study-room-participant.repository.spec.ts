@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudyRoomParticipantRepository } from './study-room-participant.repository';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StudyRoomParticipant } from '../entity/study-room-participant.entity';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.test' });
 
 describe('Study Room Participant 레포지토리 테스트', () => {
   let studyRoomParticipantRepository: StudyRoomParticipantRepository;
@@ -10,13 +13,21 @@ describe('Study Room Participant 레포지토리 테스트', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        StudyRoomParticipantRepository,
-        {
-          provide: getRepositoryToken(StudyRoomParticipant),
-          useClass: Repository,
-        },
+      imports: [
+        // 테스트를 위한 MySQL 데이터베이스 설정
+        TypeOrmModule.forRoot({
+          type: 'mysql',
+          host: process.env.DATABASE_TEST_HOST,
+          port: Number(process.env.DATABASE_TEST_PORT),
+          username: process.env.DATABASE_TEST_USER,
+          password: process.env.DATABASE_TEST_PASSWORD,
+          database: process.env.DATABASE_TEST_NAME,
+          entities: [StudyRoomParticipant],
+          synchronize: true,
+        }),
+        TypeOrmModule.forFeature([StudyRoomParticipant]),
       ],
+      providers: [StudyRoomParticipantRepository],
     }).compile();
 
     studyRoomParticipantRepository = module.get<StudyRoomParticipantRepository>(
@@ -27,55 +38,48 @@ describe('Study Room Participant 레포지토리 테스트', () => {
     );
   });
 
+  afterEach(async () => {
+    await repository.query('DROP TABLE study_room_participant;');
+    await repository.manager.connection.destroy();
+  });
+
   describe('사용자가 방에 추가될 때', () => {
     it('사용자가 성공적으로 추가된다.', async () => {
       const roomId = 1;
       const socketId = '12345';
 
-      const mockParticipant: StudyRoomParticipant = {
-        socket_id: socketId,
-        room_id: roomId,
-      };
-
-      jest.spyOn(repository, 'create').mockReturnValue(mockParticipant);
-      jest.spyOn(repository, 'save').mockResolvedValue(mockParticipant);
-
       await studyRoomParticipantRepository.addUserToRoom(roomId, socketId);
 
-      expect(repository.create).toHaveBeenCalledWith({
-        socket_id: socketId,
-        room_id: roomId,
+      const savedParticipant = await repository.findOne({
+        where: { socket_id: socketId, room_id: roomId },
       });
-      expect(repository.save).toHaveBeenCalledWith(mockParticipant);
+
+      expect(savedParticipant).toBeDefined();
+      expect(savedParticipant?.socket_id).toEqual(socketId);
+      expect(savedParticipant?.room_id).toEqual(roomId);
     });
   });
 
   describe('특정 사용자를 조회할 때', () => {
     it('사용자가 존재하면 반환한다.', async () => {
+      const roomId = 1;
       const socketId = '12345';
 
-      const mockParticipant: StudyRoomParticipant = {
-        socket_id: socketId,
-        room_id: 1,
-      };
-
-      jest.spyOn(repository, 'findOne').mockResolvedValue(mockParticipant);
+      await studyRoomParticipantRepository.addUserToRoom(roomId, socketId);
 
       const result = await studyRoomParticipantRepository.findParticipant(socketId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { socket_id: socketId } });
-      expect(result).toEqual(mockParticipant);
+      expect(result).toBeDefined();
+      expect(result?.socket_id).toEqual(socketId);
+      expect(result?.room_id).toEqual(roomId);
     });
 
-    it('사용자가 존재하지 않으면 undefined를 반환한다.', async () => {
+    it('사용자가 존재하지 않으면 null을 반환한다.', async () => {
       const socketId = '99999';
-
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
 
       const result = await studyRoomParticipantRepository.findParticipant(socketId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { socket_id: socketId } });
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
   });
 
@@ -84,27 +88,20 @@ describe('Study Room Participant 레포지토리 테스트', () => {
       const roomId = 1;
       const socketId = '12345';
 
-      const mockParticipant: StudyRoomParticipant = {
-        socket_id: socketId,
-        room_id: roomId,
-      };
-
-      jest.spyOn(repository, 'findOne').mockResolvedValue(mockParticipant);
-      jest.spyOn(repository, 'remove').mockResolvedValue(mockParticipant);
+      await studyRoomParticipantRepository.addUserToRoom(roomId, socketId);
 
       await studyRoomParticipantRepository.removeUserFromRoom(roomId, socketId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({
+      const result = await repository.findOne({
         where: { socket_id: socketId, room_id: roomId },
       });
-      expect(repository.remove).toHaveBeenCalledWith(mockParticipant);
+
+      expect(result).toBeNull();
     });
 
     it('사용자가 존재하지 않으면 예외를 발생시킨다.', async () => {
       const roomId = 1;
       const socketId = '99999';
-
-      jest.spyOn(repository, 'findOne').mockResolvedValue(undefined);
 
       await expect(
         studyRoomParticipantRepository.removeUserFromRoom(roomId, socketId),
@@ -115,17 +112,20 @@ describe('Study Room Participant 레포지토리 테스트', () => {
   describe('특정 방의 모든 사용자를 조회할 때', () => {
     it('방의 모든 사용자 정보를 반환한다.', async () => {
       const roomId = 1;
-
-      const mockParticipants: StudyRoomParticipant[] = [
-        { socket_id: '12345', room_id: roomId },
-        { socket_id: '67890', room_id: roomId },
+      const participants = [
+        { socketId: '12345', roomId },
+        { socketId: '67890', roomId },
       ];
 
-      jest.spyOn(repository, 'find').mockResolvedValue(mockParticipants);
+      for (const participant of participants) {
+        await studyRoomParticipantRepository.addUserToRoom(
+          participant.roomId,
+          participant.socketId,
+        );
+      }
 
       const result = await studyRoomParticipantRepository.getRoomUsers(roomId);
 
-      expect(repository.find).toHaveBeenCalledWith({ where: { room_id: roomId } });
       expect(result).toEqual([{ socketId: '12345' }, { socketId: '67890' }]);
     });
   });
