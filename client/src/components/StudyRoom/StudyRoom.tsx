@@ -28,7 +28,12 @@ const StudyRoom = () => {
           maxParticipant={16}
           webRTCMap={webRTCMap}
         />
-        <VideoGrid localVideoRef={localVideoRef} webRTCMap={webRTCMap} grid={grid} />
+        <VideoGrid
+          localVideoRef={localVideoRef}
+          webRTCMap={webRTCMap}
+          participantCount={participantCount}
+          grid={grid}
+        />
         <ControlBar
           className="mb-10"
           toggleVideo={toggleVideo}

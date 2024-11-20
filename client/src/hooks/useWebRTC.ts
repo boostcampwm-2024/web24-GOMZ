@@ -28,12 +28,14 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef(new MediaStream());
   const [grid, setGrid] = useState({ cols: 1, rows: 1 });
+  const [participantCount, setParticipantCount] = useState(1);
 
   const calculateGrid = () => {
-    const totalVideos = webRTCMap.current.size + 1;
-    const cols = Math.ceil(Math.sqrt(totalVideos));
-    const rows = Math.ceil(totalVideos / cols);
+    const currentParticipantCount = webRTCMap.current.size + 1;
+    const cols = Math.ceil(Math.sqrt(currentParticipantCount));
+    const rows = Math.ceil(currentParticipantCount / cols);
     setGrid({ cols, rows });
+    setParticipantCount(currentParticipantCount);
   };
 
   const toggleVideo = () => {
@@ -96,7 +98,7 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     {
       localVideoRef,
       webRTCMap,
-      participantCount: webRTCMap.current.size + 1,
+      participantCount,
       grid,
     },
     {

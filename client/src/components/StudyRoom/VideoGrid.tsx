@@ -21,10 +21,11 @@ interface WebRTCData {
 interface VideoGridProps {
   localVideoRef: React.RefObject<HTMLVideoElement>;
   webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
+  participantCount: number;
   grid: Grid;
 }
 
-const VideoGrid = ({ localVideoRef, webRTCMap, grid }: VideoGridProps) => {
+const VideoGrid = ({ localVideoRef, webRTCMap, participantCount, grid }: VideoGridProps) => {
   const elapsedSecondsMap = useRef(new Map<string, number>());
   const [, forceUpdate] = useState(0);
 
@@ -43,7 +44,7 @@ const VideoGrid = ({ localVideoRef, webRTCMap, grid }: VideoGridProps) => {
         dataChannel.onmessage = () => {};
       });
     };
-  }, [grid.cols, grid.rows]);
+  }, [participantCount]);
 
   return (
     <section
