@@ -42,11 +42,14 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
   }
 
   async handleDisconnect(client: Socket) {
+    const defaultRoom = '1';
     this.logger.info(`${client.id} 접속해제!!!`);
     this.studyRoomsService.leaveAllRooms(client.id);
-    const users = this.studyRoomsService.getRoomUsers(defaultRoom);
+    const users = await this.studyRoomsService.getRoomUsers(defaultRoom);
     for (const userId of users) {
-      this.server.to(userId).emit('userDisconnected', JSON.stringify({ targetId: client.id }));
+      this.server
+        .to(userId.socketId)
+        .emit('userDisconnected', JSON.stringify({ targetId: client.id }));
     }
   }
 
