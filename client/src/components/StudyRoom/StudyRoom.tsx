@@ -15,7 +15,7 @@ const StudyRoom = () => {
 
   const handleExit = () => {
     exitRoom();
-    navigate('/');
+    navigate(-1);
   };
 
   return (
