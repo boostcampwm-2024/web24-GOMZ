@@ -29,7 +29,6 @@ describe('Study Room 컨트롤러 테스트', () => {
     it('새로운 방을 생성한다.', async () => {
       const roomId = '1';
       const clientId = 'socket123';
-      const nickname = 'Tester';
 
       const mockStudyRoom: StudyRoom = {
         room_id: 1,
@@ -41,9 +40,9 @@ describe('Study Room 컨트롤러 테스트', () => {
 
       jest.spyOn(service, 'createRoom').mockResolvedValue(mockStudyRoom);
 
-      const result = await controller.creatRoom(roomId, clientId, nickname);
+      const result = await controller.creatRoom(roomId, clientId);
 
-      expect(service.createRoom).toHaveBeenCalledWith(roomId, clientId, nickname);
+      expect(service.createRoom).toHaveBeenCalledWith(roomId, clientId);
       expect(result).toEqual(mockStudyRoom);
     });
   });
@@ -53,14 +52,11 @@ describe('Study Room 컨트롤러 테스트', () => {
       const mockRooms = [
         {
           roomId: '1',
-          users: [
-            { socketId: 'socket123', nickname: 'Tester1' },
-            { socketId: 'socket456', nickname: 'Tester2' },
-          ],
+          users: [{ socketId: 'socket123' }, { socketId: 'socket456' }],
         },
         {
           roomId: '2',
-          users: [{ socketId: 'socket789', nickname: 'Tester3' }],
+          users: [{ socketId: 'socket789' }],
         },
       ];
 

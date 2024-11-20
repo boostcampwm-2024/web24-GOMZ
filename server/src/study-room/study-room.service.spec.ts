@@ -46,7 +46,6 @@ describe('Study Room 서비스 테스트', () => {
     it('방을 생성하고 사용자도 추가한다.', async () => {
       const roomId = '1';
       const clientId = 'socket123';
-      const nickname = 'Tester';
 
       const mockStudyRoom: StudyRoom = {
         room_id: 1,
@@ -59,10 +58,10 @@ describe('Study Room 서비스 테스트', () => {
       jest.spyOn(roomRepository, 'createRoom').mockResolvedValue(mockStudyRoom);
       jest.spyOn(participantRepository, 'addUserToRoom').mockResolvedValue();
 
-      const result = await service.createRoom(roomId, clientId, nickname);
+      const result = await service.createRoom(roomId, clientId);
 
       expect(roomRepository.createRoom).toHaveBeenCalledWith(roomId, 0);
-      expect(participantRepository.addUserToRoom).toHaveBeenCalledWith(1, clientId, nickname);
+      expect(participantRepository.addUserToRoom).toHaveBeenCalledWith(1, clientId);
       expect(result).toEqual(mockStudyRoom);
     });
   });
@@ -103,15 +102,14 @@ describe('Study Room 서비스 테스트', () => {
     it('유효한 방에 사용자를 추가한다.', async () => {
       const roomId = '1';
       const socketId = 'socket123';
-      const nickname = 'Tester';
 
       jest.spyOn(roomRepository, 'findRoom').mockResolvedValue({} as StudyRoom);
       jest.spyOn(participantRepository, 'addUserToRoom').mockResolvedValue();
 
-      await service.addUserToRoom(roomId, socketId, nickname);
+      await service.addUserToRoom(roomId, socketId);
 
       expect(roomRepository.findRoom).toHaveBeenCalledWith(1);
-      expect(participantRepository.addUserToRoom).toHaveBeenCalledWith(1, socketId, nickname);
+      expect(participantRepository.addUserToRoom).toHaveBeenCalledWith(1, socketId);
     });
   });
 
@@ -123,7 +121,6 @@ describe('Study Room 서비스 테스트', () => {
       jest.spyOn(roomRepository, 'findRoom').mockResolvedValue({} as StudyRoom);
       jest.spyOn(participantRepository, 'findParticipant').mockResolvedValue({
         socket_id: '12345',
-        nickname: 'Tester',
         room_id: 1,
       } as StudyRoomParticipant);
       jest.spyOn(participantRepository, 'removeUserFromRoom').mockResolvedValue();
@@ -151,10 +148,7 @@ describe('Study Room 서비스 테스트', () => {
   describe('방의 모든 사용자 정보를 요청할 때', () => {
     it('방의 모든 사용자를 반환한다.', async () => {
       const roomId = '1';
-      const mockUsers = [
-        { socketId: 'socket123', nickname: 'Tester1' },
-        { socketId: 'socket456', nickname: 'Tester2' },
-      ];
+      const mockUsers = [{ socketId: 'socket123' }, { socketId: 'socket456' }];
 
       jest.spyOn(participantRepository, 'getRoomUsers').mockResolvedValue(mockUsers);
 
@@ -181,8 +175,8 @@ describe('Study Room 서비스 테스트', () => {
     it('사용자가 속한 방 ID를 반환한다.', async () => {
       const clientId = 'socket123';
       const mockRooms = {
-        '1': [{ socketId: 'socket123', nickname: 'Tester1' }],
-        '2': [{ socketId: 'socket456', nickname: 'Tester2' }],
+        '1': [{ socketId: 'socket123' }],
+        '2': [{ socketId: 'socket456' }],
       };
 
       jest.spyOn(participantRepository, 'getAllRooms').mockResolvedValue(mockRooms);
@@ -196,8 +190,8 @@ describe('Study Room 서비스 테스트', () => {
     it('사용자가 속한 방이 없으면 undefined를 반환한다.', async () => {
       const clientId = 'socket999';
       const mockRooms = {
-        '1': [{ socketId: 'socket123', nickname: 'Tester1' }],
-        '2': [{ socketId: 'socket456', nickname: 'Tester2' }],
+        '1': [{ socketId: 'socket123' }],
+        '2': [{ socketId: 'socket456' }],
       };
 
       jest.spyOn(participantRepository, 'getAllRooms').mockResolvedValue(mockRooms);
