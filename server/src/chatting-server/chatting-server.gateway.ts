@@ -1,8 +1,6 @@
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -14,7 +12,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
 @WebSocketGateway({ cors: { origin: '*' } })
-export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChattingServerGateway {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER)
     private readonly logger: Logger,
@@ -23,15 +21,6 @@ export class ChattingServerGateway implements OnGatewayConnection, OnGatewayDisc
 
   @WebSocketServer()
   server: Server;
-
-  async handleConnection(client: Socket) {
-    this.logger.info(`Client connected: ${client.id}`);
-  }
-
-  async handleDisconnect(client: Socket) {
-    this.logger.info(`Client disconnected: ${client.id}`);
-    await this.studyRoomsService.leaveAllRooms(client.id);
-  }
 
   // 메시지 전송
   @SubscribeMessage('sendMessage')
