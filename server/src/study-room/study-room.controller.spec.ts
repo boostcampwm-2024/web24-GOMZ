@@ -1,22 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudyRoomController } from './study-room.controller';
 import { StudyRoomsService } from './study-room.service';
-import { StudyRoom } from './entity/study-room.entity';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
-describe('Study Room 컨트롤러 테스트', () => {
+describe('Study Room 컨트롤러  테스트', () => {
   let controller: StudyRoomController;
   let service: StudyRoomsService;
 
   beforeEach(async () => {
+    const mockLogger = { info: jest.fn(), error: jest.fn() } as unknown as Logger;
+
+    const mockService = {
+      createRoom: jest.fn(),
+      getAllRoom: jest.fn(),
+      checkAccess: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [StudyRoomController],
       providers: [
         {
           provide: StudyRoomsService,
-          useValue: {
-            createRoom: jest.fn(),
-            getAllRoom: jest.fn(),
-          },
+          useValue: mockService,
+        },
+        {
+          provide: WINSTON_MODULE_PROVIDER,
+          useValue: mockLogger,
         },
       ],
     }).compile();
@@ -25,47 +35,76 @@ describe('Study Room 컨트롤러 테스트', () => {
     service = module.get<StudyRoomsService>(StudyRoomsService);
   });
 
-  describe('클라이언트가 방 생성을 요청할 때', () => {
-    it('새로운 방을 생성한다.', async () => {
-      const roomId = '1';
-      const clientId = 'socket123';
-
-      const mockStudyRoom: StudyRoom = {
+  describe('POST /create 요청', () => {
+    it('방을 생성하고 결과를 반환해야 한다.', async () => {
+      const mockRoom = {
         room_id: 1,
         room_name: 'Test Room',
         category_id: 0,
         created_at: new Date(),
         setCreatedAt: jest.fn(),
+        password: '',
       };
+      jest.spyOn(service, 'createRoom').mockResolvedValue(mockRoom);
 
-      jest.spyOn(service, 'createRoom').mockResolvedValue(mockStudyRoom);
+      const roomName = 'Test Room';
+      const clientId = 'socket123';
+      const result = await controller.creatRoom(roomName, clientId);
 
-      const result = await controller.creatRoom(roomId, clientId);
-
-      expect(service.createRoom).toHaveBeenCalledWith(roomId, clientId);
-      expect(result).toEqual(mockStudyRoom);
+      expect(service.createRoom).toHaveBeenCalledWith(roomName, clientId);
+      expect(result).toEqual(mockRoom);
     });
   });
 
-  describe('클라이언트가 방 조회를 요청할 때', () => {
-    it('모든 방을 조회한다.', async () => {
+  describe('GET /rooms 요청', () => {
+    it('모든 방 목록을 반환해야 한다.', async () => {
       const mockRooms = [
         {
           roomId: '1',
-          users: [{ socketId: 'socket123' }, { socketId: 'socket456' }],
+          roomName: 'Room 1',
+          users: [{ socketId: 'user1' }],
         },
         {
           roomId: '2',
-          users: [{ socketId: 'socket789' }],
+          roomName: 'Room 2',
+          users: [{ socketId: 'user2' }],
         },
       ];
-
       jest.spyOn(service, 'getAllRoom').mockResolvedValue(mockRooms);
 
       const result = await controller.getAllRooms();
 
       expect(service.getAllRoom).toHaveBeenCalled();
       expect(result).toEqual(mockRooms);
+    });
+  });
+
+  describe('GET /check 요청', () => {
+    it('올바른 비밀번호로 접근 시 canAccess: true를 반환해야 한다.', async () => {
+      const password = 'correct_password';
+      const roomId = 1;
+
+      jest.spyOn(service, 'checkAccess').mockResolvedValue(true);
+
+      const result = await controller.checkAccess(password, roomId);
+
+      expect(service.checkAccess).toHaveBeenCalledWith(password, roomId);
+      expect(result).toEqual({ canAccess: true });
+    });
+
+    it('잘못된 비밀번호로 접근 시 canAccess: false와 에러를 반환해야 한다.', async () => {
+      const password = 'wrong_password';
+      const roomId = 1;
+
+      jest.spyOn(service, 'checkAccess').mockRejectedValue(new Error('Unauthorized'));
+
+      const result = await controller.checkAccess(password, roomId);
+
+      expect(service.checkAccess).toHaveBeenCalledWith(password, roomId);
+      expect(result).toEqual({
+        canAccess: false,
+        error: expect.any(Error),
+      });
     });
   });
 });
