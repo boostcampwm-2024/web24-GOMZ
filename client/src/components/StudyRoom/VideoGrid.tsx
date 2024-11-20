@@ -1,3 +1,6 @@
+import { useState, useEffect, useRef } from 'react';
+import StopWatch from '@components/common/StopWatch';
+
 const RATIO = 4 / 3;
 const MAX_HEIGHT = 600;
 const MAX_WIDTH = MAX_HEIGHT * RATIO;
@@ -22,6 +25,26 @@ interface VideoGridProps {
 }
 
 const VideoGrid = ({ localVideoRef, webRTCMap, grid }: VideoGridProps) => {
+  const elapsedSecondsMap = useRef(new Map<string, number>());
+  const [, forceUpdate] = useState(0);
+
+  useEffect(() => {
+    webRTCMap.current.forEach(({ dataChannel }, id) => {
+      dataChannel.onmessage = ({ data }) => {
+        const elapsedSeconds = Number(data);
+        elapsedSecondsMap.current.set(id, elapsedSeconds);
+        forceUpdate(elapsedSeconds);
+      };
+    });
+
+    return () => {
+      webRTCMap.current.forEach(({ dataChannel }, id) => {
+        elapsedSecondsMap.current.delete(id);
+        dataChannel.onmessage = () => {};
+      });
+    };
+  }, [grid.cols, grid.rows]);
+
   return (
     <section
       className="flex flex-wrap items-center justify-center"
@@ -61,14 +84,6 @@ const VideoGrid = ({ localVideoRef, webRTCMap, grid }: VideoGridProps) => {
             }}
           >
             {localStorage.getItem('nickName')}
-          </div>
-          <div
-            className="truncate font-normal tabular-nums"
-            style={{
-              fontSize: `${Math.max(1.75 / Math.sqrt(grid.cols), 0.625)}rem`,
-            }}
-          >
-            01 : 23 : 45
           </div>
         </div>
       </div>
@@ -112,12 +127,12 @@ const VideoGrid = ({ localVideoRef, webRTCMap, grid }: VideoGridProps) => {
               {webRTCMap.current.get(id)!.nickName}
             </div>
             <div
-              className="truncate font-normal tabular-nums"
+              className="truncate font-normal"
               style={{
                 fontSize: `${Math.max(1.75 / Math.sqrt(grid.cols), 0.625)}rem`,
               }}
             >
-              01 : 23 : 45
+              <StopWatch elapsedSeconds={elapsedSecondsMap.current.get(id)!} />
             </div>
           </div>
         </div>
