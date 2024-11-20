@@ -29,9 +29,7 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     this.studyRoomsService.removeUserFromRoom(roomId, client.id);
     const users = await this.studyRoomsService.getRoomUsers(roomId);
     for (const userId of users) {
-      this.server
-        .to(userId.socketId)
-        .emit('userDisconnected', JSON.stringify({ targetId: client.id }));
+      this.server.to(userId.socketId).emit('userDisconnected', { targetId: client.id });
     }
     this.logger.info(`${client.id} 접속해제!!!`);
   }
@@ -56,9 +54,7 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     this.logger.silly(
       `new user: ${client.id}(${newRandomId}) sends an offer to old user: ${oldId}`,
     );
-    this.server
-      .to(oldId)
-      .emit('answerRequest', JSON.stringify({ newId: client.id, offer, newRandomId }));
+    this.server.to(oldId).emit('answerRequest', { newId: client.id, offer, newRandomId });
   }
 
   // 3. 기존 참가자들은 신규 참가자에게 answer를 보낸다.
@@ -72,14 +68,11 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     this.logger.silly(
       `old user: ${client.id}(${oldRandomId}) sends an answer to new user: ${newId}`,
     );
-    this.server.to(newId).emit(
-      'completeConnection',
-      JSON.stringify({
-        oldId: client.id,
-        answer,
-        oldRandomId,
-      }),
-    );
+    this.server.to(newId).emit('completeConnection', {
+      oldId: client.id,
+      answer,
+      oldRandomId,
+    });
   }
 
   // 4. 참가자들간에 icecandidate를 주고 받는다.
@@ -92,6 +85,6 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     this.logger.silly(`user: ${client.id} sends ICE candidate to user: ${targetId}`);
     this.server
       .to(targetId)
-      .emit('setIceCandidate', JSON.stringify({ senderId: client.id, iceCandidate: candidate }));
+      .emit('setIceCandidate', { senderId: client.id, iceCandidate: candidate });
   }
 }
