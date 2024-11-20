@@ -8,14 +8,20 @@ interface Grid {
   rows: number;
 }
 
+interface WebRTCData {
+  peerConnection: RTCPeerConnection;
+  remoteStream: MediaStream;
+  dataChannel: RTCDataChannel;
+  nickName: string;
+}
+
 interface VideoGridProps {
   localVideoRef: React.RefObject<HTMLVideoElement>;
-  remoteStreamMap: React.MutableRefObject<Map<string | undefined, MediaStream>>;
-  nickNameMap: React.MutableRefObject<Map<string | undefined, string>>;
+  webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
   grid: Grid;
 }
 
-const VideoGrid = ({ localVideoRef, remoteStreamMap, grid, nickNameMap }: VideoGridProps) => {
+const VideoGrid = ({ localVideoRef, webRTCMap, grid }: VideoGridProps) => {
   return (
     <section
       className="flex flex-wrap items-center justify-center"
@@ -66,7 +72,7 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid, nickNameMap }: VideoG
           </div>
         </div>
       </div>
-      {[...remoteStreamMap.current].map(([id, stream]) => (
+      {[...webRTCMap.current].map(([id, { remoteStream }]) => (
         <div
           key={String(id)}
           className="relative rounded-2xl border border-black bg-black"
@@ -81,7 +87,7 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid, nickNameMap }: VideoG
             height="100%"
             ref={(element) => {
               if (element) {
-                element.srcObject = stream;
+                element.srcObject = remoteStream;
               }
             }}
             autoPlay
@@ -103,7 +109,7 @@ const VideoGrid = ({ localVideoRef, remoteStreamMap, grid, nickNameMap }: VideoG
                 maxWidth: `${MAX_WIDTH / grid.cols / 2.5}px`,
               }}
             >
-              {nickNameMap.current.get(id)}
+              {webRTCMap.current.get(id)!.nickName}
             </div>
             <div
               className="truncate font-normal tabular-nums"
