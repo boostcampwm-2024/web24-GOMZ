@@ -19,6 +19,6 @@ export class StudyRoom {
     this.created_at = new Date();
   }
 
-  @Column({ type: 'varchar', length: 45 })
+  @Column({ type: 'varchar', length: 45, nullable: true })
   password: string;
 }
