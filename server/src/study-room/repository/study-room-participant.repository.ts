@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { StudyRoomParticipant } from './study-room-participant.entity';
+import { StudyRoomParticipant } from '../entity/study-room-participant.entity';
 
 @Injectable()
 export class StudyRoomParticipantRepository {

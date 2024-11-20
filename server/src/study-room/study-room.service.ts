@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { StudyRoom } from './study-room.entity';
-import { StudyRoomRepository } from './study-room.repository';
-import { StudyRoomParticipantRepository } from './study-room-participant.repository';
+import { StudyRoom } from './entity/study-room.entity';
+import { StudyRoomRepository } from './repository/study-room.repository';
+import { StudyRoomParticipantRepository } from './repository/study-room-participant.repository';
 
 @Injectable()
 export class StudyRoomsService {
