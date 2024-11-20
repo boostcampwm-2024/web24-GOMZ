@@ -139,6 +139,13 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     }
   });
 
+  socket.on('userDisconnected', (data: string) => {
+    const { targetId } = JSON.parse(data);
+    const { peerConnection } = webRTCMap.get(targetId)!;
+
+    handlePeerDisconnection(peerConnection, targetId);
+  });
+
   return socket;
 };
 
