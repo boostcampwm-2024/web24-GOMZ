@@ -29,7 +29,7 @@ export class StudyRoomsService {
    * @param roomId 방 ID
    * @returns 방 객체 또는 undefined
    */
-  async findRoom(roomId: string): Promise<StudyRoom | undefined> {
+  async findRoom(roomId: string): Promise<StudyRoom | null> {
     const room = await this.roomRepository.findRoom(parseInt(roomId, 10));
     return room || undefined; // null 대신 undefined로 반환
   }
@@ -77,7 +77,7 @@ export class StudyRoomsService {
    * @param clientId 클라이언트 ID
    * @returns 사용자가 속한 방 ID 또는 undefined
    */
-  async findUserRoom(clientId: string): Promise<string | undefined> {
+  async findUserRoom(clientId: string): Promise<string | null> {
     const rooms = await this.participantRepository.getAllRooms();
     return Object.keys(rooms).find((roomId) =>
       rooms[roomId].some((user) => user.socketId === clientId),
