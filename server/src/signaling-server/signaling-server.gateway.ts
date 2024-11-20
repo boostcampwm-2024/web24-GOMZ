@@ -1,13 +1,13 @@
 import {
-  SubscribeMessage,
-  WebSocketGateway,
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
-  WebSocketServer,
-  ConnectedSocket,
   OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
