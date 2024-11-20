@@ -6,20 +6,16 @@ import { StudyRoom } from './entity/study-room.entity';
 export class StudyRoomController {
   constructor(private readonly studyRoomService: StudyRoomsService) {}
 
-  // 지금은 로그인 기능 구현 전이라서 nickname도 같이 넘겨줘야 돼요.
   @Post('/create')
   async creatRoom(
     @Body('roomId') roomId: string,
     @Body('clientId') clientId: string,
-    @Body('nickname') nickname: string,
   ): Promise<StudyRoom> {
-    return await this.studyRoomService.createRoom(roomId, clientId, nickname);
+    return await this.studyRoomService.createRoom(roomId, clientId);
   }
 
   @Get('/rooms')
-  async getAllRooms(): Promise<
-    { roomId: string; users: { socketId: string; nickname: string }[] }[]
-  > {
+  async getAllRooms(): Promise<{ roomId: string; users: { socketId: string }[] }[]> {
     return await this.studyRoomService.getAllRoom();
   }
 }
