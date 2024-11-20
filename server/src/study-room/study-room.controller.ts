@@ -21,7 +21,9 @@ export class StudyRoomController {
   }
 
   @Get('/rooms')
-  async getAllRooms(): Promise<{ roomId: string; users: { socketId: string }[] }[]> {
+  async getAllRooms(): Promise<
+    { roomId: string; roomName: string; users: { socketId: string }[] }[]
+  > {
     return await this.studyRoomService.getAllRoom();
   }
 

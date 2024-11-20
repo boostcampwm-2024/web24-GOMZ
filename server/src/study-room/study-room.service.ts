@@ -87,12 +87,21 @@ export class StudyRoomsService {
   /**
    * 존재하는 모든 방을 조회합니다.
    */
-  async getAllRoom(): Promise<{ roomId: string; users: { socketId: string }[] }[]> {
+  async getAllRoom(): Promise<
+    { roomId: string; roomName: string; users: { socketId: string }[] }[]
+  > {
     const allRooms = await this.participantRepository.getAllRooms();
-    return Object.keys(allRooms).map((roomId) => ({
-      roomId,
-      users: allRooms[roomId],
-    }));
+
+    return await Promise.all(
+      Object.keys(allRooms).map(async (roomId) => {
+        const room = await this.roomRepository.findRoom(parseInt(roomId, 10));
+        return {
+          roomId,
+          roomName: room.room_name,
+          users: allRooms[roomId],
+        };
+      }),
+    );
   }
 
   private async isValidRoom(roomId: string): Promise<void> {
