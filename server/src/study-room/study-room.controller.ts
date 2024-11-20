@@ -14,10 +14,10 @@ export class StudyRoomController {
 
   @Post('/create')
   async creatRoom(
-    @Body('roomId') roomId: string,
+    @Body('roomName') roomName: string,
     @Body('clientId') clientId: string,
   ): Promise<StudyRoom> {
-    return await this.studyRoomService.createRoom(roomId, clientId);
+    return await this.studyRoomService.createRoom(roomName, clientId);
   }
 
   @Get('/rooms')
