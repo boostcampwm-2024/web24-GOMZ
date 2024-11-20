@@ -13,7 +13,7 @@ export class StudyRoomController {
   ) {}
 
   @Post('/create')
-  async creatRoom(
+  creatRoom(
     @Body('roomName') roomName: string,
     @Body('clientId') clientId: string,
   ): Promise<StudyRoom> {
