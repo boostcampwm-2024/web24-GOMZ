@@ -4,7 +4,7 @@ import { StudyRoomsService } from './study-room.service';
 import { StudyRoomController } from './study-room.controller';
 import { StudyRoom } from './entity/study-room.entity';
 import { StudyRoomParticipant } from './entity/study-room-participant.entity';
-import { StudyRoomRepository } from './study-room.repository';
+import { StudyRoomRepository } from './repository/study-room.repository';
 import { StudyRoomParticipantRepository } from './repository/study-room-participant.repository';
 
 @Module({
