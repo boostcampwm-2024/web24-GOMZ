@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { StudyRoom } from './entity/study-room.entity';
 import { StudyRoomRepository } from './repository/study-room.repository';
 import { StudyRoomParticipantRepository } from './repository/study-room-participant.repository';
@@ -108,5 +108,25 @@ export class StudyRoomsService {
     if (!participant) {
       throw new Error('participant not found');
     }
+  }
+
+  /**
+   * 선택한 방에 입장가능여부 체크
+   * @param password 사용자 입력 패스워드
+   * @param roomId 들어가려는 방 ID
+   */
+  async checkAccess(password: string, roomId: number) {
+    // 방 존재여부 체크
+    const studyRoom = await this.roomRepository.findRoom(roomId);
+    if (!studyRoom) {
+      throw new NotFoundException('No such study room');
+    }
+
+    // 비밀번호 체크
+    if (password !== studyRoom.password) {
+      throw new UnauthorizedException('Passwords do not match');
+    }
+
+    return true;
   }
 }
