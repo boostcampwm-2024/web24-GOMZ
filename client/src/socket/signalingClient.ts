@@ -56,7 +56,7 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
 
   socket.on('offerRequest', async (data: string) => {
     const { users } = JSON.parse(data);
-    for (const oldId of users) {
+    for (const { socketId: oldId } of users) {
       const peerConnection = new RTCPeerConnection(configuration);
 
       const dataChannel = peerConnection.createDataChannel('stopWatch');
