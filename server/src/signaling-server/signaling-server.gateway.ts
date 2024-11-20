@@ -38,7 +38,7 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     );
 
     // 기존 사용자 목록 전송
-    client.emit('offerRequest', { users });
+    client.emit('offerRequest', JSON.stringify({ users }));
   }
 
   async handleDisconnect(client: Socket) {
@@ -80,11 +80,14 @@ export class SignalingServerGateway implements OnGatewayConnection, OnGatewayDis
     this.logger.silly(
       `old user: ${client.id}(${oldRandomId}) sends an answer to new user: ${newId}`,
     );
-    this.server.to(newId).emit('completeConnection', {
-      oldId: client.id,
-      answer,
-      oldRandomId,
-    });
+    this.server.to(newId).emit(
+      'completeConnection',
+      JSON.stringify({
+        oldId: client.id,
+        answer,
+        oldRandomId,
+      }),
+    );
   }
 
   @SubscribeMessage('sendIceCandidate')
