@@ -39,9 +39,9 @@ export class StudyRoomsService {
    * @param roomId 방 ID
    * @param socketId 소켓 ID
    */
-  async addUserToRoom(roomId: string, socketId: string, nickname: string): Promise<void> {
+  async addUserToRoom(roomId: string, socketId: string): Promise<void> {
     await this.isValidRoom(roomId);
-    await this.participantRepository.addUserToRoom(parseInt(roomId, 10), socketId, nickname);
+    await this.participantRepository.addUserToRoom(parseInt(roomId, 10), socketId);
   }
 
   /**
@@ -60,7 +60,7 @@ export class StudyRoomsService {
    * @param roomId 방 ID
    * @returns 방에 있는 사용자의 목록
    */
-  async getRoomUsers(roomId: string): Promise<{ socketId: string; nickname: string }[]> {
+  async getRoomUsers(roomId: string): Promise<{ socketId: string }[]> {
     return await this.participantRepository.getRoomUsers(parseInt(roomId, 10));
   }
 
@@ -87,9 +87,7 @@ export class StudyRoomsService {
   /**
    * 존재하는 모든 방을 조회합니다.
    */
-  async getAllRoom(): Promise<
-    { roomId: string; users: { socketId: string; nickname: string }[] }[]
-  > {
+  async getAllRoom(): Promise<{ roomId: string; users: { socketId: string }[] }[]> {
     const allRooms = await this.participantRepository.getAllRooms();
     return Object.keys(allRooms).map((roomId) => ({
       roomId,
