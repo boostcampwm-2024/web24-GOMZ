@@ -34,7 +34,7 @@ describe('Study Room 레포지토리 테스트', () => {
     repository = module.get<Repository<StudyRoom>>(getRepositoryToken(StudyRoom));
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await repository.query('DROP TABLE study_room;');
     await repository.manager.connection.destroy();
   });
