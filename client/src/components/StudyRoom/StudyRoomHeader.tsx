@@ -1,13 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@components/common/Header';
 import Icon from '@components/common/Icon';
 import StopWatch from '@components/common/StopWatch';
+import useStopWatch from '@hooks/useStopWatch';
+
+interface WebRTCData {
+  peerConnection: RTCPeerConnection;
+  remoteStream: MediaStream;
+  dataChannel: RTCDataChannel;
+  nickName: string;
+}
 
 interface StudyRoomHeaderProps {
   className?: string;
   title: string;
   curParticipant: number;
   maxParticipant: number;
+  webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
 }
 
 const StudyRoomHeader = ({
@@ -15,8 +24,16 @@ const StudyRoomHeader = ({
   title,
   curParticipant,
   maxParticipant,
+  webRTCMap,
 }: StudyRoomHeaderProps) => {
   const [isStopWatchRunning, setIsStopWatchRunning] = useState(false);
+  const elapsedSeconds = useStopWatch(isStopWatchRunning);
+
+  useEffect(() => {
+    webRTCMap.current.forEach(({ dataChannel }) => {
+      dataChannel.send(elapsedSeconds.toString());
+    });
+  }, [elapsedSeconds]);
 
   return (
     <Header
@@ -31,7 +48,7 @@ const StudyRoomHeader = ({
       }
       stopWatch={
         <div className="flex translate-x-[1.125rem] gap-3 text-xl font-normal">
-          <StopWatch isRunning={isStopWatchRunning} />
+          <StopWatch elapsedSeconds={elapsedSeconds} />
           <button
             onClick={() => {
               setIsStopWatchRunning(!isStopWatchRunning);
