@@ -17,7 +17,7 @@ export class StudyRoomController {
     @Body('roomName') roomName: string,
     @Body('clientId') clientId: string,
   ): Promise<StudyRoom> {
-    return await this.studyRoomService.createRoom(roomName, clientId);
+    return this.studyRoomService.createRoom(roomName, clientId);
   }
 
   @Get('/rooms')
