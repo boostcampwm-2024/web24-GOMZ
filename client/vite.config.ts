@@ -23,6 +23,7 @@ export default defineConfig({
       '@': resolve(dirname, 'src'),
       '@hooks': resolve(dirname, 'src/hooks'),
       '@socket': resolve(dirname, 'src/socket'),
+      '@constants': resolve(dirname, 'src/constants'),
       '@components': resolve(dirname, 'src/components'),
     },
   },
