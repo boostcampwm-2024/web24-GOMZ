@@ -28,15 +28,18 @@ export class ChattingServerGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody('message') message: string,
   ) {
-    const userRoom = await this.studyRoomsService.findUserRoom(client.id);
+    const roomId = await this.studyRoomsService.findUserRoom(client.id);
 
-    if (!userRoom) {
+    if (!roomId) {
       this.logger.info(`사용자 ${client.id}가 속한 방이 없습니다.`);
       return;
     }
 
-    this.logger.info(`Message from ${client.id} in room ${userRoom}: ${message}`);
-    client.broadcast.to(userRoom).emit('receiveMessage', {
+    const users = await this.studyRoomsService.getRoomUsers(roomId);
+    const userList = users.map((user) => user.socketId);
+
+    this.logger.info(`Message from ${client.id} in room ${userList}: ${message}`);
+    client.broadcast.to(userList).emit('receiveMessage', {
       userId: client.id,
       message,
     });
