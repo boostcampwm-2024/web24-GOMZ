@@ -93,7 +93,7 @@ export class StudyRoomsService {
    */
   async getAllRoom(): Promise<
     {
-      roomId: string;
+      roomId: number;
       roomName: string;
       categoryName: string;
       isPrivate: boolean;
@@ -107,7 +107,7 @@ export class StudyRoomsService {
       Object.keys(allRooms).map(async (roomId) => {
         const room = await this.roomRepository.findRoom(parseInt(roomId, 10));
         return {
-          roomId,
+          roomId: parseInt(roomId, 10),
           roomName: room.room_name,
           categoryName: room.category_name,
           isPrivate: !!room.password,
