@@ -14,7 +14,7 @@ const StudyRoom = () => {
 
   const [
     { localVideoRef, webRTCMap, participantCount, grid },
-    { toggleVideo, toggleMic, joinRoom, exitRoom },
+    { toggleVideo, toggleMic, joinRoom, exitRoom, sendMessage },
   ] = useWebRTC();
 
   useEffect(() => {
@@ -42,7 +42,9 @@ const StudyRoom = () => {
           className="mb-10"
           toggleVideo={toggleVideo}
           toggleMic={toggleMic}
-          toggleChat={() => {}}
+          toggleChat={() => {
+            sendMessage(`안녕하세요, 저는 ${localStorage.getItem('nickName')}입니다.`);
+          }}
           exitRoom={() => navigate('/studyroomlist')}
         />
       </div>
