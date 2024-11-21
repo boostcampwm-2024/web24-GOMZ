@@ -23,7 +23,7 @@ export class StudyRoomController {
   @Get('/rooms')
   async getAllRooms(): Promise<
     {
-      roomId: string;
+      roomId: number;
       roomName: string;
       categoryName: string;
       isPrivate: boolean;
