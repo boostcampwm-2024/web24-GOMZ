@@ -11,7 +11,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/studyroomlist',
-    element: <StudyRoomList />,
+    element: (
+      <ProtectedRoute>
+        <StudyRoomList />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/studyroom',
