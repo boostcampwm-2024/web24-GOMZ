@@ -21,7 +21,4 @@ export class StudyRoom {
 
   @Column({ type: 'varchar', length: 45, nullable: true })
   password: string;
-
-  @Column({ type: 'boolean' })
-  is_private: boolean;
 }
