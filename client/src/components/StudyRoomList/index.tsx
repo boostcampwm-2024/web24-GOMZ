@@ -37,7 +37,10 @@ const StudyRoomList = () => {
             maxParticipant={16}
             categoryName="부캠"
             isPrivate={true}
-            openModal={() => setIsJoinRoomModalOpen(true)}
+            openModal={() => {
+              setIsJoinRoomModalOpen(true);
+              setRoomId('2');
+            }}
           />
           <ItemCard
             id={'3'}
@@ -46,25 +49,34 @@ const StudyRoomList = () => {
             maxParticipant={16}
             categoryName="부캠"
             isPrivate={true}
-            openModal={() => setIsJoinRoomModalOpen(true)}
+            openModal={() => {
+              setIsJoinRoomModalOpen(true);
+              setRoomId('3');
+            }}
           />
           <ItemCard
-            id={'1'}
+            id={'4'}
             roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
             categoryName="부캠"
             isPrivate={true}
-            openModal={() => setIsJoinRoomModalOpen(true)}
+            openModal={() => {
+              setIsJoinRoomModalOpen(true);
+              setRoomId('4');
+            }}
           />
           <ItemCard
-            id={'1'}
+            id={'5'}
             roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
             categoryName="부캠"
             isPrivate={true}
-            openModal={() => setIsJoinRoomModalOpen(true)}
+            openModal={() => {
+              setIsJoinRoomModalOpen(true);
+              setRoomId('5');
+            }}
           />
         </div>
         <Pagination />
