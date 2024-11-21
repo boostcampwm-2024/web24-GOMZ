@@ -30,6 +30,7 @@ const StudyRoomHeader = ({
   const elapsedSeconds = useStopWatch(isStopWatchRunning);
 
   useEffect(() => {
+    localStorage.setItem('studyTime', elapsedSeconds.toString());
     webRTCMap.current.forEach(({ dataChannel }) => {
       dataChannel.send(elapsedSeconds.toString());
     });
