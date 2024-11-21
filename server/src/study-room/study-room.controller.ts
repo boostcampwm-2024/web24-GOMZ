@@ -15,9 +15,10 @@ export class StudyRoomController {
   @Post('/create')
   creatRoom(
     @Body('roomName') roomName: string,
-    @Body('clientId') clientId: string,
+    @Body('password') password: string,
+    @Body('categoryName') categoryName: string,
   ): Promise<StudyRoom> {
-    return this.studyRoomService.createRoom(roomName, clientId);
+    return this.studyRoomService.createRoom(roomName, password, categoryName);
   }
 
   @Get('/rooms')
