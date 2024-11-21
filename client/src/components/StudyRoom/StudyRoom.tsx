@@ -17,11 +17,6 @@ const StudyRoom = () => {
     { toggleVideo, toggleMic, joinRoom, exitRoom },
   ] = useWebRTC();
 
-  const handleExit = () => {
-    exitRoom();
-    navigate('/studyroomlist');
-  };
-
   useEffect(() => {
     joinRoom(roomId);
     return () => exitRoom();
@@ -48,7 +43,7 @@ const StudyRoom = () => {
           toggleVideo={toggleVideo}
           toggleMic={toggleMic}
           toggleChat={() => {}}
-          exitRoom={handleExit}
+          exitRoom={() => navigate('/studyroomlist')}
         />
       </div>
     </div>
