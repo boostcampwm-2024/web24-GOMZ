@@ -7,6 +7,7 @@ interface ControlBarProps {
   toggleMic: () => boolean;
   toggleChat: () => void;
   exitRoom: () => void;
+  isChatOn: boolean;
 }
 
 const ControlBar = ({
@@ -15,17 +16,15 @@ const ControlBar = ({
   toggleMic,
   toggleChat,
   exitRoom,
+  isChatOn,
 }: ControlBarProps) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
-  // const [isChatOn, setIsChatOn] = useState(false);
 
   return (
     <div className={`flex gap-12 ${className}`}>
       <button
-        onClick={() => {
-          setIsVideoOn(toggleVideo());
-        }}
+        onClick={() => setIsVideoOn(toggleVideo())}
         className="bg-gomz-black flex h-10 w-10 items-center justify-center rounded-full"
       >
         <Icon
@@ -34,9 +33,7 @@ const ControlBar = ({
         ></Icon>
       </button>
       <button
-        onClick={() => {
-          setIsMicOn(toggleMic());
-        }}
+        onClick={() => setIsMicOn(toggleMic())}
         className="bg-gomz-black flex h-10 w-10 items-center justify-center rounded-full"
       >
         <Icon
@@ -48,7 +45,10 @@ const ControlBar = ({
         onClick={toggleChat}
         className="bg-gomz-black flex h-10 w-10 items-center justify-center rounded-full"
       >
-        <Icon id="chat-off" className="text-gomz-white h-5 w-5 fill-current"></Icon>
+        <Icon
+          id={isChatOn ? 'chat' : 'chat-off'}
+          className="text-gomz-white h-5 w-5 fill-current"
+        ></Icon>
       </button>
       <button
         onClick={exitRoom}
