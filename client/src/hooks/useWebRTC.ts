@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import signalingClient from '@socket/signalingClient';
 
@@ -19,6 +19,7 @@ interface WebRTCState {
 interface WebRTCControls {
   toggleVideo: () => boolean;
   toggleMic: () => boolean;
+  joinRoom: (roomId: string) => void;
   exitRoom: () => void;
 }
 
@@ -48,6 +49,39 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     return localStreamRef.current.getAudioTracks().every((track) => track.enabled);
   };
 
+  const joinRoom = async (roomId: string) => {
+    localStreamRef.current = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+
+    localVideoRef.current!.srcObject = localStreamRef.current;
+
+    toggleVideo();
+    toggleMic();
+
+    const observableMap = new Map();
+    const set = observableMap.set.bind(observableMap);
+    const del = observableMap.delete.bind(observableMap);
+
+    observableMap.set = (key: string, value: WebRTCData) => {
+      set(key, value);
+      calculateGrid();
+      return observableMap;
+    };
+
+    observableMap.delete = (key: string) => {
+      const result = del(key);
+      calculateGrid();
+      return result;
+    };
+
+    webRTCMap.current = observableMap;
+
+    socket.current = signalingClient(localStreamRef.current, webRTCMap.current);
+    socket.current.emit('joinRoom', { roomId });
+  };
+
   const exitRoom = () => {
     webRTCMap.current.forEach(({ peerConnection }) => {
       peerConnection.close();
@@ -55,44 +89,6 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     localStreamRef.current.getTracks().forEach((track) => track.stop());
     socket.current.close();
   };
-
-  useEffect(() => {
-    const initStream = async () => {
-      localStreamRef.current = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-
-      localVideoRef.current!.srcObject = localStreamRef.current;
-
-      toggleVideo();
-      toggleMic();
-
-      const observableMap = new Map();
-      const set = observableMap.set.bind(observableMap);
-      const del = observableMap.delete.bind(observableMap);
-
-      observableMap.set = (key: string, value: WebRTCData) => {
-        set(key, value);
-        calculateGrid();
-        return observableMap;
-      };
-
-      observableMap.delete = (key: string) => {
-        const result = del(key);
-        calculateGrid();
-        return result;
-      };
-
-      webRTCMap.current = observableMap;
-
-      socket.current = signalingClient(localStreamRef.current, webRTCMap.current);
-    };
-
-    initStream();
-
-    return () => exitRoom();
-  }, []);
 
   return [
     {
@@ -104,6 +100,7 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     {
       toggleVideo,
       toggleMic,
+      joinRoom,
       exitRoom,
     },
   ];
