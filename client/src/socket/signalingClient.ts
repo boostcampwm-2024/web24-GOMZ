@@ -54,8 +54,7 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     peerConnection.close();
   };
 
-  socket.on('offerRequest', async (data: string) => {
-    const { users } = JSON.parse(data);
+  socket.on('offerRequest', async ({ users }) => {
     for (const { socketId: oldId } of users) {
       const peerConnection = new RTCPeerConnection(configuration);
 
@@ -85,9 +84,7 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     }
   });
 
-  socket.on('answerRequest', async (data) => {
-    const { newId, offer, newRandomId } = JSON.parse(data);
-
+  socket.on('answerRequest', async ({ newId, offer, newRandomId }) => {
     const peerConnection = new RTCPeerConnection(configuration);
 
     peerConnection.ondatachannel = ({ channel }) => {
@@ -123,9 +120,7 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     updatePendingConnection(newId, { peerConnection, nickName: newRandomId });
   });
 
-  socket.on('completeConnection', async (data) => {
-    const { oldId, answer, oldRandomId } = JSON.parse(data);
-
+  socket.on('completeConnection', async ({ oldId, answer, oldRandomId }) => {
     const { peerConnection } = pendingConnectionsMap.get(oldId)!;
 
     peerConnection.ontrack = ({ streams }) => {
@@ -137,16 +132,14 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     updatePendingConnection(oldId, { nickName: oldRandomId });
   });
 
-  socket.on('setIceCandidate', (data: string) => {
-    const { senderId, iceCandidate } = JSON.parse(data);
+  socket.on('setIceCandidate', ({ senderId, iceCandidate }) => {
     const { peerConnection } = pendingConnectionsMap.get(senderId)!;
     if (peerConnection) {
       peerConnection.addIceCandidate(new RTCIceCandidate(iceCandidate));
     }
   });
 
-  socket.on('userDisconnected', (data: string) => {
-    const { targetId } = JSON.parse(data);
+  socket.on('userDisconnected', ({ targetId }) => {
     const { peerConnection } = webRTCMap.get(targetId)!;
 
     handlePeerDisconnection(peerConnection, targetId);
