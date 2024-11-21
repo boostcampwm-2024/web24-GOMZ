@@ -1,22 +1,31 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-import StudyRoomHeader from './StudyRoomHeader';
-import VideoGrid from './VideoGrid';
-import ControlBar from './ControlBar';
+import StudyRoomHeader from '@components/StudyRoom/StudyRoomHeader';
+import VideoGrid from '@components/StudyRoom/VideoGrid';
+import ControlBar from '@components/StudyRoom/ControlBar';
 import useWebRTC from '@hooks/useWebRTC';
 
 const StudyRoom = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const roomId = queryParams.get('roomId')!;
 
   const [
     { localVideoRef, webRTCMap, participantCount, grid },
-    { toggleVideo, toggleMic, exitRoom },
+    { toggleVideo, toggleMic, joinRoom, exitRoom },
   ] = useWebRTC();
 
   const handleExit = () => {
     exitRoom();
     navigate(-1);
   };
+
+  useEffect(() => {
+    joinRoom(roomId);
+    return () => exitRoom();
+  }, []);
 
   return (
     <div className="flex h-screen w-screen justify-center">
