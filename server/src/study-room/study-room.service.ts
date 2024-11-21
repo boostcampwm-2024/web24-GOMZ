@@ -18,9 +18,8 @@ export class StudyRoomsService {
    */
   // TODO 생성된 방 entity를 그대로 주는 것보다 방 생성 성공 여부를 가르는 것은 어떤가요.
   // TODO 나중에는 카테고리 ID도 필요해요.
-  async createRoom(roomName: string, clientId: string): Promise<StudyRoom> {
-    const studyRoom = await this.roomRepository.createRoom(roomName, 0);
-    this.participantRepository.addUserToRoom(studyRoom.room_id, clientId);
+  async createRoom(roomName: string, password: string, categoryName: string): Promise<StudyRoom> {
+    const studyRoom = await this.roomRepository.createRoom(roomName, password, categoryName);
     return studyRoom;
   }
 
