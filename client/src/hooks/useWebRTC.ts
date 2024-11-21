@@ -21,6 +21,7 @@ interface WebRTCControls {
   toggleMic: () => boolean;
   joinRoom: (roomId: string) => void;
   exitRoom: () => void;
+  sendMessage: (message: string) => void;
 }
 
 const useWebRTC = (): [WebRTCState, WebRTCControls] => {
@@ -80,6 +81,10 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
 
     socket.current = signalingClient(localStreamRef.current, webRTCMap.current);
     socket.current.emit('joinRoom', { roomId });
+    socket.current.on('receiveMessage', ({ userId, message }) => {
+      const { nickName } = webRTCMap.current.get(userId)!;
+      console.log(`${nickName}: ${message}`);
+    });
   };
 
   const exitRoom = () => {
@@ -88,6 +93,10 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     });
     localStreamRef.current.getTracks().forEach((track) => track.stop());
     socket.current.close();
+  };
+
+  const sendMessage = (message: string) => {
+    socket.current.emit('sendMessage', { message });
   };
 
   return [
@@ -102,6 +111,7 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
       toggleMic,
       joinRoom,
       exitRoom,
+      sendMessage,
     },
   ];
 };
