@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import CATEGORIES from '@constants/CATEGORIES';
+import CATEGORY_NAMES from '@constants/CATEGORY_NAMES';
 
 const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
   const [isPrivate, setIsPrivate] = useState(false);
-  const [title, setTitle] = useState('');
+  const [roomName, setRoomName] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleTitleChange = ({ target }: { target: HTMLInputElement }) => {
-    setTitle(target.value);
+  const handleRoomNameChange = ({ target }: { target: HTMLInputElement }) => {
+    setRoomName(target.value);
   };
 
   const handlePasswordChange = ({ target }: { target: HTMLInputElement }) => {
@@ -45,8 +45,8 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
             <h2 className="w-14 font-semibold">제목</h2>
             <input
               className="border-gomz-black h-8 w-48 rounded-lg border p-2 focus:outline-none"
-              value={title}
-              onChange={handleTitleChange}
+              value={roomName}
+              onChange={handleRoomNameChange}
               required
               minLength={2}
               onInvalid={({ target }: React.InvalidEvent<HTMLInputElement>) => {
@@ -94,8 +94,8 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
           <div className="flex items-center gap-5">
             <h2 className="w-14 font-semibold">카테고리</h2>
             <select className="border-gomz-black h-8 w-24 truncate rounded-full border bg-white p-1 px-2 text-sm">
-              {CATEGORIES.map((category: string) => (
-                <option value={category}>#{category}</option>
+              {CATEGORY_NAMES.map((categoryName: string) => (
+                <option value={categoryName}>#{categoryName}</option>
               ))}
             </select>
           </div>

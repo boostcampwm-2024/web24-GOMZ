@@ -13,7 +13,7 @@ interface WebRTCData {
 
 interface StudyRoomHeaderProps {
   className?: string;
-  title: string;
+  roomName: string;
   curParticipant: number;
   maxParticipant: number;
   webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
@@ -21,7 +21,7 @@ interface StudyRoomHeaderProps {
 
 const StudyRoomHeader = ({
   className,
-  title,
+  roomName,
   curParticipant,
   maxParticipant,
   webRTCMap,
@@ -40,7 +40,7 @@ const StudyRoomHeader = ({
       className={className}
       title={
         <div className="flex items-baseline gap-3">
-          <h1 className="text-xl font-semibold">{title}</h1>
+          <h1 className="text-xl font-semibold">{roomName}</h1>
           <span className="text-gomz-gray-800 font-normal">
             {curParticipant} / {maxParticipant}
           </span>

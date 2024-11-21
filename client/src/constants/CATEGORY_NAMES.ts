@@ -1,4 +1,4 @@
-const CATEGORIES: string[] = [
+const CATEGORY_NAMES: string[] = [
   '부캠',
   '개발자',
   '중학교',
@@ -30,4 +30,4 @@ const CATEGORIES: string[] = [
   '편입',
 ];
 
-export default CATEGORIES;
+export default CATEGORY_NAMES;
