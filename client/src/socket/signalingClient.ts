@@ -57,8 +57,9 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
   socket.on('offerRequest', async ({ users }) => {
     for (const { socketId: oldId } of users) {
       const peerConnection = new RTCPeerConnection(configuration);
-
       const dataChannel = peerConnection.createDataChannel('stopWatch');
+
+      updatePendingConnection(oldId, { peerConnection, dataChannel });
 
       localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
 
@@ -79,13 +80,13 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
       };
 
       socket.emit('sendOffer', { oldId, offer, newRandomId: localStorage.getItem('nickName') });
-
-      updatePendingConnection(oldId, { peerConnection, dataChannel });
     }
   });
 
   socket.on('answerRequest', async ({ newId, offer, newRandomId }) => {
     const peerConnection = new RTCPeerConnection(configuration);
+
+    updatePendingConnection(newId, { peerConnection, nickName: newRandomId });
 
     peerConnection.ondatachannel = ({ channel }) => {
       updatePendingConnection(newId, { dataChannel: channel });
@@ -116,8 +117,6 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     };
 
     socket.emit('sendAnswer', { newId, answer, oldRandomId: localStorage.getItem('nickName') });
-
-    updatePendingConnection(newId, { peerConnection, nickName: newRandomId });
   });
 
   socket.on('completeConnection', async ({ oldId, answer, oldRandomId }) => {
