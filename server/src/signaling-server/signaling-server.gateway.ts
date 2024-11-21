@@ -26,6 +26,7 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
   // 5. 참가자가 공부방을 나갔을 때 방에 있는 참가자들에게 퇴장인원 소켓 정보를 전달한다
   async handleDisconnect(client: Socket) {
     const roomId = await this.studyRoomsService.findUserRoom(client.id);
+    if (roomId === undefined) return;
     this.studyRoomsService.removeUserFromRoom(roomId, client.id);
     const users = await this.studyRoomsService.getRoomUsers(roomId);
     for (const userId of users) {
