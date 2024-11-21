@@ -12,6 +12,11 @@ const StudyRoomList = () => {
   const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false);
   const [roomId, setRoomId] = useState('');
 
+  const totalStudyTime =
+    Number(localStorage.getItem('totalStudyTime')) + Number(localStorage.getItem('studyTime'));
+  localStorage.setItem('studyTime', '0');
+  localStorage.setItem('totalStudyTime', totalStudyTime.toString());
+
   return (
     <div className="flex h-screen w-screen flex-col items-center">
       <div className="flex h-[56.25rem] w-[90rem] flex-col items-center gap-8">
