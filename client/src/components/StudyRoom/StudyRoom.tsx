@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import StudyRoomHeader from '@components/StudyRoom/StudyRoomHeader';
 import VideoGrid from '@components/StudyRoom/VideoGrid';
 import ControlBar from '@components/StudyRoom/ControlBar';
+import Chat from '@components/StudyRoom/Chat';
 import useWebRTC from '@hooks/useWebRTC';
 
 const StudyRoom = () => {
@@ -11,6 +12,8 @@ const StudyRoom = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const roomId = queryParams.get('roomId')!;
+
+  const [isChatOn, setIsChatOn] = useState(false);
 
   const [
     { localVideoRef, webRTCMap, participantCount, grid },
@@ -43,11 +46,20 @@ const StudyRoom = () => {
           toggleVideo={toggleVideo}
           toggleMic={toggleMic}
           toggleChat={() => {
-            sendMessage(`안녕하세요, 저는 ${localStorage.getItem('nickName')}입니다.`);
+            setIsChatOn(!isChatOn);
           }}
           exitRoom={() => navigate('/studyroomlist')}
+          isChatOn={isChatOn}
         />
       </div>
+      {isChatOn && (
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          onClick={({ target, currentTarget }) => target === currentTarget && setIsChatOn(false)}
+        >
+          <Chat sendMessage={sendMessage} className="-translate-y-44" />
+        </div>
+      )}
     </div>
   );
 };
