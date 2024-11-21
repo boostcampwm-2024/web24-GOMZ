@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Inject, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { StudyRoomsService } from './study-room.service';
-import { StudyRoom } from './entity/study-room.entity';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
@@ -17,7 +16,7 @@ export class StudyRoomController {
     @Body('roomName') roomName: string,
     @Body('password') password: string,
     @Body('categoryName') categoryName: string,
-  ): Promise<StudyRoom> {
+  ): Promise<{ roomId: number }> {
     return this.studyRoomService.createRoom(roomName, password, categoryName);
   }
 
