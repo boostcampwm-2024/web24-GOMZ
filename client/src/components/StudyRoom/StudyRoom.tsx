@@ -19,7 +19,7 @@ const StudyRoom = () => {
 
   const handleExit = () => {
     exitRoom();
-    navigate(-1);
+    navigate('/studyroomlist');
   };
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const StudyRoom = () => {
       <div className="flex h-[56.25rem] w-[90rem] flex-col items-center justify-between">
         <StudyRoomHeader
           className="mt-1"
-          title="부스트 캠프 공부방"
+          roomName="부스트 캠프 공부방"
           curParticipant={participantCount}
           maxParticipant={16}
           webRTCMap={webRTCMap}
