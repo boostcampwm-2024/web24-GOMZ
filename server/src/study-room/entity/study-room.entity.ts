@@ -11,8 +11,8 @@ export class StudyRoom {
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
-  @Column({ type: 'int', nullable: false })
-  category_id: number;
+  @Column({ type: 'varchar', nullable: false })
+  category_name: string;
 
   @BeforeInsert()
   setCreatedAt() {
