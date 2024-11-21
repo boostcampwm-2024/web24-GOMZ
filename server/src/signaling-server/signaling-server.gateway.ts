@@ -37,10 +37,12 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
   // 1. 신규 참가자가 공부방 입장을 요청한다. 그리고 방에 있는 기존 참가자들 소켓 정보를 반환한다.
   @SubscribeMessage('joinRoom')
   async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody('roomId') roomId: string) {
-    const users = await this.studyRoomsService.getRoomUsers(roomId);
+    const users = (await this.studyRoomsService.getRoomUsers(roomId)).filter(
+      (user) => user.socketId !== client.id,
+    );
     await this.studyRoomsService.addUserToRoom(roomId, client.id);
     client.emit('offerRequest', { users });
-    this.logger.info(`${client.id} 접속, [${users}]`);
+    this.logger.info(`${client.id} 접속, ${JSON.stringify(users)}`);
   }
 
   // 2. 신규 참가자가 기존 참가자들에게 offer를 보낸다.
