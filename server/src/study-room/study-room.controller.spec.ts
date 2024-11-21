@@ -36,8 +36,8 @@ describe('Study Room 컨트롤러 테스트', () => {
     service = module.get<StudyRoomsService>(StudyRoomsService);
   });
 
-  describe('클라이언트가 방 생성을 요청할 때', () => {
-    it('새로운 방을 생성한다.', async () => {
+  describe('POST /create 요청', () => {
+    it('방을 생성하고 결과를 반환해야 한다.', async () => {
       const roomName = 'testRoom';
       const password = null;
       const categoryName = '#test';
@@ -60,8 +60,8 @@ describe('Study Room 컨트롤러 테스트', () => {
     });
   });
 
-  describe('클라이언트가 방 조회를 요청할 때', () => {
-    it('모든 방을 조회한다.', async () => {
+  describe('GET /rooms 요청', () => {
+    it('모든 방 목록을 반환해야 한다.', async () => {
       const mockRooms = [
         {
           roomId: 19,
