@@ -10,6 +10,7 @@ import JoinRoomModal from '@components/StudyRoomList/JoinRoomModal';
 const StudyRoomList = () => {
   const [isJoinRoomModalOpen, setIsJoinRoomModalOpen] = useState(false);
   const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false);
+  const [roomId, setRoomId] = useState('');
 
   return (
     <div className="flex h-screen w-screen flex-col items-center">
@@ -18,42 +19,50 @@ const StudyRoomList = () => {
         <div className="flex h-[41.25rem] flex-col gap-3">
           <AddItemCard openModal={() => setIsAddRoomModalOpen(true)} />
           <ItemCard
-            title={'부스트 캠프 공부방'}
+            id={'1'}
+            roomName={'부스트 캠프 공부방'}
+            curParticipant={5}
+            maxParticipant={16}
+            categoryName="부캠"
+            isPrivate={true}
+            openModal={() => {
+              setIsJoinRoomModalOpen(true);
+              setRoomId('1');
+            }}
+          />
+          <ItemCard
+            id={'2'}
+            roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
-            category="부캠"
+            categoryName="부캠"
             isPrivate={true}
             openModal={() => setIsJoinRoomModalOpen(true)}
           />
           <ItemCard
-            title={'부스트 캠프 공부방'}
+            id={'3'}
+            roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
-            category="부캠"
+            categoryName="부캠"
             isPrivate={true}
             openModal={() => setIsJoinRoomModalOpen(true)}
           />
           <ItemCard
-            title={'부스트 캠프 공부방'}
+            id={'1'}
+            roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
-            category="부캠"
+            categoryName="부캠"
             isPrivate={true}
             openModal={() => setIsJoinRoomModalOpen(true)}
           />
           <ItemCard
-            title={'부스트 캠프 공부방'}
+            id={'1'}
+            roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
-            category="부캠"
-            isPrivate={true}
-            openModal={() => setIsJoinRoomModalOpen(true)}
-          />
-          <ItemCard
-            title={'부스트 캠프 공부방'}
-            curParticipant={6}
-            maxParticipant={16}
-            category="부캠"
+            categoryName="부캠"
             isPrivate={true}
             openModal={() => setIsJoinRoomModalOpen(true)}
           />
@@ -67,7 +76,7 @@ const StudyRoomList = () => {
             target === currentTarget && setIsJoinRoomModalOpen(false)
           }
         >
-          <JoinRoomModal closeModal={() => setIsJoinRoomModalOpen(false)} />
+          <JoinRoomModal id={roomId} closeModal={() => setIsJoinRoomModalOpen(false)} />
         </div>
       )}
       {isAddRoomModalOpen && (
