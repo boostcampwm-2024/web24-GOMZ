@@ -23,7 +23,14 @@ export class StudyRoomController {
 
   @Get('/rooms')
   async getAllRooms(): Promise<
-    { roomId: string; roomName: string; users: { socketId: string }[] }[]
+    {
+      roomId: string;
+      roomName: string;
+      categoryName: string;
+      isPrivate: boolean;
+      curParticipant: number;
+      maxParticipant: number;
+    }[]
   > {
     return await this.studyRoomService.getAllRoom();
   }
