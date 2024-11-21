@@ -12,8 +12,9 @@ export class StudyRoomsService {
 
   /**
    * 새로운 방을 생성합니다.
-   * @param roomName 방 ID
-   * @param clientId 생성자 ID
+   * @param roomName 방 제목
+   * @param password 방 비밀번호
+   * @param categoryName 방 카테고리 명
    * @returns 생성된 방
    */
   // TODO 생성된 방 entity를 그대로 주는 것보다 방 생성 성공 여부를 가르는 것은 어떤가요.
@@ -86,7 +87,14 @@ export class StudyRoomsService {
    * 존재하는 모든 방을 조회합니다.
    */
   async getAllRoom(): Promise<
-    { roomId: string; roomName: string; users: { socketId: string }[] }[]
+    {
+      roomId: string;
+      roomName: string;
+      categoryName: string;
+      isPrivate: boolean;
+      curParticipant: number;
+      maxParticipant: number;
+    }[]
   > {
     const allRooms = await this.participantRepository.getAllRooms();
 
@@ -96,7 +104,10 @@ export class StudyRoomsService {
         return {
           roomId,
           roomName: room.room_name,
-          users: allRooms[roomId],
+          categoryName: room.category_name,
+          isPrivate: !!room.password,
+          curParticipant: allRooms[roomId].length,
+          maxParticipant: 8,
         };
       }),
     );
