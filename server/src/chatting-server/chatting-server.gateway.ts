@@ -10,6 +10,7 @@ import { StudyRoomsService } from '../study-room/study-room.service';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { SendMessageDto } from './chatting-server.dto';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChattingServerGateway {
@@ -26,8 +27,9 @@ export class ChattingServerGateway {
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody('message') message: string,
+    @MessageBody() sendMessageDto: SendMessageDto,
   ) {
+    const { message } = sendMessageDto;
     const roomId = await this.studyRoomsService.findUserRoom(client.id);
 
     if (!roomId) {
