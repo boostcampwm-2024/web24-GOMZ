@@ -1,7 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { StudyRoomsService } from '../study-room/study-room.service';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { ROOM_ID_NOT_FOUND_ERROR, ROOM_NOT_FOUND } from './chatting-server.constant';
 
 @Injectable()
 export class ChattingServerService {
@@ -23,8 +24,8 @@ export class ChattingServerService {
 
   private async validateRoomIdExists(roomId: string, clientId: string) {
     if (!roomId) {
-      this.logger.info(`사용자 ${clientId}가 속한 방이 없습니다.`);
-      throw new Error('Room ID does not exist for the user.');
+      this.logger.info(ROOM_NOT_FOUND(clientId));
+      throw new NotFoundException(ROOM_ID_NOT_FOUND_ERROR);
     }
   }
 }
