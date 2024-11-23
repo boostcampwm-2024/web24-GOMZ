@@ -11,6 +11,12 @@ import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { StudyRoomsService } from '../study-room/study-room.service';
+import {
+  JoinRoomDto,
+  SendAnswerDto,
+  SendIceCandidateDto,
+  SendOfferDto,
+} from './signalling-server.dto';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SignalingServerGateway implements OnGatewayDisconnect {
@@ -37,7 +43,8 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
 
   // 1. 신규 참가자가 공부방 입장을 요청한다. 그리고 방에 있는 기존 참가자들 소켓 정보를 반환한다.
   @SubscribeMessage('joinRoom')
-  async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody('roomId') roomId: string) {
+  async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() joinRoomDto: JoinRoomDto) {
+    const roomId = joinRoomDto.roomId;
     const users = (await this.studyRoomsService.getRoomUsers(roomId)).filter(
       (user) => user.socketId !== client.id,
     );
@@ -48,12 +55,8 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
 
   // 2. 신규 참가자가 기존 참가자들에게 offer를 보낸다.
   @SubscribeMessage('sendOffer')
-  handleSendOffer(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('offer') offer: RTCSessionDescriptionInit,
-    @MessageBody('oldId') oldId: string,
-    @MessageBody('newRandomId') newRandomId: string,
-  ) {
+  handleSendOffer(@ConnectedSocket() client: Socket, @MessageBody() sendOfferDto: SendOfferDto) {
+    const { offer, oldId, newRandomId } = sendOfferDto;
     this.logger.silly(
       `new user: ${client.id}(${newRandomId}) sends an offer to old user: ${oldId}`,
     );
@@ -62,12 +65,8 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
 
   // 3. 기존 참가자들은 신규 참가자에게 answer를 보낸다.
   @SubscribeMessage('sendAnswer')
-  handleSendAnswer(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('answer') answer: RTCSessionDescriptionInit,
-    @MessageBody('newId') newId: string,
-    @MessageBody('oldRandomId') oldRandomId: string,
-  ) {
+  handleSendAnswer(@ConnectedSocket() client: Socket, @MessageBody() sendAnswerDto: SendAnswerDto) {
+    const { answer, newId, oldRandomId } = sendAnswerDto;
     this.logger.silly(
       `old user: ${client.id}(${oldRandomId}) sends an answer to new user: ${newId}`,
     );
@@ -82,9 +81,9 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
   @SubscribeMessage('sendIceCandidate')
   handleSendIceCandidate(
     @ConnectedSocket() client: Socket,
-    @MessageBody('targetId') targetId: string,
-    @MessageBody('iceCandidate') candidate: RTCIceCandidateInit,
+    @MessageBody() sendIceCandidateDto: SendIceCandidateDto,
   ) {
+    const { targetId, candidate } = sendIceCandidateDto;
     this.logger.silly(`user: ${client.id} sends ICE candidate to user: ${targetId}`);
     this.server
       .to(targetId)
