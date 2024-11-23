@@ -27,6 +27,7 @@
     "@nestjs/platform-socket.io": "^10.4.7",
     "@nestjs/typeorm": "^10.0.2",
     "@nestjs/websockets": "^10.4.7",
+    "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "mysql2": "^3.11.4",
     "nest-winston": "^1.9.7",
