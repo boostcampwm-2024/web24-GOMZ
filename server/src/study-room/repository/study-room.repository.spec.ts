@@ -42,33 +42,35 @@ describe('Study Room 레포지토리 테스트', () => {
   describe('사용자가 방을 생성할 때', () => {
     it('방이 성공적으로 생성된다.', async () => {
       const roomName = '테스트 스터디 그룹입니다.';
-      const categoryId = 1;
+      const password = '';
+      const categoryName = '1';
 
       // 방 생성
-      const result = await studyRoomRepository.createRoom(roomName, categoryId);
+      const result = await studyRoomRepository.createRoom(roomName, password, categoryName);
 
       // 검증
       expect(result).toBeDefined();
       expect(result.room_id).toBeDefined();
       expect(result.room_name).toEqual(roomName);
-      expect(result.category_id).toEqual(categoryId);
+      expect(result.category_name).toEqual(categoryName);
       expect(result.created_at).toBeDefined();
 
       // 데이터베이스에 방이 존재하는지 확인
       const foundRoom = await repository.findOne({ where: { room_id: result.room_id } });
       expect(foundRoom).toBeDefined();
       expect(foundRoom.room_name).toEqual(roomName);
-      expect(foundRoom.category_id).toEqual(categoryId);
+      expect(foundRoom.category_name).toEqual(categoryName);
     });
   });
 
   describe('방 ID로 방을 찾을 때', () => {
     it('방이 존재하면 방을 반환한다.', async () => {
       const roomName = 'Math Study Room';
-      const categoryId = 1;
+      const password = '';
+      const categoryName = '1';
 
       // 생성된 방 추가
-      const expectedRoom = await studyRoomRepository.createRoom(roomName, categoryId);
+      const expectedRoom = await studyRoomRepository.createRoom(roomName, password, categoryName);
 
       // 실행
       const result = await studyRoomRepository.findRoom(expectedRoom.room_id);
@@ -77,7 +79,7 @@ describe('Study Room 레포지토리 테스트', () => {
       expect(result).toBeDefined();
       expect(result.room_id).toEqual(expectedRoom.room_id);
       expect(result.room_name).toEqual(roomName);
-      expect(result.category_id).toEqual(categoryId);
+      expect(result.category_name).toEqual(categoryName);
     });
 
     it('방이 존재하지 않으면 undefined를 반환한다.', async () => {
