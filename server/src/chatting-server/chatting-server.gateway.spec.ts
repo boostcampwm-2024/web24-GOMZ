@@ -5,7 +5,7 @@ import { ChattingServerService } from './chatting-server.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { io, Socket } from 'socket.io-client';
 
-describe('Chatting Server Gateway 테스트', () => {
+describe('Chatting Server 게이트웨이 테스트', () => {
   let app: INestApplication;
   let clientSocket1: Socket;
   let clientSocket2: Socket;

@@ -4,7 +4,7 @@ import { StudyRoomsService } from '../study-room/study-room.service';
 import { NotFoundException } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
-describe('Chatting Server 서비스', () => {
+describe('Chatting Server 서비스 테스트', () => {
   let service: ChattingServerService;
 
   const mockStudyRoomsService = {
