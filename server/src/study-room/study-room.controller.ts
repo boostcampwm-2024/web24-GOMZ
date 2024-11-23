@@ -1,7 +1,13 @@
-import { Body, Controller, Get, Inject, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Query } from '@nestjs/common';
 import { StudyRoomsService } from './study-room.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import {
+  CheckAccessRequestDto,
+  CreateRoomRequestDto,
+  CreateRoomResponseDto,
+} from './dto/create-room.dto';
+import { RoomInfoResponseDto } from './dto/read-room.dto';
 
 @Controller('study-room')
 export class StudyRoomController {
@@ -12,35 +18,19 @@ export class StudyRoomController {
   ) {}
 
   @Post('/create')
-  creatRoom(
-    @Body('roomName') roomName: string,
-    @Body('password') password: string,
-    @Body('categoryName') categoryName: string,
-  ): Promise<{ roomId: number }> {
-    return this.studyRoomService.createRoom(roomName, password, categoryName);
+  creatRoom(@Body() createRoomRequestDto: CreateRoomRequestDto): Promise<CreateRoomResponseDto> {
+    return this.studyRoomService.createRoom(createRoomRequestDto);
   }
 
   @Get('/rooms')
-  async getAllRooms(): Promise<
-    {
-      roomId: number;
-      roomName: string;
-      categoryName: string;
-      isPrivate: boolean;
-      curParticipant: number;
-      maxParticipant: number;
-    }[]
-  > {
+  async getAllRooms(): Promise<RoomInfoResponseDto[]> {
     return await this.studyRoomService.getAllRoom();
   }
 
   @Get('/check')
-  async checkAccess(
-    @Query('password') password: string,
-    @Query('roomId', ParseIntPipe) roomId: number,
-  ) {
+  async checkAccess(@Query() checkAccessRequestDto: CheckAccessRequestDto) {
     try {
-      const result = await this.studyRoomService.checkAccess(password, roomId);
+      const result = await this.studyRoomService.checkAccess(checkAccessRequestDto);
       return { canAccess: result };
     } catch (error) {
       return { canAccess: false, error };
