@@ -2,13 +2,28 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { StudyRoomsService } from './study-room.service';
 import { StudyRoomRepository } from './repository/study-room.repository';
 import { StudyRoomParticipantRepository } from './repository/study-room-participant.repository';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  CreateRoomRequestDto,
+  CreateRoomResponseDto,
+  CheckAccessRequestDto,
+} from './dto/create-room.dto';
+import { RoomInfoResponseDto } from './dto/read-room.dto';
 import { StudyRoom } from './entity/study-room.entity';
-import { StudyRoomParticipant } from './entity/study-room-participant.entity';
 
 describe('Study Room 서비스 테스트', () => {
   let service: StudyRoomsService;
-  let roomRepository: StudyRoomRepository;
-  let participantRepository: StudyRoomParticipantRepository;
+  let roomRepository: jest.Mocked<StudyRoomRepository>;
+  let participantRepository: jest.Mocked<StudyRoomParticipantRepository>;
+
+  const mockRoom = {
+    room_id: 1,
+    room_name: 'Test Room',
+    password: '1234',
+    category_name: 'Study',
+    created_at: new Date(),
+    setCreatedAt: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,189 +32,99 @@ describe('Study Room 서비스 테스트', () => {
         {
           provide: StudyRoomRepository,
           useValue: {
-            createRoom: jest.fn(),
             findRoom: jest.fn(),
+            createRoom: jest.fn(),
           },
         },
         {
           provide: StudyRoomParticipantRepository,
           useValue: {
             addUserToRoom: jest.fn(),
-            removeUserFromRoom: jest.fn(),
-            findParticipant: jest.fn(),
             getRoomUsers: jest.fn(),
-            leaveAllRooms: jest.fn(),
             getAllRooms: jest.fn(),
+            findParticipant: jest.fn(),
+            removeUserFromRoom: jest.fn(),
           },
         },
       ],
     }).compile();
 
     service = module.get<StudyRoomsService>(StudyRoomsService);
-    roomRepository = module.get<StudyRoomRepository>(StudyRoomRepository);
-    participantRepository = module.get<StudyRoomParticipantRepository>(
+    roomRepository = module.get(StudyRoomRepository) as jest.Mocked<StudyRoomRepository>;
+    participantRepository = module.get(
       StudyRoomParticipantRepository,
-    );
+    ) as jest.Mocked<StudyRoomParticipantRepository>;
   });
 
-  describe('방 생성을 요청할 때', () => {
-    it('방을 생성한다.', async () => {
-      const roomName = 'testRoom';
-      const password = null;
-      const categoryName = '#test';
+  describe('createRoom', () => {
+    it('새로운 방을 성공적으로 생성해야 한다.', async () => {
+      // given
+      const createRoomDto = new CreateRoomRequestDto('Test Room', '1234', 'Study');
+      roomRepository.createRoom.mockResolvedValue(mockRoom);
 
-      const mockStudyRoom: StudyRoom = {
-        room_id: 1,
-        room_name: 'testRoom',
-        category_name: '#test',
-        created_at: new Date(),
-        setCreatedAt: jest.fn(),
-        password: null,
-      };
+      // when
+      const result = await service.createRoom(createRoomDto);
 
-      jest.spyOn(roomRepository, 'createRoom').mockResolvedValue(mockStudyRoom);
-
-      const result = await service.createRoom(roomName, password, categoryName);
-      expect(roomRepository.createRoom).toHaveBeenCalledWith(roomName, password, categoryName);
-      expect(result.roomId).toEqual(mockStudyRoom.room_id);
+      // then
+      expect(result).toEqual(new CreateRoomResponseDto(mockRoom.room_id));
     });
   });
 
-  describe('방 검색을 요청할 때', () => {
-    it('존재하는 방을 반환한다.', async () => {
-      const roomId = '1';
+  describe('checkAccess', () => {
+    it('올바른 비밀번호로 방 접근을 허용해야 한다.', async () => {
+      // given
+      const checkAccessDto = new CheckAccessRequestDto('1234', 1);
+      roomRepository.findRoom.mockResolvedValue(mockRoom);
 
-      const mockStudyRoom: StudyRoom = {
-        room_id: 1,
-        room_name: 'Test Room',
-        category_name: '#test',
-        created_at: new Date(),
-        setCreatedAt: jest.fn(),
-        password: null,
-      };
+      // when
+      const result = await service.checkAccess(checkAccessDto);
 
-      jest.spyOn(roomRepository, 'findRoom').mockResolvedValue(mockStudyRoom);
-
-      const result = await service.findRoom(roomId);
-
-      expect(roomRepository.findRoom).toHaveBeenCalledWith(1);
-      expect(result).toEqual(mockStudyRoom);
+      // then
+      expect(result).toBe(true);
     });
 
-    it('존재하지 않는 방은 undefined를 반환한다.', async () => {
-      const roomId = '999';
+    it('방이 존재하지 않으면 예외를 던져야 한다.', async () => {
+      // given
+      const checkAccessDto = new CheckAccessRequestDto('1234', 1);
+      roomRepository.findRoom.mockResolvedValue(null);
 
-      jest.spyOn(roomRepository, 'findRoom').mockResolvedValue(undefined);
+      // when
+      const testFn = () => service.checkAccess(checkAccessDto);
 
-      const result = await service.findRoom(roomId);
-
-      expect(roomRepository.findRoom).toHaveBeenCalledWith(999);
-      expect(result).toBeUndefined();
+      // then
+      await expect(testFn).rejects.toThrow(NotFoundException);
     });
-  });
 
-  describe('방에 사용자 추가를 요청할 때', () => {
-    it('유효한 방에 사용자를 추가한다.', async () => {
-      const roomId = '1';
-      const socketId = 'socket123';
+    it('잘못된 비밀번호로 방 접근을 거부해야 한다.', async () => {
+      // given
+      const checkAccessDto = new CheckAccessRequestDto('wrong-password', 1);
+      roomRepository.findRoom.mockResolvedValue(mockRoom);
 
-      jest.spyOn(roomRepository, 'findRoom').mockResolvedValue({} as StudyRoom);
-      jest.spyOn(participantRepository, 'addUserToRoom').mockResolvedValue();
+      // when
+      const testFn = () => service.checkAccess(checkAccessDto);
 
-      await service.addUserToRoom(roomId, socketId);
-
-      expect(roomRepository.findRoom).toHaveBeenCalledWith(1);
-      expect(participantRepository.addUserToRoom).toHaveBeenCalledWith(1, socketId);
+      // then
+      await expect(testFn).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  describe('방에서 사용자 제거를 요청할 때', () => {
-    it('유효한 방과 참가자를 제거한다.', async () => {
-      const roomId = '1';
-      const socketId = 'socket123';
-
-      jest.spyOn(roomRepository, 'findRoom').mockResolvedValue({} as StudyRoom);
-      jest.spyOn(participantRepository, 'findParticipant').mockResolvedValue({
-        socket_id: '12345',
-        room_id: 1,
-      } as StudyRoomParticipant);
-      jest.spyOn(participantRepository, 'removeUserFromRoom').mockResolvedValue();
-
-      await service.removeUserFromRoom(roomId, socketId);
-
-      expect(roomRepository.findRoom).toHaveBeenCalledWith(1);
-      expect(participantRepository.findParticipant).toHaveBeenCalledWith(socketId);
-      expect(participantRepository.removeUserFromRoom).toHaveBeenCalledWith(1, socketId);
-    });
-
-    it('유효하지 않은 참가자를 제거하려고 하면 예외를 던진다.', async () => {
-      const roomId = '1';
-      const socketId = 'socket123';
-
-      jest.spyOn(roomRepository, 'findRoom').mockResolvedValue({} as StudyRoom);
-      jest.spyOn(participantRepository, 'findParticipant').mockResolvedValue(undefined);
-
-      await expect(service.removeUserFromRoom(roomId, socketId)).rejects.toThrow(
-        'participant not found',
-      );
-    });
-  });
-
-  describe('방의 모든 사용자 정보를 요청할 때', () => {
-    it('방의 모든 사용자를 반환한다.', async () => {
-      const roomId = '1';
-      const mockUsers = [{ socketId: 'socket123' }, { socketId: 'socket456' }];
-
-      jest.spyOn(participantRepository, 'getRoomUsers').mockResolvedValue(mockUsers);
-
-      const result = await service.getRoomUsers(roomId);
-
-      expect(participantRepository.getRoomUsers).toHaveBeenCalledWith(1);
-      expect(result).toEqual(mockUsers);
-    });
-  });
-
-  describe('한 사용자가 방 퇴장을 요청할 때', () => {
-    it('사용자가 모든 방에서 나가게 한다.', async () => {
-      const socketId = 'socket123';
-
-      jest.spyOn(participantRepository, 'leaveAllRooms').mockResolvedValue();
-
-      await service.leaveAllRooms(socketId);
-
-      expect(participantRepository.leaveAllRooms).toHaveBeenCalledWith(socketId);
-    });
-  });
-
-  describe('사용자가 속한 방 정보를 요청할 때', () => {
-    it('사용자가 속한 방 ID를 반환한다.', async () => {
-      const clientId = 'socket123';
+  describe('getAllRoom', () => {
+    it('모든 방 정보를 반환해야 한다.', async () => {
+      // given
       const mockRooms = {
-        '1': [{ socketId: 'socket123' }],
-        '2': [{ socketId: 'socket456' }],
+        1: [{ socketId: 'socket1' }, { socketId: 'socket2' }],
       };
+      const mockRoomEntity: StudyRoom = mockRoom;
+      participantRepository.getAllRooms.mockResolvedValue(mockRooms);
+      roomRepository.findRoom.mockResolvedValue(mockRoomEntity);
 
-      jest.spyOn(participantRepository, 'getAllRooms').mockResolvedValue(mockRooms);
+      // when
+      const result = await service.getAllRoom();
 
-      const result = await service.findUserRoom(clientId);
-
+      // then
       expect(participantRepository.getAllRooms).toHaveBeenCalled();
-      expect(result).toBe('1');
-    });
-
-    it('사용자가 속한 방이 없으면 undefined를 반환한다.', async () => {
-      const clientId = 'socket999';
-      const mockRooms = {
-        '1': [{ socketId: 'socket123' }],
-        '2': [{ socketId: 'socket456' }],
-      };
-
-      jest.spyOn(participantRepository, 'getAllRooms').mockResolvedValue(mockRooms);
-
-      const result = await service.findUserRoom(clientId);
-
-      expect(participantRepository.getAllRooms).toHaveBeenCalled();
-      expect(result).toBeUndefined();
+      expect(roomRepository.findRoom).toHaveBeenCalledWith(1);
+      expect(result).toEqual([new RoomInfoResponseDto(mockRoomEntity, 1, 2, 8)]);
     });
   });
 });
