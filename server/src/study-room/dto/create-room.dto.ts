@@ -30,9 +30,9 @@ export class CreateRoomResponseDto {
 }
 
 export class CheckAccessRequestDto {
-  constructor(password: string, roomId: string) {
+  constructor(password: string, roomId: number) {
     this.password = password;
-    this.roomId = parseInt(roomId, 10);
+    this.roomId = roomId;
     Object.freeze(this);
   }
 
