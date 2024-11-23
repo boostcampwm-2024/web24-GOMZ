@@ -11,6 +11,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { SendMessageDto } from './chatting-server.dto';
 import { ChattingServerService } from './chatting-server.service';
+import { MESSAGE_SENT } from './chatting-server.constant';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChattingServerGateway {
@@ -28,11 +29,14 @@ export class ChattingServerGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() sendMessageDto: SendMessageDto,
   ) {
-    const userList = await this.chattingServerService.handleSendMessage(client.id);
+    const { message } = sendMessageDto;
+    const clientId = client.id;
+    const userList = await this.chattingServerService.handleSendMessage(clientId);
 
+    this.logger.info(MESSAGE_SENT(clientId, userList, message));
     client.broadcast.to(userList).emit('receiveMessage', {
-      userId: client.id,
-      message: sendMessageDto.message,
+      userId: clientId,
+      message: message,
     });
   }
 }
