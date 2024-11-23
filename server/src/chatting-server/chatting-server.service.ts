@@ -12,7 +12,7 @@ export class ChattingServerService {
     private readonly studyRoomsService: StudyRoomsService,
   ) {}
 
-  async handleSendMessage(clientId: string): Promise<string[]> {
+  async getRoomMemberSocketIdList(clientId: string): Promise<string[]> {
     const roomId = await this.studyRoomsService.findUserRoom(clientId);
     await this.validateRoomIdExists(roomId, clientId);
 

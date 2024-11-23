@@ -31,7 +31,7 @@ export class ChattingServerGateway {
   ) {
     const { message } = sendMessageDto;
     const clientId = client.id;
-    const userList = await this.chattingServerService.handleSendMessage(clientId);
+    const userList = await this.chattingServerService.getRoomMemberSocketIdList(clientId);
 
     this.logger.info(MESSAGE_SENT(clientId, userList, message));
     client.broadcast.to(userList).emit('receiveMessage', {
