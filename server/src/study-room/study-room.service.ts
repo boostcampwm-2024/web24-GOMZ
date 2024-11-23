@@ -2,6 +2,12 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { StudyRoom } from './entity/study-room.entity';
 import { StudyRoomRepository } from './repository/study-room.repository';
 import { StudyRoomParticipantRepository } from './repository/study-room-participant.repository';
+import {
+  CheckAccessRequestDto,
+  CreateRoomRequestDto,
+  CreateRoomResponseDto,
+} from './dto/create-room.dto';
+import { RoomInfoResponseDto } from './dto/read-room.dto';
 
 @Injectable()
 export class StudyRoomsService {
@@ -19,13 +25,11 @@ export class StudyRoomsService {
    */
   // TODO 생성된 방 entity를 그대로 주는 것보다 방 생성 성공 여부를 가르는 것은 어떤가요.
   // TODO 나중에는 카테고리 ID도 필요해요.
-  async createRoom(
-    roomName: string,
-    password: string,
-    categoryName: string,
-  ): Promise<{ roomId: number }> {
+  async createRoom(createRoomRequestDto: CreateRoomRequestDto): Promise<CreateRoomResponseDto> {
+    const { roomName, password, categoryName } = createRoomRequestDto;
     const studyRoom = await this.roomRepository.createRoom(roomName, password, categoryName);
-    return { roomId: studyRoom.room_id };
+    const response = new CreateRoomResponseDto(studyRoom.room_id);
+    return response;
   }
 
   /**
@@ -91,29 +95,18 @@ export class StudyRoomsService {
   /**
    * 존재하는 모든 방을 조회합니다.
    */
-  async getAllRoom(): Promise<
-    {
-      roomId: number;
-      roomName: string;
-      categoryName: string;
-      isPrivate: boolean;
-      curParticipant: number;
-      maxParticipant: number;
-    }[]
-  > {
+  async getAllRoom(): Promise<RoomInfoResponseDto[]> {
     const allRooms = await this.participantRepository.getAllRooms();
 
     return await Promise.all(
-      Object.keys(allRooms).map(async (roomId) => {
-        const room = await this.roomRepository.findRoom(parseInt(roomId, 10));
-        return {
-          roomId: parseInt(roomId, 10),
-          roomName: room.room_name,
-          categoryName: room.category_name,
-          isPrivate: !!room.password,
-          curParticipant: allRooms[roomId].length,
-          maxParticipant: 8,
-        };
+      Object.keys(allRooms).map(async (roomIdString) => {
+        const roomId = parseInt(roomIdString, 10);
+        const room = await this.roomRepository.findRoom(roomId);
+        const curParticipant = allRooms[roomId].length;
+        const maxParticipant = 8;
+        const response = new RoomInfoResponseDto(room, roomId, curParticipant, maxParticipant);
+
+        return response;
       }),
     );
   }
@@ -138,8 +131,8 @@ export class StudyRoomsService {
    * @param password 사용자 입력 패스워드
    * @param roomId 들어가려는 방 ID
    */
-  async checkAccess(password: string, roomId: number) {
-    // 방 존재여부 체크
+  async checkAccess(checkAccessRequestDto: CheckAccessRequestDto) {
+    const { password, roomId } = checkAccessRequestDto;
     const studyRoom = await this.roomRepository.findRoom(roomId);
     if (!studyRoom) {
       throw new NotFoundException('No such study room');
