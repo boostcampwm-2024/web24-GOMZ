@@ -3,7 +3,7 @@ import Icon from '@components/common/Icon';
 
 interface ControlBarProps {
   className?: string;
-  toggleVideo: () => boolean;
+  toggleVideo: () => Promise<boolean>;
   toggleMic: () => boolean;
   toggleChat: () => void;
   exitRoom: () => void;
@@ -24,7 +24,7 @@ const ControlBar = ({
   return (
     <div className={`flex gap-12 ${className}`}>
       <button
-        onClick={() => setIsVideoOn(toggleVideo())}
+        onClick={() => toggleVideo().then((result) => setIsVideoOn(result))}
         className="bg-gomz-black flex h-10 w-10 items-center justify-center rounded-full"
       >
         <Icon
