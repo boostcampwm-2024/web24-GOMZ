@@ -40,14 +40,6 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     }
   };
 
-  const isDisconnected = (peerConnection: RTCPeerConnection) => {
-    return (
-      peerConnection.connectionState === 'disconnected' ||
-      peerConnection.connectionState === 'failed' ||
-      peerConnection.connectionState === 'closed'
-    );
-  };
-
   const handlePeerDisconnection = (peerConnection: RTCPeerConnection, targetId: string) => {
     webRTCMap.delete(targetId);
     pendingConnectionsMap.delete(targetId);
@@ -70,12 +62,6 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
       peerConnection.onicecandidate = ({ candidate }) => {
         if (candidate) {
           socket.emit('sendIceCandidate', { targetId: oldId, iceCandidate: candidate });
-        }
-      };
-
-      peerConnection.onconnectionstatechange = () => {
-        if (isDisconnected(peerConnection)) {
-          handlePeerDisconnection(peerConnection, oldId);
         }
       };
 
@@ -107,12 +93,6 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
     peerConnection.onicecandidate = ({ candidate }) => {
       if (candidate) {
         socket.emit('sendIceCandidate', { targetId: newId, iceCandidate: candidate });
-      }
-    };
-
-    peerConnection.onconnectionstatechange = () => {
-      if (isDisconnected(peerConnection)) {
-        handlePeerDisconnection(peerConnection, newId);
       }
     };
 
