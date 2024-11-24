@@ -44,11 +44,9 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
 
       updatePendingConnection(oldId, { peerConnection, dataChannel });
 
-      localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
-
-      const offer = await peerConnection.createOffer();
-
-      await peerConnection.setLocalDescription(offer);
+      peerConnection.ontrack = ({ streams }) => {
+        updatePendingConnection(oldId, { remoteStream: streams[0] });
+      };
 
       peerConnection.onicecandidate = ({ candidate }) => {
         if (candidate) {
@@ -56,11 +54,39 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
         }
       };
 
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
+      });
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
       socket.emit('sendOffer', { oldId, offer, newRandomId: localStorage.getItem('nickName') });
+
+      peerConnection.onnegotiationneeded = async () => {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        socket.emit('sendOffer', { oldId, offer, newRandomId: localStorage.getItem('nickName') });
+      };
     }
   });
 
   socket.on('answerRequest', async ({ newId, offer, newRandomId }) => {
+    const isRenegotiation = webRTCMap.has(newId);
+
+    if (isRenegotiation) {
+      const { peerConnection } = webRTCMap.get(newId)!;
+      await peerConnection.setRemoteDescription(offer);
+
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      socket.emit('sendAnswer', { newId, answer, oldRandomId: localStorage.getItem('nickName') });
+
+      // removeTrack 이벤트 발생 시 화면 갱신을 위한 remoteStream 수동 업데이트
+      updatePendingConnection(newId, { remoteStream: webRTCMap.get(newId)!.remoteStream });
+
+      return;
+    }
+
     const peerConnection = new RTCPeerConnection(configuration);
 
     updatePendingConnection(newId, { peerConnection, nickName: newRandomId });
@@ -73,33 +99,39 @@ const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTC
       updatePendingConnection(newId, { remoteStream: streams[0] });
     };
 
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-    localStream.getTracks().forEach((track) => peerConnection.addTrack(track, localStream));
-
-    const answer = await peerConnection.createAnswer();
-
-    await peerConnection.setLocalDescription(answer);
-
     peerConnection.onicecandidate = ({ candidate }) => {
       if (candidate) {
         socket.emit('sendIceCandidate', { targetId: newId, iceCandidate: candidate });
       }
     };
 
+    await peerConnection.setRemoteDescription(offer);
+
+    localStream.getTracks().forEach((track) => {
+      peerConnection.addTrack(track, localStream);
+    });
+
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
     socket.emit('sendAnswer', { newId, answer, oldRandomId: localStorage.getItem('nickName') });
+
+    peerConnection.onnegotiationneeded = async () => {
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      socket.emit('sendOffer', {
+        oldId: newId,
+        offer,
+        newRandomId: localStorage.getItem('nickName'),
+      });
+    };
   });
 
   socket.on('completeConnection', async ({ oldId, answer, oldRandomId }) => {
     const { peerConnection } = pendingConnectionsMap.get(oldId)!;
 
-    peerConnection.ontrack = ({ streams }) => {
-      updatePendingConnection(oldId, { remoteStream: streams[0] });
-    };
-
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-
     updatePendingConnection(oldId, { nickName: oldRandomId });
+
+    await peerConnection.setRemoteDescription(answer);
   });
 
   socket.on('setIceCandidate', ({ senderId, iceCandidate }) => {
