@@ -17,7 +17,7 @@ interface WebRTCState {
 }
 
 interface WebRTCControls {
-  toggleVideo: () => boolean;
+  toggleVideo: () => Promise<boolean>;
   toggleMic: () => boolean;
   joinRoom: (roomId: string) => void;
   exitRoom: () => void;
@@ -40,9 +40,34 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     setParticipantCount(currentParticipantCount);
   };
 
-  const toggleVideo = () => {
-    localStreamRef.current.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
-    return localStreamRef.current.getVideoTracks().every((track) => track.enabled);
+  const toggleVideo = async () => {
+    const currentVideoTrack = localStreamRef.current.getVideoTracks()[0];
+
+    if (currentVideoTrack) {
+      currentVideoTrack.stop();
+      localStreamRef.current.removeTrack(currentVideoTrack);
+
+      webRTCMap.current.forEach(({ peerConnection }) => {
+        const sender = peerConnection.getSenders().find(({ track }) => track?.kind === 'video')!;
+        peerConnection.removeTrack(sender);
+      });
+
+      return false;
+    } else {
+      const videoTrack = await navigator.mediaDevices
+        .getUserMedia({
+          video: { deviceId: { ideal: 'default' } },
+        })
+        .then((stream) => stream.getVideoTracks()[0]);
+
+      localStreamRef.current.addTrack(videoTrack);
+
+      webRTCMap.current.forEach(({ peerConnection }) => {
+        peerConnection.addTrack(videoTrack, localStreamRef.current);
+      });
+
+      return true;
+    }
   };
 
   const toggleMic = () => {
@@ -52,13 +77,11 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
 
   const joinRoom = async (roomId: string) => {
     localStreamRef.current = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
+      audio: { deviceId: { ideal: 'default' } },
     });
 
     localVideoRef.current!.srcObject = localStreamRef.current;
 
-    toggleVideo();
     toggleMic();
 
     const observableMap = new Map();
