@@ -18,7 +18,6 @@ const StudyRoomListHeader = ({ className }: { className?: string }) => {
       userInfo={
         <div className="flex gap-4 text-base font-normal">
           <div>{localStorage.getItem('nickName')}</div>
-          <button className="underline-offset-4 hover:underline">로그인</button>
         </div>
       }
     />
