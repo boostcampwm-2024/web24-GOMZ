@@ -48,7 +48,7 @@ describe('Study Room Participant 레포지토리 테스트', () => {
       const roomId = 1;
       const socketId = '12345';
 
-      await studyRoomParticipantRepository.addUserToRoom(roomId, socketId);
+      await studyRoomParticipantRepository.saveParticipant(roomId, socketId);
 
       const savedParticipant = await repository.findOne({
         where: { socket_id: socketId, room_id: roomId },
@@ -65,9 +65,9 @@ describe('Study Room Participant 레포지토리 테스트', () => {
       const roomId = 1;
       const socketId = '12345';
 
-      await studyRoomParticipantRepository.addUserToRoom(roomId, socketId);
+      await studyRoomParticipantRepository.saveParticipant(roomId, socketId);
 
-      const result = await studyRoomParticipantRepository.findParticipant(socketId);
+      const result = await studyRoomParticipantRepository.findParticipantBySocketId(socketId);
 
       expect(result).toBeDefined();
       expect(result?.socket_id).toEqual(socketId);
@@ -77,7 +77,7 @@ describe('Study Room Participant 레포지토리 테스트', () => {
     it('사용자가 존재하지 않으면 null을 반환한다.', async () => {
       const socketId = '99999';
 
-      const result = await studyRoomParticipantRepository.findParticipant(socketId);
+      const result = await studyRoomParticipantRepository.findParticipantBySocketId(socketId);
 
       expect(result).toBeNull();
     });
@@ -88,9 +88,9 @@ describe('Study Room Participant 레포지토리 테스트', () => {
       const roomId = 1;
       const socketId = '12345';
 
-      await studyRoomParticipantRepository.addUserToRoom(roomId, socketId);
+      await studyRoomParticipantRepository.saveParticipant(roomId, socketId);
 
-      await studyRoomParticipantRepository.removeUserFromRoom(roomId, socketId);
+      await studyRoomParticipantRepository.deleteParticipantBySocketId(roomId, socketId);
 
       const result = await repository.findOne({
         where: { socket_id: socketId, room_id: roomId },
@@ -104,7 +104,7 @@ describe('Study Room Participant 레포지토리 테스트', () => {
       const socketId = '99999';
 
       await expect(
-        studyRoomParticipantRepository.removeUserFromRoom(roomId, socketId),
+        studyRoomParticipantRepository.deleteParticipantBySocketId(roomId, socketId),
       ).rejects.toThrow('Participant not found in the room');
     });
   });
@@ -118,13 +118,13 @@ describe('Study Room Participant 레포지토리 테스트', () => {
       ];
 
       for (const participant of participants) {
-        await studyRoomParticipantRepository.addUserToRoom(
+        await studyRoomParticipantRepository.saveParticipant(
           participant.roomId,
           participant.socketId,
         );
       }
 
-      const result = await studyRoomParticipantRepository.getRoomUsers(roomId);
+      const result = await studyRoomParticipantRepository.findParticipantsByRoomId(roomId);
 
       expect(result).toEqual([{ socketId: '12345' }, { socketId: '67890' }]);
     });

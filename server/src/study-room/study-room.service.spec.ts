@@ -9,7 +9,6 @@ import {
   CheckAccessRequestDto,
 } from './dto/create-room.dto';
 import { RoomInfoResponseDto } from './dto/read-room.dto';
-import { StudyRoom } from './entity/study-room.entity';
 
 describe('Study Room 서비스 테스트', () => {
   let service: StudyRoomsService;
@@ -32,18 +31,19 @@ describe('Study Room 서비스 테스트', () => {
         {
           provide: StudyRoomRepository,
           useValue: {
-            findRoom: jest.fn(),
-            createRoom: jest.fn(),
+            findAllRooms: jest.fn(),
+            findRoomById: jest.fn(),
+            saveRoom: jest.fn(),
           },
         },
         {
           provide: StudyRoomParticipantRepository,
           useValue: {
-            addUserToRoom: jest.fn(),
-            getRoomUsers: jest.fn(),
-            getAllRooms: jest.fn(),
-            findParticipant: jest.fn(),
-            removeUserFromRoom: jest.fn(),
+            saveParticipant: jest.fn(),
+            findParticipantBySocketId: jest.fn(),
+            findParticipantsByRoomId: jest.fn(),
+            findRoomIdBySocketId: jest.fn(),
+            deleteParticipantBySocketId: jest.fn(),
           },
         },
       ],
@@ -60,7 +60,7 @@ describe('Study Room 서비스 테스트', () => {
     it('새로운 방을 성공적으로 생성해야 한다.', async () => {
       // given
       const createRoomDto = new CreateRoomRequestDto('Test Room', '1234', 'Study');
-      roomRepository.createRoom.mockResolvedValue(mockRoom);
+      roomRepository.saveRoom.mockResolvedValue(mockRoom);
 
       // when
       const result = await service.createRoom(createRoomDto);
@@ -74,7 +74,7 @@ describe('Study Room 서비스 테스트', () => {
     it('올바른 비밀번호로 방 접근을 허용해야 한다.', async () => {
       // given
       const checkAccessDto = new CheckAccessRequestDto('1234', 1);
-      roomRepository.findRoom.mockResolvedValue(mockRoom);
+      roomRepository.findRoomById.mockResolvedValue(mockRoom);
 
       // when
       const result = await service.checkAccess(checkAccessDto);
@@ -86,7 +86,7 @@ describe('Study Room 서비스 테스트', () => {
     it('방이 존재하지 않으면 예외를 던져야 한다.', async () => {
       // given
       const checkAccessDto = new CheckAccessRequestDto('1234', 1);
-      roomRepository.findRoom.mockResolvedValue(null);
+      roomRepository.findRoomById.mockResolvedValue(null);
 
       // when
       const testFn = () => service.checkAccess(checkAccessDto);
@@ -98,7 +98,7 @@ describe('Study Room 서비스 테스트', () => {
     it('잘못된 비밀번호로 방 접근을 거부해야 한다.', async () => {
       // given
       const checkAccessDto = new CheckAccessRequestDto('wrong-password', 1);
-      roomRepository.findRoom.mockResolvedValue(mockRoom);
+      roomRepository.findRoomById.mockResolvedValue(mockRoom);
 
       // when
       const testFn = () => service.checkAccess(checkAccessDto);
@@ -111,20 +111,16 @@ describe('Study Room 서비스 테스트', () => {
   describe('getAllRoom', () => {
     it('모든 방 정보를 반환해야 한다.', async () => {
       // given
-      const mockRooms = {
-        1: [{ socketId: 'socket1' }, { socketId: 'socket2' }],
-      };
-      const mockRoomEntity: StudyRoom = mockRoom;
-      participantRepository.getAllRooms.mockResolvedValue(mockRooms);
-      roomRepository.findRoom.mockResolvedValue(mockRoomEntity);
+      const mockParticipants = [{ socketId: 'socket1' }, { socketId: 'socket2' }];
+      const mockRoomEntity = [mockRoom];
+      roomRepository.findAllRooms.mockResolvedValue(mockRoomEntity);
+      participantRepository.findParticipantsByRoomId.mockResolvedValue(mockParticipants);
 
       // when
       const result = await service.getAllRoom();
 
       // then
-      expect(participantRepository.getAllRooms).toHaveBeenCalled();
-      expect(roomRepository.findRoom).toHaveBeenCalledWith(1);
-      expect(result).toEqual([new RoomInfoResponseDto(mockRoomEntity, 1, 2, 8)]);
+      expect(result).toEqual([new RoomInfoResponseDto(mockRoomEntity[0], 1, 2, 8)]);
     });
   });
 });
