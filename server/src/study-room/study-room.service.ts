@@ -47,7 +47,7 @@ export class StudyRoomsService {
    */
   async addUserToRoom(roomId: string, socketId: string): Promise<void> {
     await this.isValidRoom(roomId);
-    await this.participantRepository.addUserToRoom(parseInt(roomId, 10), socketId);
+    await this.participantRepository.saveParticipant(parseInt(roomId, 10), socketId);
   }
 
   /**
@@ -58,7 +58,7 @@ export class StudyRoomsService {
   async removeUserFromRoom(roomId: string, socketId: string): Promise<void> {
     await this.isValidRoom(roomId);
     await this.isValidParticipant(socketId);
-    await this.participantRepository.removeUserFromRoom(parseInt(roomId, 10), socketId);
+    await this.participantRepository.deleteParticipantBySocketId(parseInt(roomId, 10), socketId);
   }
 
   /**
@@ -67,15 +67,7 @@ export class StudyRoomsService {
    * @returns 방에 있는 사용자의 목록
    */
   async getRoomUsers(roomId: string): Promise<{ socketId: string }[]> {
-    return await this.participantRepository.getRoomUsers(parseInt(roomId, 10));
-  }
-
-  /**
-   * 특정 사용자를 모든 방에서 제거합니다.
-   * @param socketId 클라이언트 ID
-   */
-  async leaveAllRooms(socketId: string): Promise<void> {
-    await this.participantRepository.leaveAllRooms(socketId);
+    return await this.participantRepository.findParticipantsByRoomId(parseInt(roomId, 10));
   }
 
   /**
@@ -84,10 +76,9 @@ export class StudyRoomsService {
    * @returns 사용자가 속한 방 ID 또는 undefined
    */
   async findUserRoom(clientId: string): Promise<string | null> {
-    const rooms = await this.participantRepository.getAllRooms();
-    return Object.keys(rooms).find((roomId) =>
-      rooms[roomId].some((user) => user.socketId === clientId),
-    );
+    const roomId = await this.participantRepository.findRoomIdBySocketId(clientId);
+
+    return roomId.toString() || null;
   }
 
   /**
@@ -99,7 +90,7 @@ export class StudyRoomsService {
     const roomInfoResponseDtoList = [];
     for (const roomInfo of roomList) {
       const roomId = roomInfo.room_id;
-      const roomParticipants = await this.participantRepository.getRoomUsers(roomId);
+      const roomParticipants = await this.participantRepository.findParticipantsByRoomId(roomId);
       const curParticipant = roomParticipants.length;
       const maxParticipant = 8;
       const roomInfoResponseDto = new RoomInfoResponseDto(
@@ -123,7 +114,7 @@ export class StudyRoomsService {
   }
 
   private async isValidParticipant(socketId: string): Promise<void> {
-    const participant = await this.participantRepository.findParticipant(socketId);
+    const participant = await this.participantRepository.findParticipantBySocketId(socketId);
     if (!participant) {
       throw new Error('participant not found');
     }
