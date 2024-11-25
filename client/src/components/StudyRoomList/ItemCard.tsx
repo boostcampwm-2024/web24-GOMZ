@@ -23,7 +23,7 @@ const ItemCard = ({
   const navigate = useNavigate();
 
   const joinRoom = () => {
-    navigate(`/studyroom/${roomId}`);
+    navigate(`/studyroom/${roomId}`, { state: { maxParticipant } });
   };
 
   return (
