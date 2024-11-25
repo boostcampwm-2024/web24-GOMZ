@@ -16,7 +16,7 @@ import {
   SendAnswerDto,
   SendIceCandidateDto,
   SendOfferDto,
-} from './signalling-server.dto';
+} from './signaling-server.dto';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SignalingServerGateway implements OnGatewayDisconnect {
