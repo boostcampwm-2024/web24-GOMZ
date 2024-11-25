@@ -41,5 +41,5 @@ export class SendIceCandidateDto {
 
   @IsObject()
   @IsNotEmpty()
-  candidate: RTCIceCandidateInit;
+  iceCandidate: RTCIceCandidateInit;
 }
