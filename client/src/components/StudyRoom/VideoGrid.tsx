@@ -56,7 +56,7 @@ const VideoGrid = ({ localVideoRef, webRTCMap, participantCount, grid }: VideoGr
       }}
     >
       <div
-        className="relative rounded-2xl border border-black bg-black"
+        className="relative rounded-2xl bg-black"
         style={{
           height: `${MAX_HEIGHT / grid.cols}px`,
           width: `${MAX_WIDTH / grid.cols}px`,
@@ -91,7 +91,7 @@ const VideoGrid = ({ localVideoRef, webRTCMap, participantCount, grid }: VideoGr
       {[...webRTCMap.current].map(([id, { remoteStream }]) => (
         <div
           key={String(id)}
-          className="relative rounded-2xl border border-black bg-black"
+          className="relative rounded-2xl bg-black"
           style={{
             height: `${MAX_HEIGHT / grid.cols}px`,
             width: `${MAX_WIDTH / grid.cols}px`,
