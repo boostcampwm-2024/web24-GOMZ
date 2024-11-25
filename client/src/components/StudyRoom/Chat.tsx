@@ -35,7 +35,7 @@ const Chat = ({ sendMessage, className }: ChatProps) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
       handleSendMessage();
     }
   };
@@ -57,6 +57,7 @@ const Chat = ({ sendMessage, className }: ChatProps) => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyDown}
+          autoFocus
         ></input>
         <button onClick={handleSendMessage}>
           <Icon id="send" className="text-gomz-black h-7 w-7 fill-current" />
