@@ -18,7 +18,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/studyroom',
+    path: '/studyroom/:roomId',
     element: (
       <ProtectedRoute>
         <StudyRoom />

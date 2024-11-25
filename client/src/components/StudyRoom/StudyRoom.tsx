@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import StudyRoomHeader from '@components/StudyRoom/StudyRoomHeader';
 import VideoGrid from '@components/StudyRoom/VideoGrid';
@@ -14,9 +14,7 @@ interface Message {
 
 const StudyRoom = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const roomId = queryParams.get('roomId')!;
+  const { roomId } = useParams();
 
   const [isChatOn, setIsChatOn] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -28,6 +26,7 @@ const StudyRoom = () => {
   ] = useWebRTC();
 
   useEffect(() => {
+    if (!roomId) return;
     joinRoom(roomId).then((socket) => {
       socket.on('receiveMessage', ({ userId, message }) => {
         const { nickName } = webRTCMap.current.get(userId)!;
