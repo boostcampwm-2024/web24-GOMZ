@@ -2,28 +2,28 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '@components/common/Icon';
 
 interface ItemCardProps {
-  id: string;
+  roomId: string;
   roomName: string;
-  curParticipant: number;
-  maxParticipant: number;
   categoryName: string;
   isPrivate: boolean;
+  curParticipant: number;
+  maxParticipant: number;
   openModal: () => void;
 }
 
 const ItemCard = ({
-  id,
+  roomId,
   roomName,
-  curParticipant,
-  maxParticipant,
   categoryName,
   isPrivate,
+  curParticipant,
+  maxParticipant,
   openModal,
 }: ItemCardProps) => {
   const navigate = useNavigate();
 
   const joinRoom = () => {
-    navigate(`/studyroom?roomId=${id}`);
+    navigate(`/studyroom/${roomId}`);
   };
 
   return (

@@ -24,7 +24,7 @@ const StudyRoomList = () => {
         <div className="flex h-[41.25rem] flex-col gap-3">
           <AddItemCard openModal={() => setIsAddRoomModalOpen(true)} />
           <ItemCard
-            id={'1'}
+            roomId={'1'}
             roomName={'부스트 캠프 공부방'}
             curParticipant={5}
             maxParticipant={16}
@@ -36,7 +36,7 @@ const StudyRoomList = () => {
             }}
           />
           <ItemCard
-            id={'2'}
+            roomId={'2'}
             roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
@@ -48,7 +48,7 @@ const StudyRoomList = () => {
             }}
           />
           <ItemCard
-            id={'3'}
+            roomId={'3'}
             roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
@@ -60,7 +60,7 @@ const StudyRoomList = () => {
             }}
           />
           <ItemCard
-            id={'4'}
+            roomId={'4'}
             roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
@@ -72,7 +72,7 @@ const StudyRoomList = () => {
             }}
           />
           <ItemCard
-            id={'5'}
+            roomId={'5'}
             roomName={'부스트 캠프 공부방'}
             curParticipant={6}
             maxParticipant={16}
@@ -93,7 +93,7 @@ const StudyRoomList = () => {
             target === currentTarget && setIsJoinRoomModalOpen(false)
           }
         >
-          <JoinRoomModal id={roomId} closeModal={() => setIsJoinRoomModalOpen(false)} />
+          <JoinRoomModal roomId={roomId} closeModal={() => setIsJoinRoomModalOpen(false)} />
         </div>
       )}
       {isAddRoomModalOpen && (
