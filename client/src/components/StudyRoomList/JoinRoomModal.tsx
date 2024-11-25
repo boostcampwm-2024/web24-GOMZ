@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const JoinRoomModal = ({ id, closeModal }: { id: string; closeModal: () => void }) => {
+interface JoinRoomModalProps {
+  roomId: string;
+  closeModal: () => void;
+}
+
+const JoinRoomModal = ({ roomId, closeModal }: JoinRoomModalProps) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
 
@@ -17,7 +22,7 @@ const JoinRoomModal = ({ id, closeModal }: { id: string; closeModal: () => void 
   const handleJoinRoom = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // 비밀번호 확인 로직
-    navigate(`/studyroom?roomId=${id}`);
+    navigate(`/studyroom/${roomId}`);
   };
 
   return (
@@ -40,7 +45,7 @@ const JoinRoomModal = ({ id, closeModal }: { id: string; closeModal: () => void 
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 event.preventDefault();
-                navigate(`/studyroom?roomId=${id}`);
+                navigate(`/studyroom/${roomId}`);
               }
             }}
             onInvalid={({ target }: React.InvalidEvent<HTMLInputElement>) => {
