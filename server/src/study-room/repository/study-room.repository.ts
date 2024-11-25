@@ -21,6 +21,11 @@ export class StudyRoomRepository {
     return await this.repository.save(newRoom);
   }
 
+  // 방 조회
+  async getRooms(): Promise<StudyRoom[]> {
+    return this.repository.find();
+  }
+
   // 특정 방 조회
   findRoom(roomId: number): Promise<StudyRoom | null> {
     return this.repository.findOne({ where: { room_id: roomId } });
