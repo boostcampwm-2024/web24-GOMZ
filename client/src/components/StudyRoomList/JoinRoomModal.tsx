@@ -1,14 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-interface JoinRoomModalProps {
+interface Room {
   roomId: string;
+  roomName: string;
+  categoryName: string;
+  isPrivate: boolean;
+  curParticipant: number;
+  maxParticipant: number;
+}
+interface JoinRoomModalProps {
+  currentRoom: Partial<Room>;
   closeModal: () => void;
 }
 
-const JoinRoomModal = ({ roomId, closeModal }: JoinRoomModalProps) => {
+const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
+  const { roomId, maxParticipant } = currentRoom;
 
   const handlePasswordChange = ({ target }: { target: HTMLInputElement }) => {
     setPassword(target.value);
@@ -22,7 +31,7 @@ const JoinRoomModal = ({ roomId, closeModal }: JoinRoomModalProps) => {
   const handleJoinRoom = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // 비밀번호 확인 로직
-    navigate(`/studyroom/${roomId}`);
+    navigate(`/studyroom/${roomId}`, { state: { maxParticipant } });
   };
 
   return (

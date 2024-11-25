@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 import StudyRoomHeader from '@components/StudyRoom/StudyRoomHeader';
 import VideoGrid from '@components/StudyRoom/VideoGrid';
@@ -14,6 +14,7 @@ interface Message {
 
 const StudyRoom = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
   const { roomId } = useParams();
 
   const [isChatOn, setIsChatOn] = useState(false);
@@ -44,7 +45,7 @@ const StudyRoom = () => {
           className="mt-1"
           roomName="부스트 캠프 공부방"
           curParticipant={participantCount}
-          maxParticipant={16}
+          maxParticipant={state.maxParticipant}
           webRTCMap={webRTCMap}
         />
         <VideoGrid
