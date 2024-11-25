@@ -83,10 +83,10 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() sendIceCandidateDto: SendIceCandidateDto,
   ) {
-    const { targetId, candidate } = sendIceCandidateDto;
+    const { targetId, iceCandidate } = sendIceCandidateDto;
     this.logger.silly(`user: ${client.id} sends ICE candidate to user: ${targetId}`);
     this.server
       .to(targetId)
-      .emit('setIceCandidate', { senderId: client.id, iceCandidate: candidate });
+      .emit('setIceCandidate', { senderId: client.id, iceCandidate: iceCandidate });
   }
 }

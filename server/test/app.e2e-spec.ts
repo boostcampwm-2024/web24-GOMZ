@@ -75,7 +75,7 @@ describe('시그널링 서버 e2e 테스트', () => {
         answer: 'TestSDPAnswer',
         oldRandomId: 'OldRandomId',
       });
-      oldClient.emit('sendIceCandidate', { targetId: newId, candidate: 'OldIceCandidate' });
+      oldClient.emit('sendIceCandidate', { targetId: newId, iceCandidate: 'OldIceCandidate' });
     });
 
     oldClient.on('setIceCandidate', ({ iceCandidate }) => {
@@ -99,7 +99,7 @@ describe('시그널링 서버 e2e 테스트', () => {
     newClient.on('completeConnection', ({ oldId, answer, oldRandomId }) => {
       expect(answer).toBe('TestSDPAnswer'); // 기존 참가자가 보낸 Answer여야함
       expect(oldRandomId).toBe('OldRandomId'); // 기존 참가자의 랜덤 ID여야함
-      newClient.emit('sendIceCandidate', { targetId: oldId, candidate: 'NewIceCandidate' });
+      newClient.emit('sendIceCandidate', { targetId: oldId, iceCandidate: 'NewIceCandidate' });
     });
 
     newClient.on('setIceCandidate', ({ iceCandidate }) => {
