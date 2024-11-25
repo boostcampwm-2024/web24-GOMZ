@@ -1,35 +1,47 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Icon from '@components/common/Icon';
 
-interface ChatProps {
-  sendMessage: (message: string) => void;
-  className?: string;
+interface Message {
+  nickName: string;
+  message: string;
 }
 
 const ChatMessage = ({ nickName, message }: { nickName: string; message: string }) => {
   return (
-    <div className="mb-2">
+    <div className="mb-2 rounded-xl">
       <span className="mr-2 font-semibold">{nickName}</span>
       <span className="break-words">{message}</span>
     </div>
   );
 };
 
-const Chat = ({ sendMessage, className }: ChatProps) => {
-  const [messages, setMessages] = useState([
-    { nickName: '귀여운 요정', message: '안녕하세요! 환영합니다 :)' },
-  ]);
-  const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+interface ChatProps {
+  className?: string;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  newMessage: string;
+  setNewMessage: React.Dispatch<React.SetStateAction<string>>;
+  sendMessage: (message: string) => void;
+}
 
-  useEffect(() => {
-    messagesEndRef.current!.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+const Chat = ({
+  className,
+  messages,
+  setMessages,
+  newMessage,
+  setNewMessage,
+  sendMessage,
+}: ChatProps) => {
+  const isFirstRender = useRef(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleSendMessage = () => {
     if (newMessage !== '') {
       sendMessage(newMessage);
-      setMessages([...messages, { nickName: '배고픈 해파리', message: newMessage }]);
+      setMessages([
+        ...messages,
+        { nickName: localStorage.getItem('nickName')!, message: newMessage },
+      ]);
       setNewMessage('');
     }
   };
@@ -40,9 +52,18 @@ const Chat = ({ sendMessage, className }: ChatProps) => {
     }
   };
 
+  useEffect(() => {
+    if (!messagesEndRef.current) return;
+
+    messagesEndRef.current.scrollIntoView({
+      behavior: isFirstRender.current ? 'instant' : 'smooth',
+    });
+    isFirstRender.current = false;
+  }, [messages]);
+
   return (
     <div
-      className={`bg-gomz-white border-gomz-black flex h-[44rem] w-[25rem] flex-col justify-between gap-4 rounded-2xl border py-6 shadow-[0.25rem_0.25rem_0.5rem_0_rgba(0,0,0,0.25)] ${className}`}
+      className={`bg-gomz-white border-gomz-black flex h-[44rem] w-[25rem] flex-col justify-between gap-4 rounded-2xl border py-6 opacity-80 shadow-[0.25rem_0.25rem_0.5rem_0_rgba(0,0,0,0.25)] ${className}`}
     >
       <h2 className="mx-auto px-6 text-xl font-bold">🧸 채팅 💬</h2>
       <div className="mx-auto h-[38rem] w-[23rem] overflow-y-auto px-2">
@@ -60,7 +81,7 @@ const Chat = ({ sendMessage, className }: ChatProps) => {
           autoFocus
         ></input>
         <button onClick={handleSendMessage}>
-          <Icon id="send" className="text-gomz-black h-7 w-7 fill-current" />
+          <Icon id="send" className="text-gomz-black h-6 w-6 fill-current" />
         </button>
       </div>
     </div>
