@@ -23,11 +23,9 @@ export class StudyRoomsService {
    * @param categoryName 방 카테고리 명
    * @returns 생성된 방
    */
-  // TODO 생성된 방 entity를 그대로 주는 것보다 방 생성 성공 여부를 가르는 것은 어떤가요.
-  // TODO 나중에는 카테고리 ID도 필요해요.
   async createRoom(createRoomRequestDto: CreateRoomRequestDto): Promise<CreateRoomResponseDto> {
     const { roomName, password, categoryName } = createRoomRequestDto;
-    const studyRoom = await this.roomRepository.createRoom(roomName, password, categoryName);
+    const studyRoom = await this.roomRepository.saveRoom(roomName, password, categoryName);
     const response = new CreateRoomResponseDto(studyRoom.room_id);
     return response;
   }
@@ -38,7 +36,7 @@ export class StudyRoomsService {
    * @returns 방 객체 또는 undefined
    */
   async findRoom(roomId: string): Promise<StudyRoom | null> {
-    const room = await this.roomRepository.findRoom(parseInt(roomId, 10));
+    const room = await this.roomRepository.findRoomById(parseInt(roomId, 10));
     return room || undefined; // null 대신 undefined로 반환
   }
 
@@ -96,7 +94,7 @@ export class StudyRoomsService {
    * 존재하는 모든 방을 조회합니다.
    */
   async getAllRoom(): Promise<RoomInfoResponseDto[]> {
-    const roomList = await this.roomRepository.getRooms();
+    const roomList = await this.roomRepository.findAllRooms();
 
     const roomInfoResponseDtoList = [];
     for (const roomInfo of roomList) {
@@ -117,9 +115,9 @@ export class StudyRoomsService {
   }
 
   private async isValidRoom(roomId: string): Promise<void> {
-    const room = await this.roomRepository.findRoom(parseInt(roomId, 10));
+    const room = await this.roomRepository.findRoomById(parseInt(roomId, 10));
     if (!room) {
-      this.roomRepository.createRoom('테스트용 방', null, '#test');
+      this.roomRepository.saveRoom('테스트용 방', null, '#test');
       // throw new Error('Room not found');
     }
   }
@@ -138,7 +136,7 @@ export class StudyRoomsService {
    */
   async checkAccess(checkAccessRequestDto: CheckAccessRequestDto) {
     const { password, roomId } = checkAccessRequestDto;
-    const studyRoom = await this.roomRepository.findRoom(roomId);
+    const studyRoom = await this.roomRepository.findRoomById(roomId);
     if (!studyRoom) {
       throw new NotFoundException('No such study room');
     }

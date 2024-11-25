@@ -46,7 +46,7 @@ describe('Study Room 레포지토리 테스트', () => {
       const categoryName = '1';
 
       // 방 생성
-      const result = await studyRoomRepository.createRoom(roomName, password, categoryName);
+      const result = await studyRoomRepository.saveRoom(roomName, password, categoryName);
 
       // 검증
       expect(result).toBeDefined();
@@ -70,10 +70,10 @@ describe('Study Room 레포지토리 테스트', () => {
       const categoryName = '1';
 
       // 생성된 방 추가
-      const expectedRoom = await studyRoomRepository.createRoom(roomName, password, categoryName);
+      const expectedRoom = await studyRoomRepository.saveRoom(roomName, password, categoryName);
 
       // 실행
-      const result = await studyRoomRepository.findRoom(expectedRoom.room_id);
+      const result = await studyRoomRepository.findRoomById(expectedRoom.room_id);
 
       // 검증
       expect(result).toBeDefined();
@@ -86,7 +86,7 @@ describe('Study Room 레포지토리 테스트', () => {
       const roomId = 999;
 
       // 실행
-      const result = await studyRoomRepository.findRoom(roomId);
+      const result = await studyRoomRepository.findRoomById(roomId);
 
       // 검증
       expect(result).toBeNull();
