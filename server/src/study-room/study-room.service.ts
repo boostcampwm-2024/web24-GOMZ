@@ -96,19 +96,24 @@ export class StudyRoomsService {
    * 존재하는 모든 방을 조회합니다.
    */
   async getAllRoom(): Promise<RoomInfoResponseDto[]> {
-    const allRooms = await this.participantRepository.getAllRooms();
+    const roomList = await this.roomRepository.getRooms();
 
-    return await Promise.all(
-      Object.keys(allRooms).map(async (roomIdString) => {
-        const roomId = parseInt(roomIdString, 10);
-        const room = await this.roomRepository.findRoom(roomId);
-        const curParticipant = allRooms[roomId].length;
-        const maxParticipant = 8;
-        const response = new RoomInfoResponseDto(room, roomId, curParticipant, maxParticipant);
+    const roomInfoResponseDtoList = [];
+    for (const roomInfo of roomList) {
+      const roomId = roomInfo.room_id;
+      const roomParticipants = await this.participantRepository.getRoomUsers(roomId);
+      const curParticipant = roomParticipants.length;
+      const maxParticipant = 8;
+      const roomInfoResponseDto = new RoomInfoResponseDto(
+        roomInfo,
+        roomId,
+        curParticipant,
+        maxParticipant,
+      );
+      roomInfoResponseDtoList.push(roomInfoResponseDto);
+    }
 
-        return response;
-      }),
-    );
+    return roomInfoResponseDtoList;
   }
 
   private async isValidRoom(roomId: string): Promise<void> {
