@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import signalingClient from '@socket/signalingClient';
 
 interface WebRTCData {
@@ -19,7 +19,7 @@ interface WebRTCState {
 interface WebRTCControls {
   toggleVideo: () => Promise<boolean>;
   toggleMic: () => boolean;
-  joinRoom: (roomId: string) => void;
+  joinRoom: (roomId: string) => Promise<Socket>;
   exitRoom: () => void;
   sendMessage: (message: string) => void;
 }
@@ -104,10 +104,8 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
 
     socket.current = signalingClient(localStreamRef.current, webRTCMap.current);
     socket.current.emit('joinRoom', { roomId });
-    socket.current.on('receiveMessage', ({ userId, message }) => {
-      const { nickName } = webRTCMap.current.get(userId)!;
-      console.log(`${nickName}: ${message}`);
-    });
+
+    return socket.current;
   };
 
   const exitRoom = () => {
