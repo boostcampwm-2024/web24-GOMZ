@@ -10,8 +10,7 @@ export class StudyRoomParticipantRepository {
     private readonly repository: Repository<StudyRoomParticipant>,
   ) {}
 
-  // 방에 사용자 추가
-  async addUserToRoom(roomId: number, socketId: string): Promise<void> {
+  async saveParticipant(roomId: number, socketId: string): Promise<void> {
     const participant = this.repository.create({
       socket_id: socketId,
       room_id: roomId,
@@ -20,26 +19,11 @@ export class StudyRoomParticipantRepository {
     await this.repository.save(participant);
   }
 
-  // 특정 사용자 조회
-  async findParticipant(socketId: string): Promise<StudyRoomParticipant | null> {
+  async findParticipantBySocketId(socketId: string): Promise<StudyRoomParticipant | null> {
     return this.repository.findOne({ where: { socket_id: socketId } });
   }
 
-  // 방에서 사용자 제거
-  async removeUserFromRoom(roomId: number, socketId: string): Promise<void> {
-    const participant = await this.repository.findOne({
-      where: { socket_id: socketId, room_id: roomId },
-    });
-
-    if (!participant) {
-      throw new NotFoundException('Participant not found in the room');
-    }
-
-    await this.repository.remove(participant);
-  }
-
-  // 특정 방의 모든 사용자 조회
-  async getRoomUsers(roomId: number): Promise<{ socketId: string }[]> {
+  async findParticipantsByRoomId(roomId: number): Promise<{ socketId: string }[]> {
     const participants = await this.repository.find({
       where: { room_id: roomId },
     });
@@ -49,32 +33,23 @@ export class StudyRoomParticipantRepository {
     }));
   }
 
-  // 모든 방에서 특정 사용자 제거
-  async leaveAllRooms(socketId: string): Promise<void> {
-    const participants = await this.repository.find({
+  async findRoomIdBySocketId(socketId: string): Promise<number | null> {
+    const participant = await this.repository.findOne({
       where: { socket_id: socketId },
     });
 
-    if (participants.length > 0) {
-      await this.repository.remove(participants);
-    }
+    return participant.room_id;
   }
 
-  // 모든 방 정보 조회
-  async getAllRooms(): Promise<Record<string, { socketId: string }[]>> {
-    const participants = await this.repository.find();
-    const rooms: Record<string, { socketId: string }[]> = {};
+  async deleteParticipantBySocketId(roomId: number, socketId: string): Promise<void> {
+    const participant = await this.repository.findOne({
+      where: { socket_id: socketId, room_id: roomId },
+    });
 
-    for (const participant of participants) {
-      if (!rooms[participant.room_id]) {
-        rooms[participant.room_id] = [];
-      }
-
-      rooms[participant.room_id].push({
-        socketId: participant.socket_id,
-      });
+    if (!participant) {
+      throw new NotFoundException('Participant not found in the room');
     }
 
-    return rooms;
+    await this.repository.remove(participant);
   }
 }
