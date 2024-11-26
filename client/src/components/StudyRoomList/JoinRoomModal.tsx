@@ -31,7 +31,7 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
   const handleJoinRoom = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // 비밀번호 확인 로직
-    navigate(`/studyroom/${roomId}`, { state: { maxParticipant } });
+    navigate(`/study-room/${roomId}`, { state: { maxParticipant } });
   };
 
   return (
@@ -54,7 +54,7 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 event.preventDefault();
-                navigate(`/studyroom/${roomId}`);
+                navigate(`/study-room/${roomId}`);
               }
             }}
             onInvalid={({ target }: React.InvalidEvent<HTMLInputElement>) => {

@@ -61,7 +61,7 @@ const StudyRoom = () => {
           toggleChat={() => {
             setIsChatOn(!isChatOn);
           }}
-          exitRoom={() => navigate('/studyroomlist')}
+          exitRoom={() => navigate('/study-room-list')}
           isChatOn={isChatOn}
         />
         {isChatOn && (
