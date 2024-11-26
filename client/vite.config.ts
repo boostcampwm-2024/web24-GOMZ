@@ -21,6 +21,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(dirname, 'src'),
+      '@utils': resolve(dirname, 'src/utils'),
       '@hooks': resolve(dirname, 'src/hooks'),
       '@socket': resolve(dirname, 'src/socket'),
       '@constants': resolve(dirname, 'src/constants'),
