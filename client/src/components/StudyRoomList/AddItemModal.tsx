@@ -15,10 +15,18 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
 
   const sendFormData = async (form: HTMLFormElement) => {
     const formData = new FormData(form);
+    const jsonData = {
+      roomName: formData.get('roomName'),
+      password: formData.get('password'),
+      categoryName: formData.get('categoryName'),
+    };
 
     const resonse = await fetch(`${API_BASE_URL}/study-room/create`, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(jsonData),
     });
 
     const { roomId } = await resonse.json();
