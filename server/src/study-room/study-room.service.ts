@@ -26,8 +26,7 @@ export class StudyRoomsService {
    */
   async createRoom(createRoomRequestDto: CreateRoomRequestDto): Promise<CreateRoomResponseDto> {
     const { roomName, password, categoryName } = createRoomRequestDto;
-    const hashedPassword = await this.hashPassword(password);
-    console.log(hashedPassword);
+    const hashedPassword = password ? await this.hashPassword(password) : null;
     const studyRoom = await this.roomRepository.saveRoom(roomName, hashedPassword, categoryName);
     const response = new CreateRoomResponseDto(studyRoom.room_id);
     return response;
@@ -136,7 +135,7 @@ export class StudyRoomsService {
     }
 
     // 비밀번호 체크
-    if (studyRoom.password && password !== studyRoom.password) {
+    if (studyRoom.password && !(await this.comparePasswords(password, studyRoom.password))) {
       throw new UnauthorizedException('Passwords do not match');
     }
 
@@ -145,7 +144,10 @@ export class StudyRoomsService {
 
   async hashPassword(password: string): Promise<string> {
     const saltOrRounds = 10;
-    const hash = await bcrypt.hash(password, saltOrRounds);
-    return hash;
+    return await bcrypt.hash(password, saltOrRounds);
+  }
+
+  async comparePasswords(password: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(password, hash);
   }
 }
