@@ -1,42 +1,48 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CATEGORY_NAMES from '@constants/CATEGORY_NAMES';
 
+const API_BASE_URL = import.meta.env.DEV ? 'api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
+
 const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
+  const navigate = useNavigate();
   const [isPrivate, setIsPrivate] = useState(false);
-  const [roomName, setRoomName] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleRoomNameChange = ({ target }: { target: HTMLInputElement }) => {
-    setRoomName(target.value);
-  };
-
-  const handlePasswordChange = ({ target }: { target: HTMLInputElement }) => {
-    setPassword(target.value);
-  };
 
   const handleCancelAddRoom = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     closeModal();
   };
 
-  const handleAddRoom = (event: React.FormEvent<HTMLFormElement>) => {
+  const sendFormData = async (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+
+    const resonse = await fetch(`${API_BASE_URL}/study-room/create`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const { roomId } = await resonse.json();
+    navigate(`/study-room/${roomId}`, { state: { maxParticipant: 8 } });
+  };
+
+  const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // 방 생성 API 요청
-    closeModal();
+    const form = event.target as HTMLFormElement;
+    sendFormData(form);
+  };
+
+  const handleOnKeyDown = (event: React.KeyboardEvent<HTMLFormElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      sendFormData(event.currentTarget);
+    }
   };
 
   return (
     <form
       className="bg-gomz-white border-gomz-black flex h-60 w-[25rem] flex-col items-center justify-center gap-6 rounded-2xl border shadow-[0.25rem_0.25rem_0.5rem_0_rgba(0,0,0,0.25)]"
-      onSubmit={handleAddRoom}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          // 방 생성 API 요청
-          console.log('방 생성');
-          closeModal();
-        }
-      }}
+      onSubmit={handleOnSubmit}
+      onKeyDown={handleOnKeyDown}
     >
       <h3 className="text-xl font-semibold leading-6">공부방 생성</h3>
       <div className="flex w-full flex-col justify-start gap-4 px-5">
@@ -45,8 +51,7 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
             <h2 className="w-14 font-semibold">제목</h2>
             <input
               className="border-gomz-black h-8 w-48 rounded-lg border p-2 focus:outline-none"
-              value={roomName}
-              onChange={handleRoomNameChange}
+              name="roomName"
               required
               minLength={2}
               onInvalid={({ target }: React.InvalidEvent<HTMLInputElement>) => {
@@ -73,12 +78,11 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
           <h2 className="w-14 font-semibold">비밀번호</h2>
           <input
             type="password"
+            name="password"
             className={`h-8 w-48 rounded-lg border p-2 focus:outline-none`}
             style={{ borderColor: isPrivate ? '#1e1e1e' : '#9f9f9f' }}
             disabled={isPrivate ? false : true}
             maxLength={20}
-            value={password}
-            onChange={handlePasswordChange}
             required={isPrivate ? true : false}
             minLength={4}
             onInvalid={({ target }: React.InvalidEvent<HTMLInputElement>) => {
@@ -93,7 +97,10 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-5">
             <h2 className="w-14 font-semibold">카테고리</h2>
-            <select className="border-gomz-black h-8 w-24 truncate rounded-full border bg-white p-1 px-2 text-sm">
+            <select
+              className="border-gomz-black h-8 w-24 truncate rounded-full border bg-white p-1 px-2 text-sm"
+              name="categoryName"
+            >
               {CATEGORY_NAMES.map((categoryName: string) => (
                 <option value={categoryName}>#{categoryName}</option>
               ))}
