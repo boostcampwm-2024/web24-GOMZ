@@ -22,7 +22,7 @@ const StudyRoom = () => {
   const [newMessage, setNewMessage] = useState('');
 
   const [
-    { localVideoRef, webRTCMap, participantCount, grid },
+    { localStream, webRTCMap, participantCount, grid },
     { toggleVideo, toggleMic, joinRoom, exitRoom, sendMessage },
   ] = useWebRTC();
 
@@ -49,7 +49,7 @@ const StudyRoom = () => {
           webRTCMap={webRTCMap}
         />
         <VideoGrid
-          localVideoRef={localVideoRef}
+          localStream={localStream}
           webRTCMap={webRTCMap}
           participantCount={participantCount}
           grid={grid}

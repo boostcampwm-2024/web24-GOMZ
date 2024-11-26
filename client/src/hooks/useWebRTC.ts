@@ -10,7 +10,7 @@ interface WebRTCData {
 }
 
 interface WebRTCState {
-  localVideoRef: React.RefObject<HTMLVideoElement>;
+  localStream: MediaStream;
   webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
   participantCount: number;
   grid: { cols: number; rows: number };
@@ -27,8 +27,8 @@ interface WebRTCControls {
 const useWebRTC = (): [WebRTCState, WebRTCControls] => {
   const socket = useRef(io());
   const webRTCMap = useRef(new Map<string, WebRTCData>());
-  const localVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef(new MediaStream());
+  const [localStream, setLocalStream] = useState(new MediaStream());
   const [grid, setGrid] = useState({ cols: 1, rows: 1 });
   const [participantCount, setParticipantCount] = useState(1);
 
@@ -41,11 +41,11 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
   };
 
   const toggleVideo = async () => {
-    const currentVideoTrack = localStreamRef.current.getVideoTracks()[0];
+    const currentVideoTrack = localStream.getVideoTracks()[0];
 
     if (currentVideoTrack) {
       currentVideoTrack.stop();
-      localStreamRef.current.removeTrack(currentVideoTrack);
+      localStream.removeTrack(currentVideoTrack);
 
       webRTCMap.current.forEach(({ peerConnection }) => {
         const sender = peerConnection.getSenders().find(({ track }) => track?.kind === 'video')!;
@@ -60,10 +60,10 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
         })
         .then((stream) => stream.getVideoTracks()[0]);
 
-      localStreamRef.current.addTrack(videoTrack);
+      localStream.addTrack(videoTrack);
 
       webRTCMap.current.forEach(({ peerConnection }) => {
-        peerConnection.addTrack(videoTrack, localStreamRef.current);
+        peerConnection.addTrack(videoTrack, localStream);
       });
 
       return true;
@@ -71,8 +71,8 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
   };
 
   const toggleMic = () => {
-    localStreamRef.current.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
-    return localStreamRef.current.getAudioTracks().every((track) => track.enabled);
+    localStream.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
+    return localStream.getAudioTracks().every((track) => track.enabled);
   };
 
   const joinRoom = async (roomId: string) => {
@@ -80,9 +80,9 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
       audio: { deviceId: { ideal: 'default' } },
     });
 
-    localVideoRef.current!.srcObject = localStreamRef.current;
+    localStreamRef.current.getAudioTracks().forEach((track) => (track.enabled = false));
 
-    toggleMic();
+    setLocalStream(localStreamRef.current);
 
     const observableMap = new Map();
     const set = observableMap.set.bind(observableMap);
@@ -122,7 +122,7 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
 
   return [
     {
-      localVideoRef,
+      localStream,
       webRTCMap,
       participantCount,
       grid,
