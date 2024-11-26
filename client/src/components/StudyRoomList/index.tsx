@@ -60,6 +60,7 @@ const StudyRoomList = () => {
                   openModal={() => {
                     setCurrentRoom({
                       roomId,
+                      roomName,
                       maxParticipant,
                     });
                     setIsJoinRoomModalOpen(true);
