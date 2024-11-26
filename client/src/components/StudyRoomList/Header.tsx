@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Header from '@components/common/Header';
 import StopWatch from '@components/common/StopWatch';
 
@@ -6,9 +7,11 @@ const StudyRoomListHeader = ({ className }: { className?: string }) => {
     <Header
       className={className}
       title={
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-2xl font-semibold">GOMZ</h1>
-        </div>
+        <Link to="/">
+          <div className="flex items-baseline">
+            <h1 className="text-2xl font-semibold">GOMZ</h1>
+          </div>
+        </Link>
       }
       stopWatch={
         <div className="text-xl font-normal">
