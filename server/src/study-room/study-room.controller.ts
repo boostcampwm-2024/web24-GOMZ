@@ -33,7 +33,7 @@ export class StudyRoomController {
       const result = await this.studyRoomService.checkAccess(checkAccessRequestDto);
       return { canAccess: result };
     } catch (error) {
-      return { canAccess: false, error };
+      return { canAccess: false, error: error.response };
     }
   }
 }
