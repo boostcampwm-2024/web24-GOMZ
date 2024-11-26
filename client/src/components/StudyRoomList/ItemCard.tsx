@@ -1,6 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import Icon from '@components/common/Icon';
 
+interface ErrorResponse {
+  message: string;
+  error: string;
+  statusCode: number;
+}
+
+interface ResponseData {
+  canAccess: boolean;
+  error?: ErrorResponse;
+}
+
 interface ItemCardProps {
   roomId: string;
   roomName: string;
@@ -10,6 +21,8 @@ interface ItemCardProps {
   maxParticipant: number;
   openModal: () => void;
 }
+
+const API_BASE_URL = import.meta.env.DEV ? 'api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
 
 const ItemCard = ({
   roomId,
@@ -22,7 +35,20 @@ const ItemCard = ({
 }: ItemCardProps) => {
   const navigate = useNavigate();
 
+  const sendFormData = async () => {
+    const resonse = await fetch(`${API_BASE_URL}/study-room/check?roomId=${roomId}`);
+
+    const { canAccess, error }: ResponseData = await resonse.json();
+
+    if (canAccess) {
+      navigate(`/study-room/${roomId}`, { state: { maxParticipant } });
+    } else if (error?.statusCode === 404) {
+      navigate(0);
+    }
+  };
+
   const joinRoom = () => {
+    sendFormData();
     navigate(`/study-room/${roomId}`, { state: { maxParticipant } });
   };
 
