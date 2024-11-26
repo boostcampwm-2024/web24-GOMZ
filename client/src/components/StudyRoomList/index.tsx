@@ -23,6 +23,8 @@ const StudyRoomList = () => {
   const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [currentRoom, setCurrentRoom] = useState<Partial<Room>>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const totalStudyTime =
     Number(localStorage.getItem('totalStudyTime')) + Number(localStorage.getItem('studyTime'));
@@ -33,9 +35,9 @@ const StudyRoomList = () => {
     const fetchRooms = async () => {
       const response = await fetch(`${API_BASE_URL}/study-room/rooms`);
       const room = await response.json();
-      setRooms(room);
+      setRooms(room.reverse());
+      setTotalPages(Math.ceil(room.length / 5));
     };
-
     fetchRooms();
   }, []);
 
@@ -46,7 +48,7 @@ const StudyRoomList = () => {
         <div className="flex h-[41.25rem] flex-col gap-3">
           <AddItemCard openModal={() => setIsAddRoomModalOpen(true)} />
           {rooms
-            .slice(0, 5)
+            .slice((currentPage - 1) * 5, currentPage * 5)
             .map(
               ({ roomId, roomName, categoryName, isPrivate, curParticipant, maxParticipant }) => (
                 <ItemCard
@@ -69,7 +71,11 @@ const StudyRoomList = () => {
               ),
             )}
         </div>
-        <Pagination />
+        <Pagination
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+        />
       </div>
       {isJoinRoomModalOpen && (
         <div
