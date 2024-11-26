@@ -28,6 +28,7 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
 
   @WebSocketServer()
   server: Server;
+  rooms = new Map<string, { users: number; timer?: NodeJS.Timeout }>();
 
   // 5. 참가자가 공부방을 나갔을 때 방에 있는 참가자들에게 퇴장인원 소켓 정보를 전달한다
   async handleDisconnect(client: Socket) {
@@ -37,6 +38,17 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     const users = await this.studyRoomsService.getRoomUsers(roomId);
     for (const userId of users) {
       this.server.to(userId.socketId).emit('userDisconnected', { targetId: client.id });
+    }
+
+    const room = this.rooms.get(roomId);
+    room.users -= 1;
+    if (room.users === 0) {
+      room.timer = setTimeout(
+        () => {
+          this.rooms.delete(roomId);
+        },
+        5 * 60 * 1000,
+      );
     }
     this.logger.info(`${client.id} 접속해제!!!`);
   }
@@ -49,6 +61,18 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
       (user) => user.socketId !== client.id,
     );
     await this.studyRoomsService.addUserToRoom(roomId, client.id);
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      this.rooms.set(roomId, { users: 1 });
+    } else {
+      room.users += 1;
+
+      if (room.timer) {
+        clearTimeout(room.timer);
+        room.timer = undefined;
+      }
+    }
+
     client.emit('offerRequest', { users });
     this.logger.info(`${client.id} 접속, ${JSON.stringify(users)}`);
   }
