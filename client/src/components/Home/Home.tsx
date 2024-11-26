@@ -11,7 +11,7 @@ const Home = () => {
       const { nickName } = await res.json();
       localStorage.setItem('nickName', nickName);
     }
-    navigate('/studyroomlist');
+    navigate('/study-room-list');
   };
 
   return (
