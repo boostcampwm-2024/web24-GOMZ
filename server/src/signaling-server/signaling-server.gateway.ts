@@ -34,14 +34,14 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
   async handleDisconnect(client: Socket) {
     const roomId = await this.studyRoomsService.findUserRoom(client.id);
     if (roomId === undefined) return;
-    this.studyRoomsService.removeUserFromRoom(roomId, client.id);
+    await this.studyRoomsService.removeUserFromRoom(roomId, client.id);
     const users = await this.studyRoomsService.getRoomUsers(roomId);
     for (const userId of users) {
       this.server.to(userId.socketId).emit('userDisconnected', { targetId: client.id });
     }
 
     const room = this.rooms.get(roomId);
-    if (!users) {
+    if (!users.length) {
       room.timer = setTimeout(
         () => {
           this.rooms.delete(roomId);
