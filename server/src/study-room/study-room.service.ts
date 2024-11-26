@@ -142,6 +142,10 @@ export class StudyRoomsService {
     return true;
   }
 
+  async deleteRoom(roomId: string): Promise<void> {
+    this.roomRepository.deleteRoomById(parseInt(roomId, 10));
+  }
+
   async hashPassword(password: string): Promise<string> {
     const saltOrRounds = 10;
     return await bcrypt.hash(password, saltOrRounds);

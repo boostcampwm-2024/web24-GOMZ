@@ -27,4 +27,8 @@ export class StudyRoomRepository {
   findRoomById(roomId: number): Promise<StudyRoom | null> {
     return this.repository.findOne({ where: { room_id: roomId } });
   }
+
+  async deleteRoomById(roomId: number) {
+    this.repository.delete(roomId);
+  }
 }
