@@ -30,7 +30,10 @@ const ItemCard = ({
     <div className="hover:bg-gomz-gray-200 flex h-[6.25rem] w-[62.5rem] items-center justify-between rounded-2xl px-6">
       <div className="flex flex-col items-start gap-3">
         <div className="flex items-center gap-2">
-          <div className="font-semibold">{roomName}</div>
+          <div className="flex items-center gap-1">
+            <div className="font-semibold">{roomName}</div>
+            {isPrivate && <Icon id="lock" className="text-gomz-black h-4 w-4 fill-current" />}
+          </div>
           <Icon id="group" className="text-gomz-gray-400 h-4 w-4 fill-current" />
           <div className="text-gomz-gray-400 text-sm font-light">
             {curParticipant} / {maxParticipant}
