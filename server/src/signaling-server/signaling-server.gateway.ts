@@ -46,6 +46,7 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
       room.timer = setTimeout(
         () => {
           this.rooms.delete(roomId);
+          this.studyRoomsService.deleteRoom(roomId);
         },
         5 * 60 * 1000,
       );
