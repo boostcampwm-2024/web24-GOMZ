@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import ProtectedRoute from '@components/common/ProtectedRoute';
 import Home from '@components/Home/Home';
 import StudyRoomList from '@components/StudyRoomList/index';
@@ -24,6 +24,7 @@ const router = createBrowserRouter([
         <StudyRoom />
       </ProtectedRoute>
     ),
+    errorElement: <Navigate to="/studyroomlist" replace />,
   },
 ]);
 
