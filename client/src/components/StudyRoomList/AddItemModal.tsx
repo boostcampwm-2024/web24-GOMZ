@@ -30,7 +30,9 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
     });
 
     const { roomId } = await resonse.json();
-    navigate(`/study-room/${roomId}`, { state: { maxParticipant: 8 } });
+    navigate(`/study-room/${roomId}`, {
+      state: { roomName: jsonData.roomName, maxParticipant: 8 },
+    });
   };
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
