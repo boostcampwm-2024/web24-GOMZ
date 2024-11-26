@@ -57,7 +57,7 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
 
     const { canAccess, error }: ResponseData = await resonse.json();
     if (canAccess) {
-      navigate(`/study-room/${roomId}`, { state: { maxParticipant } });
+      navigate(`/study-room/${roomId}`, { state: { roomName, maxParticipant } });
     } else if (error?.statusCode === 404) {
       navigate(0);
     } else {

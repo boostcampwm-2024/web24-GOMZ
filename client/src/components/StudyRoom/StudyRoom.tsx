@@ -43,7 +43,7 @@ const StudyRoom = () => {
       <div className="relative flex h-[56.25rem] w-[90rem] flex-col items-center justify-between">
         <StudyRoomHeader
           className="mt-1"
-          roomName="부스트 캠프 공부방"
+          roomName={state.roomName}
           curParticipant={participantCount}
           maxParticipant={state.maxParticipant}
           webRTCMap={webRTCMap}
