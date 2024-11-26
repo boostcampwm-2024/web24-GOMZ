@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateRoomRequestDto {
   constructor(roomName: string, password: string, categoryName?: string) {
@@ -22,11 +22,15 @@ export class CreateRoomRequestDto {
 export class CreateRoomResponseDto {
   constructor(roomId: number) {
     this.roomId = roomId;
+    this.maxParticipant = 8;
     Object.freeze(this);
   }
 
   @IsNumber()
   readonly roomId: number;
+
+  @IsNumber()
+  readonly maxParticipant: number;
 }
 
 export class CheckAccessRequestDto {
