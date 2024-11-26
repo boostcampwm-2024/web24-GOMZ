@@ -8,6 +8,7 @@ import {
   CreateRoomResponseDto,
 } from './dto/create-room.dto';
 import { RoomInfoResponseDto } from './dto/read-room.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class StudyRoomsService {
@@ -25,7 +26,9 @@ export class StudyRoomsService {
    */
   async createRoom(createRoomRequestDto: CreateRoomRequestDto): Promise<CreateRoomResponseDto> {
     const { roomName, password, categoryName } = createRoomRequestDto;
-    const studyRoom = await this.roomRepository.saveRoom(roomName, password, categoryName);
+    const hashedPassword = await this.hashPassword(password);
+    console.log(hashedPassword);
+    const studyRoom = await this.roomRepository.saveRoom(roomName, hashedPassword, categoryName);
     const response = new CreateRoomResponseDto(studyRoom.room_id);
     return response;
   }
@@ -138,5 +141,11 @@ export class StudyRoomsService {
     }
 
     return true;
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    const saltOrRounds = 10;
+    const hash = await bcrypt.hash(password, saltOrRounds);
+    return hash;
   }
 }
