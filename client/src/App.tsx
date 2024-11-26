@@ -10,7 +10,7 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: '/studyroomlist',
+    path: '/study-room-list',
     element: (
       <ProtectedRoute>
         <StudyRoomList />
@@ -18,13 +18,13 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/studyroom/:roomId',
+    path: '/study-room/:roomId',
     element: (
       <ProtectedRoute>
         <StudyRoom />
       </ProtectedRoute>
     ),
-    errorElement: <Navigate to="/studyroomlist" replace />,
+    errorElement: <Navigate to="/study-room-list" replace />,
   },
 ]);
 
