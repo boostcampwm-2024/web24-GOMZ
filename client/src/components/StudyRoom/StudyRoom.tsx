@@ -20,6 +20,7 @@ const StudyRoom = () => {
   const [isChatOn, setIsChatOn] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [lastReadMessageIndex, setLastReadMessageIndex] = useState(-1);
 
   const [
     {
@@ -86,6 +87,7 @@ const StudyRoom = () => {
           selectedAudioDeviceId={selectedAudioDeviceId}
           setSelectedVideoDeviceId={setSelectedVideoDeviceId}
           setSelectedAudioDeviceId={setSelectedAudioDeviceId}
+          unreadMessagesCount={messages.length - lastReadMessageIndex - 1}
         />
         {isChatOn && (
           <div
@@ -98,6 +100,7 @@ const StudyRoom = () => {
               newMessage={newMessage}
               setNewMessage={setNewMessage}
               sendMessage={sendMessage}
+              setLastReadMessageIndex={setLastReadMessageIndex}
             />
           </div>
         )}
