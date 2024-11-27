@@ -22,6 +22,8 @@ interface WebRTCControls {
   joinRoom: (roomId: string) => Promise<Socket>;
   exitRoom: () => void;
   sendMessage: (message: string) => void;
+  getVideoDevices: () => Promise<MediaDeviceInfo[]>;
+  getAudioDevices: () => Promise<MediaDeviceInfo[]>;
 }
 
 const useWebRTC = (): [WebRTCState, WebRTCControls] => {
@@ -120,6 +122,16 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     socket.current.emit('sendMessage', { message });
   };
 
+  const getVideoDevices = async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.filter((device) => device.kind === 'videoinput');
+  };
+
+  const getAudioDevices = async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.filter((device) => device.kind === 'audioinput');
+  };
+
   return [
     {
       localStream,
@@ -133,6 +145,8 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
       joinRoom,
       exitRoom,
       sendMessage,
+      getVideoDevices,
+      getAudioDevices,
     },
   ];
 };
