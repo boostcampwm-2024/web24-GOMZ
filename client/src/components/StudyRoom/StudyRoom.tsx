@@ -22,8 +22,25 @@ const StudyRoom = () => {
   const [newMessage, setNewMessage] = useState('');
 
   const [
-    { localStream, webRTCMap, participantCount, grid },
-    { toggleVideo, toggleMic, joinRoom, exitRoom, sendMessage, getVideoDevices, getAudioDevices },
+    {
+      localStream,
+      webRTCMap,
+      participantCount,
+      grid,
+      selectedVideoDeviceId,
+      selectedAudioDeviceId,
+    },
+    {
+      toggleVideo,
+      toggleMic,
+      joinRoom,
+      exitRoom,
+      sendMessage,
+      getVideoDevices,
+      getAudioDevices,
+      setSelectedVideoDeviceId,
+      setSelectedAudioDeviceId,
+    },
   ] = useWebRTC();
 
   useEffect(() => {
@@ -65,6 +82,10 @@ const StudyRoom = () => {
           isChatOn={isChatOn}
           getVideoDevices={getVideoDevices}
           getAudioDevices={getAudioDevices}
+          selectedVideoDeviceId={selectedVideoDeviceId}
+          selectedAudioDeviceId={selectedAudioDeviceId}
+          setSelectedVideoDeviceId={setSelectedVideoDeviceId}
+          setSelectedAudioDeviceId={setSelectedAudioDeviceId}
         />
         {isChatOn && (
           <div
