@@ -23,7 +23,7 @@ const StudyRoom = () => {
 
   const [
     { localStream, webRTCMap, participantCount, grid },
-    { toggleVideo, toggleMic, joinRoom, exitRoom, sendMessage },
+    { toggleVideo, toggleMic, joinRoom, exitRoom, sendMessage, getVideoDevices, getAudioDevices },
   ] = useWebRTC();
 
   useEffect(() => {
@@ -63,6 +63,8 @@ const StudyRoom = () => {
           }}
           exitRoom={() => navigate('/study-room-list')}
           isChatOn={isChatOn}
+          getVideoDevices={getVideoDevices}
+          getAudioDevices={getAudioDevices}
         />
         {isChatOn && (
           <div
