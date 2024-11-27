@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { SetStateAction, useState } from 'react';
 import Icon from '@components/common/Icon';
 import MediaSelectModal from '@components/StudyRoom/MediaSelectModal';
 
@@ -11,6 +11,10 @@ interface ControlBarProps {
   isChatOn: boolean;
   getVideoDevices: () => Promise<MediaDeviceInfo[]>;
   getAudioDevices: () => Promise<MediaDeviceInfo[]>;
+  selectedVideoDeviceId: string;
+  selectedAudioDeviceId: string;
+  setSelectedVideoDeviceId: React.Dispatch<SetStateAction<string>>;
+  setSelectedAudioDeviceId: React.Dispatch<SetStateAction<string>>;
 }
 
 const ControlBar = ({
@@ -22,6 +26,10 @@ const ControlBar = ({
   isChatOn,
   getVideoDevices,
   getAudioDevices,
+  selectedVideoDeviceId,
+  selectedAudioDeviceId,
+  setSelectedVideoDeviceId,
+  setSelectedAudioDeviceId,
 }: ControlBarProps) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
@@ -84,12 +92,16 @@ const ControlBar = ({
       {isVideoSelectModalOpen && (
         <MediaSelectModal
           className="absolute bottom-0 -translate-y-14 translate-x-10"
+          selectedMediaDeviceId={selectedVideoDeviceId}
+          setSelectedMediaDevice={setSelectedVideoDeviceId}
           getMediaDevices={getVideoDevices}
         />
       )}
       {isAudioSelectModalOpen && (
         <MediaSelectModal
           className="absolute bottom-0 -translate-y-14 translate-x-40"
+          selectedMediaDeviceId={selectedAudioDeviceId}
+          setSelectedMediaDevice={setSelectedAudioDeviceId}
           getMediaDevices={getAudioDevices}
         />
       )}

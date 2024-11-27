@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef, SetStateAction } from 'react';
 import { io, Socket } from 'socket.io-client';
 import signalingClient from '@socket/signalingClient';
 
@@ -14,6 +14,8 @@ interface WebRTCState {
   webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
   participantCount: number;
   grid: { cols: number; rows: number };
+  selectedVideoDeviceId: string;
+  selectedAudioDeviceId: string;
 }
 
 interface WebRTCControls {
@@ -24,6 +26,8 @@ interface WebRTCControls {
   sendMessage: (message: string) => void;
   getVideoDevices: () => Promise<MediaDeviceInfo[]>;
   getAudioDevices: () => Promise<MediaDeviceInfo[]>;
+  setSelectedVideoDeviceId: React.Dispatch<SetStateAction<string>>;
+  setSelectedAudioDeviceId: React.Dispatch<SetStateAction<string>>;
 }
 
 const useWebRTC = (): [WebRTCState, WebRTCControls] => {
@@ -33,6 +37,8 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
   const [localStream, setLocalStream] = useState(new MediaStream());
   const [grid, setGrid] = useState({ cols: 1, rows: 1 });
   const [participantCount, setParticipantCount] = useState(1);
+  const [selectedVideoDeviceId, setSelectedVideoDeviceId] = useState('default');
+  const [selectedAudioDeviceId, setSelectedAudioDeviceId] = useState('default');
 
   const calculateGrid = () => {
     const currentParticipantCount = webRTCMap.current.size + 1;
@@ -58,7 +64,7 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     } else {
       const videoTrack = await navigator.mediaDevices
         .getUserMedia({
-          video: { deviceId: { ideal: 'default' } },
+          video: { deviceId: { ideal: selectedVideoDeviceId } },
         })
         .then((stream) => stream.getVideoTracks()[0]);
 
@@ -77,10 +83,61 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     return localStream.getAudioTracks().every((track) => track.enabled);
   };
 
+  const changeVideo = async () => {
+    const currentVideoTrack = localStream.getVideoTracks()[0];
+
+    if (!currentVideoTrack) return;
+
+    const videoTrack = await navigator.mediaDevices
+      .getUserMedia({
+        video: { deviceId: { ideal: selectedAudioDeviceId } },
+      })
+      .then((stream) => stream.getVideoTracks()[0]);
+
+    webRTCMap.current.forEach(({ peerConnection }) => {
+      const sender = peerConnection.getSenders().find(({ track }) => track?.kind === 'video')!;
+      sender.replaceTrack(videoTrack);
+    });
+
+    currentVideoTrack.stop();
+    localStream.removeTrack(currentVideoTrack);
+    localStream.addTrack(videoTrack);
+  };
+
+  const changeAudio = async () => {
+    const currentAudioTrack = localStream.getAudioTracks()[0];
+
+    if (!currentAudioTrack) return;
+
+    const audioTrack = await navigator.mediaDevices
+      .getUserMedia({
+        audio: { deviceId: { ideal: selectedAudioDeviceId } },
+      })
+      .then((stream) => stream.getAudioTracks()[0]);
+
+    webRTCMap.current.forEach(({ peerConnection }) => {
+      const sender = peerConnection.getSenders().find(({ track }) => track?.kind === 'audio')!;
+      sender.replaceTrack(audioTrack);
+    });
+
+    currentAudioTrack.stop();
+    localStream.removeTrack(currentAudioTrack);
+    localStream.addTrack(audioTrack);
+  };
+
   const joinRoom = async (roomId: string) => {
     localStreamRef.current = await navigator.mediaDevices.getUserMedia({
       audio: { deviceId: { ideal: 'default' } },
     });
+
+    const audioDevices = await getAudioDevices();
+    const audioDeviceLabel = localStreamRef.current.getAudioTracks()[0].label;
+    const audioDeviceId = audioDevices.find(({ label }) => label === audioDeviceLabel)!.deviceId;
+    setSelectedAudioDeviceId(audioDeviceId);
+
+    const videoDevices = await getVideoDevices();
+    const hasDefaultVideoDevice = videoDevices.some(({ deviceId }) => deviceId === 'default');
+    setSelectedVideoDeviceId(hasDefaultVideoDevice ? 'default' : videoDevices[0].deviceId);
 
     localStreamRef.current.getAudioTracks().forEach((track) => (track.enabled = false));
 
@@ -132,12 +189,22 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     return devices.filter((device) => device.kind === 'audioinput');
   };
 
+  useEffect(() => {
+    changeVideo();
+  }, [selectedVideoDeviceId]);
+
+  useEffect(() => {
+    changeAudio();
+  }, [selectedAudioDeviceId]);
+
   return [
     {
       localStream,
       webRTCMap,
       participantCount,
       grid,
+      selectedVideoDeviceId,
+      selectedAudioDeviceId,
     },
     {
       toggleVideo,
@@ -147,6 +214,8 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
       sendMessage,
       getVideoDevices,
       getAudioDevices,
+      setSelectedVideoDeviceId,
+      setSelectedAudioDeviceId,
     },
   ];
 };
