@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, SetStateAction } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import signalingClient from '@socket/signalingClient';
 
@@ -26,8 +26,8 @@ interface WebRTCControls {
   sendMessage: (message: string) => void;
   getVideoDevices: () => Promise<MediaDeviceInfo[]>;
   getAudioDevices: () => Promise<MediaDeviceInfo[]>;
-  setSelectedVideoDeviceId: React.Dispatch<SetStateAction<string>>;
-  setSelectedAudioDeviceId: React.Dispatch<SetStateAction<string>>;
+  setSelectedVideoDeviceId: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedAudioDeviceId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const useWebRTC = (): [WebRTCState, WebRTCControls] => {

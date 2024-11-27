@@ -1,10 +1,10 @@
-import { useState, useEffect, SetStateAction } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@components/common/Icon';
 
 interface MediaSelectModalProps {
   className?: string;
   selectedMediaDeviceId: string;
-  setSelectedMediaDevice: React.Dispatch<SetStateAction<string>>;
+  setSelectedMediaDevice: React.Dispatch<React.SetStateAction<string>>;
   getMediaDevices: () => Promise<MediaDeviceInfo[]>;
 }
 
