@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Icon from '@components/common/Icon';
+import MediaSelectModal from '@components/StudyRoom/MediaSelectModal';
 
 interface ControlBarProps {
   className?: string;
@@ -22,7 +23,9 @@ const ControlBar = ({
   const [isMicOn, setIsMicOn] = useState(false);
 
   return (
-    <div className={`flex gap-10 ${className}`}>
+    <div className={`relative flex gap-10 ${className}`}>
+      {/* <MediaSelectModal className="absolute -left-28 bottom-14" /> */}
+      <MediaSelectModal className="absolute bottom-14 left-0" />
       <div className="bg-gomz-gray-300 flex h-10 w-20 items-center rounded-full">
         <button
           onClick={() => toggleVideo().then((result) => setIsVideoOn(result))}
