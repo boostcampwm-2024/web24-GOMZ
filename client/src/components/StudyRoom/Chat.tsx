@@ -22,6 +22,7 @@ interface ChatProps {
   newMessage: string;
   setNewMessage: React.Dispatch<React.SetStateAction<string>>;
   sendMessage: (message: string) => void;
+  setLastReadMessageIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const Chat = ({
@@ -31,6 +32,7 @@ const Chat = ({
   newMessage,
   setNewMessage,
   sendMessage,
+  setLastReadMessageIndex,
 }: ChatProps) => {
   const isFirstRender = useRef(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ const Chat = ({
     messagesEndRef.current.scrollIntoView({
       behavior: isFirstRender.current ? 'instant' : 'smooth',
     });
+    setLastReadMessageIndex(messages.length - 1);
     isFirstRender.current = false;
   }, [messages]);
 

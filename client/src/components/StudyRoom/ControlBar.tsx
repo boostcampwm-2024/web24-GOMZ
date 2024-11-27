@@ -1,4 +1,4 @@
-import { SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import Icon from '@components/common/Icon';
 import MediaSelectModal from '@components/StudyRoom/MediaSelectModal';
 
@@ -13,8 +13,9 @@ interface ControlBarProps {
   getAudioDevices: () => Promise<MediaDeviceInfo[]>;
   selectedVideoDeviceId: string;
   selectedAudioDeviceId: string;
-  setSelectedVideoDeviceId: React.Dispatch<SetStateAction<string>>;
-  setSelectedAudioDeviceId: React.Dispatch<SetStateAction<string>>;
+  setSelectedVideoDeviceId: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedAudioDeviceId: React.Dispatch<React.SetStateAction<string>>;
+  unreadMessagesCount: number;
 }
 
 const ControlBar = ({
@@ -30,6 +31,7 @@ const ControlBar = ({
   selectedAudioDeviceId,
   setSelectedVideoDeviceId,
   setSelectedAudioDeviceId,
+  unreadMessagesCount,
 }: ControlBarProps) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
@@ -80,7 +82,7 @@ const ControlBar = ({
           />
         </div>
         <div className="text-gomz-white absolute left-11 flex h-5 w-5 items-center justify-center rounded-full text-sm">
-          0
+          {unreadMessagesCount}
         </div>
       </button>
       <button
