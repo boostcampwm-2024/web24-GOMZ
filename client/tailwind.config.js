@@ -26,9 +26,15 @@ export default {
       colors: {
         'gomz-black': '#1E1E1E',
         'gomz-gray': {
+          900: '#353535',
           800: '#4B4B4B',
+          700: '#686868',
+          600: '#838383',
+          500: '#919191',
           400: '#9F9F9F',
+          300: '#C5C5C5',
           200: '#EBEBEB',
+          100: '#F8F8F8',
         },
         'gomz-white': '#FAFAFA',
         'gomz-red': '#FF3B30',
