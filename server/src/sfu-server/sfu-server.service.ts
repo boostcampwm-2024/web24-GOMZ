@@ -137,7 +137,6 @@ export class SfuServerService {
   }
 
   private async isValidRoomId(roomId: string) {
-    if (!roomId) return false;
-    return true;
+    return roomId;
   }
 }
