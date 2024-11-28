@@ -8,6 +8,7 @@ import {
   CreateRoomResponseDto,
 } from './dto/create-room.dto';
 import { RoomInfoResponseDto } from './dto/read-room.dto';
+import { createHmac } from 'crypto';
 
 @Controller('study-room')
 export class StudyRoomController {
@@ -35,5 +36,28 @@ export class StudyRoomController {
     } catch (error) {
       return { canAccess: false, error: error.response };
     }
+  }
+
+  @Get('/credentials')
+  getCoturnCredentials() {
+    const validSeconds = 1 * 60 * 60; // 1시간
+    const username = (Math.floor(Date.now() / 1000) + validSeconds).toString();
+    const hmac = createHmac('sha1', process.env.COTURN_SECRET);
+    hmac.setEncoding('base64');
+    hmac.write(username);
+    hmac.end();
+    const password = hmac.read();
+
+    const stunUrls = ['stun:stun.l.google.com:19302'];
+    return {
+      iceServers: [
+        { urls: stunUrls },
+        {
+          urls: process.env.COTURN_TURN_URL,
+          username: username,
+          credential: password,
+        },
+      ],
+    };
   }
 }
