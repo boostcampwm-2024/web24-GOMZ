@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChattingServerService } from './chatting-server.service';
+import { ChattingService } from './chatting-server.service';
 import { StudyRoomsService } from '../study-room/study-room.service';
 import { NotFoundException } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 describe('Chatting Server 서비스 테스트', () => {
-  let service: ChattingServerService;
+  let service: ChattingService;
 
   const mockStudyRoomsService = {
     findUserRoom: jest.fn(),
@@ -15,7 +15,7 @@ describe('Chatting Server 서비스 테스트', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ChattingServerService,
+        ChattingService,
         { provide: StudyRoomsService, useValue: mockStudyRoomsService },
         {
           provide: WINSTON_MODULE_PROVIDER,
@@ -24,7 +24,7 @@ describe('Chatting Server 서비스 테스트', () => {
       ],
     }).compile();
 
-    service = module.get<ChattingServerService>(ChattingServerService);
+    service = module.get<ChattingService>(ChattingService);
   });
 
   afterEach(() => {
