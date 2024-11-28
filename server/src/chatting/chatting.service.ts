@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { StudyRoomsService } from '../study-room/study-room.service';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { ROOM_ID_NOT_FOUND_ERROR, ROOM_NOT_FOUND } from './chatting-server.constant';
+import { ROOM_ID_NOT_FOUND_ERROR, ROOM_NOT_FOUND } from './chatting.constant';
 
 @Injectable()
 export class ChattingService {
