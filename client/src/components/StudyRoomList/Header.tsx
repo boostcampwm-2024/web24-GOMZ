@@ -15,7 +15,10 @@ const StudyRoomListHeader = ({ className }: { className?: string }) => {
       }
       stopWatch={
         <div className="text-xl font-normal">
-          <StopWatch elapsedSeconds={Number(localStorage.getItem('totalStudyTime'))} />
+          <StopWatch
+            elapsedSeconds={Number(localStorage.getItem('totalStudyTime'))}
+            isAnimationOn={false}
+          />
         </div>
       }
       userInfo={

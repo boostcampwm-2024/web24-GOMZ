@@ -49,7 +49,7 @@ const StudyRoomHeader = ({
       }
       stopWatch={
         <div className="flex translate-x-[1.125rem] gap-3 text-xl font-normal">
-          <StopWatch elapsedSeconds={elapsedSeconds} />
+          <StopWatch elapsedSeconds={elapsedSeconds} isAnimationOn={true} />
           <button
             onClick={() => {
               setIsStopWatchRunning(!isStopWatchRunning);
