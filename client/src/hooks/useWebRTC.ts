@@ -146,6 +146,10 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     if (audioDevices.length !== 0) {
       const hasDefaultAudioDevice = audioDevices.some(({ deviceId }) => deviceId === 'default');
       setSelectedAudioDeviceId(hasDefaultAudioDevice ? 'default' : audioDevices[0].deviceId);
+
+      localStreamRef.current = await navigator.mediaDevices.getUserMedia({
+        audio: { deviceId: { ideal: 'default' } },
+      });
     } else {
       const dummyTrack = createDummyTrack();
       localStreamRef.current.addTrack(dummyTrack);
