@@ -52,6 +52,7 @@ const VideoGrid = ({ localStream, webRTCMap, grid }: VideoGridProps) => {
       </div>
       {[...webRTCMap.current].map(([id, { remoteStream, dataChannel, nickName }]) => (
         <div
+          key={id}
           className="relative rounded-2xl bg-black"
           style={{
             height: `${MAX_HEIGHT / grid.cols}px`,
@@ -59,7 +60,6 @@ const VideoGrid = ({ localStream, webRTCMap, grid }: VideoGridProps) => {
           }}
         >
           <Video
-            key={id}
             mediaStream={remoteStream}
             dataChannel={dataChannel}
             nickName={nickName}
