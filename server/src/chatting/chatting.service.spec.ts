@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChattingService } from './chatting-server.service';
+import { ChattingService } from './chatting.service';
 import { StudyRoomsService } from '../study-room/study-room.service';
 import { NotFoundException } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';

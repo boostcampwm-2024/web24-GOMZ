@@ -17,9 +17,9 @@ import {
   SendIceCandidateDto,
   SendOfferDto,
 } from './signaling-server.dto';
-import { SendMessageDto } from 'src/chatting-server/chatting-server.dto';
-import { MESSAGE_SENT } from 'src/chatting-server/chatting-server.constant';
-import { ChattingService } from 'src/chatting-server/chatting-server.service';
+import { SendMessageDto } from 'src/chatting/chatting.dto';
+import { MESSAGE_SENT } from 'src/chatting/chatting.constant';
+import { ChattingService } from 'src/chatting/chatting.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SignalingServerGateway implements OnGatewayDisconnect {
