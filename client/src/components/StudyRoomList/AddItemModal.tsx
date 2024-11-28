@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PropagateLoader } from 'react-spinners';
 import CATEGORY_NAMES from '@constants/CATEGORY_NAMES';
 
-const API_BASE_URL = import.meta.env.DEV ? 'api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
+const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
 
 const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
   const navigate = useNavigate();

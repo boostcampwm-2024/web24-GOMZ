@@ -1,15 +1,5 @@
 import { io } from 'socket.io-client';
 
-const configuration = {
-  iceServers: [
-    {
-      urls: import.meta.env.VITE_TURN_SERVER_URL,
-      username: import.meta.env.VITE_TURN_SERVER_USERNAME,
-      credential: import.meta.env.VITE_TURN_SERVER_CREDENTIAL,
-    },
-  ],
-};
-
 interface WebRTCData {
   peerConnection: RTCPeerConnection;
   remoteStream: MediaStream;
@@ -17,9 +7,21 @@ interface WebRTCData {
   nickName: string;
 }
 
+interface IceServer {
+  urls: string;
+  username?: string;
+  credential?: string;
+}
+
+interface Configuration {
+  iceServers: IceServer[];
+}
+
+type SignalingClientParams = [Configuration, MediaStream, Map<string, WebRTCData>];
+
 const requiredKeys = ['peerConnection', 'remoteStream', 'dataChannel', 'nickName'];
 
-const signalingClient = (localStream: MediaStream, webRTCMap: Map<string, WebRTCData>) => {
+const signalingClient = (...[configuration, localStream, webRTCMap]: SignalingClientParams) => {
   const socket = io(import.meta.env.VITE_SIGNALING_SERVER_URL);
   const pendingConnectionsMap = new Map<string, WebRTCData>();
 
