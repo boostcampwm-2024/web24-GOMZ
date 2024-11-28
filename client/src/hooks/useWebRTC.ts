@@ -126,18 +126,21 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
   };
 
   const joinRoom = async (roomId: string) => {
-    localStreamRef.current = await navigator.mediaDevices.getUserMedia({
-      audio: { deviceId: { ideal: 'default' } },
-    });
-
     const audioDevices = await getAudioDevices();
-    const audioDeviceLabel = localStreamRef.current.getAudioTracks()[0].label;
-    const audioDeviceId = audioDevices.find(({ label }) => label === audioDeviceLabel)!.deviceId;
-    setSelectedAudioDeviceId(audioDeviceId);
+    if (audioDevices.length !== 0) {
+      const hasDefaultAudioDevice = audioDevices.some(({ deviceId }) => deviceId === 'default');
+      setSelectedAudioDeviceId(hasDefaultAudioDevice ? 'default' : audioDevices[0].deviceId);
+
+      localStreamRef.current = await navigator.mediaDevices.getUserMedia({
+        audio: { deviceId: { ideal: 'default' } },
+      });
+    }
 
     const videoDevices = await getVideoDevices();
-    const hasDefaultVideoDevice = videoDevices.some(({ deviceId }) => deviceId === 'default');
-    setSelectedVideoDeviceId(hasDefaultVideoDevice ? 'default' : videoDevices[0].deviceId);
+    if (videoDevices.length !== 0) {
+      const hasDefaultVideoDevice = videoDevices.some(({ deviceId }) => deviceId === 'default');
+      setSelectedVideoDeviceId(hasDefaultVideoDevice ? 'default' : videoDevices[0].deviceId);
+    }
 
     localStreamRef.current.getAudioTracks().forEach((track) => (track.enabled = false));
 
