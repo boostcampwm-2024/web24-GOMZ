@@ -10,73 +10,34 @@ import { Server, Socket } from 'socket.io';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { StudyRoomsService } from '../study-room/study-room.service';
-import { ChattingService } from '../chatting/chatting.service';
 import { JoinRoomDto } from '../signaling-server/signaling-server.dto';
-
-@WebSocketGateway()
+import { SfuServerService } from './sfu-server.service';
+//
+// 아 이거 dev 브랜치에서 .... 커밋은 아직 안 했어요. 아 됩니다!! 저 근데 잠시만요
+//
+@WebSocketGateway({ cors: { origin: '*' }, namespace: '/sfu' })
 export class SfuServerGateway implements OnGatewayDisconnect {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER)
     private readonly logger: Logger,
-    private readonly studyRoomsService: StudyRoomsService,
-    private readonly chattingService: ChattingService,
+    private readonly sfuServerService: SfuServerService,
   ) {}
-
   @WebSocketServer()
   server: Server;
-  peerConnections = {};
-  mediaStreams = {};
-  rooms = new Map<string, { timer?: NodeJS.Timeout }>();
 
   async handleDisconnect(client: Socket) {
     const socketId = client.id;
-    const roomId = await this.studyRoomsService.findUserRoom(client.id);
-    if (roomId === undefined) return;
-    await this.studyRoomsService.removeUserFromRoom(roomId, client.id);
-    const users = await this.studyRoomsService.getRoomUsers(roomId);
-
-    if (this.peerConnections[socketId]) {
-      this.peerConnections[socketId].close();
-      delete this.peerConnections[socketId];
-    }
-
-    const mediaStreamId = this.mediaStreams[socketId].id;
-    if (this.mediaStreams[socketId]) {
-      delete this.mediaStreams[socketId];
-    }
-
-    for (const userId of users) {
-      this.server.to(userId.socketId).emit('removeStream', { mediaStreamId });
-    }
-
-    const room = this.rooms.get(roomId);
-    if (!users.length) {
-      room.timer = setTimeout(
-        () => {
-          this.rooms.delete(roomId);
-          this.studyRoomsService.deleteRoom(roomId);
-        },
-        5 * 60 * 1000,
-      );
-    }
-
-    this.logger.info(`${client.id} 접속해제!!!`);
+    const { socketIdList, mediaStreamId } = await this.sfuServerService.exitRoom(socketId);
+    this.logger.info(`${socketId}이 SFU 방에서 나갔습니다.`);
+    this.server.to(socketIdList).emit('removeStream', { mediaStreamId });
   }
 
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() joinRoomDto: JoinRoomDto) {
-    const roomId = joinRoomDto.roomId;
+  async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() joinRoomDto: JoinRoomDto) {
+    const { roomId } = joinRoomDto;
+    const socketId = client.id;
+    const { users } = await this.sfuServerService.enterRoom(socketId, roomId);
 
-    const room = this.rooms.get(roomId);
-    if (!room) {
-      this.rooms.set(roomId, { timer: null });
-    } else {
-      if (room.timer) {
-        clearTimeout(room.timer);
-        room.timer = undefined;
-      }
-    }
-    this.logger.info(`${client.id} 접속, `); //, ${JSON.stringify(users)}
+    this.logger.info(`${socketId} 접속, ${JSON.stringify(users)}`);
   }
 }
