@@ -30,6 +30,8 @@ interface WebRTCControls {
   setSelectedAudioDeviceId: React.Dispatch<React.SetStateAction<string>>;
 }
 
+const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
+
 const useWebRTC = (): [WebRTCState, WebRTCControls] => {
   const socket = useRef(io());
   const webRTCMap = useRef(new Map<string, WebRTCData>());
@@ -141,6 +143,12 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     return destination.stream.getAudioTracks()[0];
   };
 
+  const getConfiguration = async () => {
+    const response = await fetch(`${API_BASE_URL}/study-room/credentials`);
+    const configuration = await response.json();
+    return configuration;
+  };
+
   const joinRoom = async (roomId: string) => {
     const audioDevices = await getAudioDevices();
     if (audioDevices.length !== 0) {
@@ -183,7 +191,9 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
 
     webRTCMap.current = observableMap;
 
-    socket.current = signalingClient(localStreamRef.current, webRTCMap.current);
+    const configuration = await getConfiguration();
+
+    socket.current = signalingClient(configuration, localStreamRef.current, webRTCMap.current);
     socket.current.emit('joinRoom', { roomId });
 
     return socket.current;

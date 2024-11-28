@@ -27,7 +27,7 @@ interface ResponseData {
   error?: ErrorResponse;
 }
 
-const API_BASE_URL = import.meta.env.DEV ? 'api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
+const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
 const SAD_EMOTICONS = [
   '｡° ૮₍°´ᯅ`°₎ა °',
   '｡° (ꢳࡇꢳ) °｡',
