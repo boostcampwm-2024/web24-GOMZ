@@ -125,15 +125,30 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
     localStream.addTrack(audioTrack);
   };
 
+  const createDummyTrack = () => {
+    const audioContext = new AudioContext();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    const destination = audioContext.createMediaStreamDestination();
+
+    gainNode.gain.value = 0;
+
+    oscillator.connect(gainNode);
+    gainNode.connect(destination);
+
+    oscillator.start();
+
+    return destination.stream.getAudioTracks()[0];
+  };
+
   const joinRoom = async (roomId: string) => {
     const audioDevices = await getAudioDevices();
     if (audioDevices.length !== 0) {
       const hasDefaultAudioDevice = audioDevices.some(({ deviceId }) => deviceId === 'default');
       setSelectedAudioDeviceId(hasDefaultAudioDevice ? 'default' : audioDevices[0].deviceId);
-
-      localStreamRef.current = await navigator.mediaDevices.getUserMedia({
-        audio: { deviceId: { ideal: 'default' } },
-      });
+    } else {
+      const dummyTrack = createDummyTrack();
+      localStreamRef.current.addTrack(dummyTrack);
     }
 
     const videoDevices = await getVideoDevices();
