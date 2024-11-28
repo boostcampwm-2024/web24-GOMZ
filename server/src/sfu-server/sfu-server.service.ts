@@ -54,6 +54,27 @@ export class SfuServerService {
     return await this.chattingService.getRoomMemberSocketIdList(clientId);
   }
 
+  async makePeerConnection(clientId: string) {
+    // peerConnection을 생성하는 함수. 감사합니다.
+    // 반환값 : peerConnection ㅎㅇㅌ 입니다! 넵
+    // 다들 감사탱구리입니다.
+    // 
+    const peerConnection = new wrtc.RTCPeerConnection(this.config);
+    this.peerConnections[clientId] = peerConnection;
+
+    return { peerConnection };
+  }
+
+  async makeAnswer(peerConnection: RTCPeerConnection, offer: RTCSessionDescriptionInit) {
+    // peerConnection을 기반으로 answer를 생성하는 함수
+    // 반환값 : answer
+    await peerConnection.setRemoteDescription(new wrtc.RTCSessionDescription(offer));
+
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    return { answer };
+  }
+
   private createPeerConnection(socketId: string) {
     const peerConnection = new wrtc.RTCPeerConnection(this.config);
     this.peerConnections[socketId] = peerConnection;
