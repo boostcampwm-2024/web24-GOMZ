@@ -22,6 +22,7 @@ export class SfuServerGateway implements OnGatewayDisconnect {
     private readonly logger: Logger,
     private readonly sfuServerService: SfuServerService,
   ) {}
+
   @WebSocketServer()
   server: Server;
 
@@ -64,8 +65,13 @@ export class SfuServerGateway implements OnGatewayDisconnect {
     // 3. peerConnection에 onIceCandidate, ontrack 이벤트 지정(mediaStreams에 저장)
     // 4. sendAnswer
     const { peerConnection } = await this.sfuServerService.makePeerConnection(client.id);
-    const { answer } = await this.sfuServerService.makeAnswer(peerConnection, offer);
 
+    peerConnection.onicecandidate = (event) => {
+      if (event.candidate) client.emit('icecandidate', event.candidate);
+    };
+
+    this.sfuServerService.onTrack(client.id, peerConnection);
+    const { answer } = await this.sfuServerService.makeAnswer(peerConnection, offer);
     client.emit('answer', answer);
     // 1~3 : this.sfuServerService.offer🦈
     // 4 : this.sfuServerService.sendAnswer 어떠신지... 좋습니다

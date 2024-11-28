@@ -73,9 +73,11 @@ export class SfuServerService {
     return { answer };
   }
 
-  private createPeerConnection(socketId: string) {
-    const peerConnection = new wrtc.RTCPeerConnection(this.config);
-    this.peerConnections[socketId] = peerConnection;
+  onTrack(socketId: string, peerConnection: RTCPeerConnection) {
+    peerConnection.ontrack = (event) => {
+      this.mediaStreams[socketId] = event.streams[0];
+      // if(Object.keys(this.peerConnections).length > 1) sendOffer();
+    };
   }
 
   private getOrCreateRoom(roomId: string) {
