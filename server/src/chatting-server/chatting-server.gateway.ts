@@ -1,42 +1,18 @@
-import {
-  ConnectedSocket,
-  MessageBody,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
 import { Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { SendMessageDto } from './chatting-server.dto';
-import { ChattingServerService } from './chatting-server.service';
-import { MESSAGE_SENT } from './chatting-server.constant';
+import { ChattingService } from './chatting-server.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
-export class ChattingServerGateway {
+export class ChattingGateway {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER)
     private readonly logger: Logger,
-    private readonly chattingServerService: ChattingServerService,
+    private readonly chattingServerService: ChattingService,
   ) {}
 
   @WebSocketServer()
   server: Server;
-
-  @SubscribeMessage('sendMessage')
-  async handleSendMessage(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() sendMessageDto: SendMessageDto,
-  ) {
-    const { message } = sendMessageDto;
-    const clientId = client.id;
-    const userList = await this.chattingServerService.getRoomMemberSocketIdList(clientId);
-
-    this.logger.info(MESSAGE_SENT(clientId, userList, message));
-    client.broadcast.to(userList).emit('receiveMessage', {
-      userId: clientId,
-      message: message,
-    });
-  }
 }

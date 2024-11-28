@@ -17,6 +17,9 @@ import {
   SendIceCandidateDto,
   SendOfferDto,
 } from './signaling-server.dto';
+import { SendMessageDto } from 'src/chatting-server/chatting-server.dto';
+import { MESSAGE_SENT } from 'src/chatting-server/chatting-server.constant';
+import { ChattingService } from 'src/chatting-server/chatting-server.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class SignalingServerGateway implements OnGatewayDisconnect {
@@ -24,6 +27,7 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     @Inject(WINSTON_MODULE_PROVIDER)
     private readonly logger: Logger,
     private readonly studyRoomsService: StudyRoomsService,
+    private readonly chattingService: ChattingService,
   ) {}
 
   @WebSocketServer()
@@ -111,5 +115,21 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     this.server
       .to(targetId)
       .emit('setIceCandidate', { senderId: client.id, iceCandidate: iceCandidate });
+  }
+
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() sendMessageDto: SendMessageDto,
+  ) {
+    const { message } = sendMessageDto;
+    const clientId = client.id;
+    const userList = await this.chattingService.getRoomMemberSocketIdList(clientId);
+
+    this.logger.info(MESSAGE_SENT(clientId, userList, message));
+    client.broadcast.to(userList).emit('receiveMessage', {
+      userId: clientId,
+      message: message,
+    });
   }
 }
