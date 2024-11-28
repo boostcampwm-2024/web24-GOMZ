@@ -80,5 +80,10 @@ export class SfuServerGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage('answer')
-  async answer() {}
+  async answer(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() answer: RTCSessionDescriptionInit,
+  ) {
+    await this.sfuServerService.answerReceived(client.id, answer);
+  }
 }
