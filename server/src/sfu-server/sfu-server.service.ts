@@ -73,11 +73,16 @@ export class SfuServerService {
     return { answer };
   }
 
-  onTrack(socketId: string, peerConnection: RTCPeerConnection) {
+  onTrack(clientId: string, peerConnection: RTCPeerConnection) {
     peerConnection.ontrack = (event) => {
-      this.mediaStreams[socketId] = event.streams[0];
+      this.mediaStreams[clientId] = event.streams[0];
       // if(Object.keys(this.peerConnections).length > 1) sendOffer();
     };
+  }
+
+  async answerReceived(clientId: string, answer: RTCSessionDescriptionInit) {
+    const peerConnection = this.peerConnections[clientId];
+    await peerConnection.setRemoteDescription(new wrtc.RTCSessionDescription(answer));
   }
 
   private getOrCreateRoom(roomId: string) {
