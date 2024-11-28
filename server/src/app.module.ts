@@ -5,7 +5,6 @@ import { SignalingServerModule } from './signaling-server/signaling-server.modul
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from '../winston.config';
 import { StudyRoomModule } from './study-room/study-room.module';
-import { ChattingServerModule } from './chatting-server/chatting-server.module';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -32,7 +31,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     SignalingServerModule,
     WinstonModule.forRoot(winstonConfig),
     StudyRoomModule,
-    ChattingServerModule,
     UserModule,
   ],
   controllers: [AppController],

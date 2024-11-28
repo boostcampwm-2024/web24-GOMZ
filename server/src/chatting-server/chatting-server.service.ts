@@ -5,7 +5,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { ROOM_ID_NOT_FOUND_ERROR, ROOM_NOT_FOUND } from './chatting-server.constant';
 
 @Injectable()
-export class ChattingServerService {
+export class ChattingService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER)
     private readonly logger: Logger,
