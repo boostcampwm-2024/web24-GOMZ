@@ -47,7 +47,7 @@ describe('StudyRoomController (e2e)', () => {
         password: '1234',
         categoryName: 'Study',
       };
-      const createRoomResponse: CreateRoomResponseDto = { roomId: 1 };
+      const createRoomResponse: CreateRoomResponseDto = { roomId: 1, maxParticipant: 8 };
       mockStudyRoomsService.createRoom.mockResolvedValue(createRoomResponse);
 
       // when
