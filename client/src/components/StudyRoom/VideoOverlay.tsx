@@ -51,7 +51,7 @@ const VideoOverlay = ({ nickName, dataChannel, gridCols }: VideoOverlayProps) =>
           fontSize: `${Math.max(1.75 / Math.sqrt(gridCols), 0.625)}rem`,
         }}
       >
-        {dataChannel && <StopWatch elapsedSeconds={elapsedSeconds} />}
+        {dataChannel && <StopWatch elapsedSeconds={elapsedSeconds} isAnimationOn={false} />}
       </div>
     </div>
   );
