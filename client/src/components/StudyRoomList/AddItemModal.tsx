@@ -123,7 +123,9 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
                   name="categoryName"
                 >
                   {CATEGORY_NAMES.map((categoryName: string) => (
-                    <option value={categoryName}>#{categoryName}</option>
+                    <option key={categoryName} value={categoryName}>
+                      #{categoryName}
+                    </option>
                   ))}
                 </select>
               </div>

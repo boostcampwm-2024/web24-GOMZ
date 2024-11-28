@@ -37,7 +37,7 @@ const MediaSelectModal = ({
       ) : (
         <>
           {mediaDevices.map((device) => (
-            <div className="flex gap-3">
+            <div key={device.deviceId} className="flex gap-3">
               {selectedMediaDeviceId === device.deviceId ? (
                 <Icon id="check" className="text-gomz-black my-1 h-6 w-6 fill-current" />
               ) : (
