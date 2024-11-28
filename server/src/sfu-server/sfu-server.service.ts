@@ -55,7 +55,7 @@ export class SfuServerService {
   }
 
   async makePeerConnection(clientId: string) {
-    // peerConnection을 생성하는 함수. 감사합니다.
+    // peerConnection을 생성하는 함수.
     // 반환값 : peerConnection
     const peerConnection = new wrtc.RTCPeerConnection(this.config);
     this.peerConnections[clientId] = peerConnection;
