@@ -12,6 +12,8 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { JoinRoomDto } from '../signaling-server/signaling-server.dto';
 import { SfuServerService } from './sfu-server.service';
+import { SendMessageDto } from 'src/chatting/chatting.dto';
+import { MESSAGE_SENT } from 'src/chatting/chatting.constant';
 //
 // 아 이거 dev 브랜치에서 .... 커밋은 아직 안 했어요. 아 됩니다!! 저 근데 잠시만요
 //
@@ -39,5 +41,21 @@ export class SfuServerGateway implements OnGatewayDisconnect {
     const { users } = await this.sfuServerService.enterRoom(socketId, roomId);
 
     this.logger.info(`${socketId} 접속, ${JSON.stringify(users)}`);
+  }
+
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() sendMessageDto: SendMessageDto,
+  ) {
+    const { message } = sendMessageDto;
+    const clientId = client.id;
+    const userList = await this.sfuServerService.getRoomMemberSocketIdList(clientId);
+
+    this.logger.info(MESSAGE_SENT(clientId, userList, message));
+    client.broadcast.to(userList).emit('receiveMessage', {
+      userId: clientId,
+      message: message,
+    });
   }
 }

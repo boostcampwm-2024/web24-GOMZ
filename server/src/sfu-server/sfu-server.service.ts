@@ -50,6 +50,10 @@ export class SfuServerService {
     return { socketIdList, mediaStreamId };
   }
 
+  async getRoomMemberSocketIdList(clientId: string) {
+    return await this.chattingService.getRoomMemberSocketIdList(clientId);
+  }
+
   private createPeerConnection(socketId: string) {
     const peerConnection = new wrtc.RTCPeerConnection(this.config);
     this.peerConnections[socketId] = peerConnection;
