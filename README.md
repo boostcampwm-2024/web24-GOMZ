@@ -74,11 +74,17 @@
 
 ### 공부방
 
-<img alt="공부방 페이지" src="https://github.com/user-attachments/assets/d61cf86f-1d16-4ba2-ab33-bbee0ef321ef" width="750" />
+<img alt="공부방 페이지" src="https://github.com/user-attachments/assets/ccb34d14-e716-40a6-bf10-ba18a3367773" width="750" />
 
 - 상단의 스톱워치를 조작해 **공부 시간**을 기록할 수 있어요.
 - 하단의 버튼을 조작해 **카메라**와 **마이크**를 끄고 켤 수 있어요.
-- 다른 사용자의 **실시간 공부 시간**을 확인할 수 있고, 다른 사용자와 **채팅**할 수 있어요.
+- 다른 사용자의 **화면**과 **실시간 공부 시간**을 확인할 수 있어요.
+
+<br/>
+
+<img alt="채팅" src="https://github.com/user-attachments/assets/98b39228-16ae-46fa-ba02-ec7b12dc4e19" width="750" />
+
+- 다른 사용자들과 **채팅**할 수 있고, **읽지 않은 채팅 수**를 확인할 수 있어요.
 
 <br/>
 
