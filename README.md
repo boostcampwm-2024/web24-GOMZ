@@ -23,6 +23,8 @@
 
 [팀 노션](https://www.notion.so/GOMZ-128fab6ff8a7807e9f85ee7da4ed2344) | [디자인](https://www.figma.com/design/WUBVqHUPPmhxxHw2aHtOfF/GOMZ) | [프로젝트](https://github.com/orgs/boostcampwm-2024/projects/3) | [위키](https://github.com/boostcampwm-2024/web24-GOMZ/wiki)
 
+<br/>
+
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fboostcampwm-2024%2Fweb24-GOMZ&count_bg=%23A5DD42&title_bg=%231E1E1E&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 </div>
@@ -39,35 +41,40 @@
 메인 페이지에서 **로그인없이 이용하기** 버튼을 클릭해 **랜덤 닉네임**을 부여받고, 다른 사용자들과 함께 공부해보세요!
 
 <br/>
-<br/>
 
 ## 💻 핵심 기능
 
 ### 공부방 리스트
 
-<img alt="공부방 리스트 페이지" src="https://github.com/user-attachments/assets/768e427e-c10f-4617-97a1-1f0df8585abc" width="700" />
+<img alt="공부방 리스트 페이지" src="https://github.com/user-attachments/assets/768e427e-c10f-4617-97a1-1f0df8585abc" width="750" />
 
 - 상단에서 **누적 공부 시간**과 서비스 입장 시 부여받은 **랜덤 닉네임**을 확인할 수 있어요.
 - 다른 사용자가 생성한 **공부방의 목록**을 조회할 수 있어요.
 - 다른 사용자의 공부방에 **참여**할 수 있고 새로운 공부방을 **생성**할 수 있어요.
 
+<br/>
+
 ### 공부방 생성
 
-  <img alt="공부방 생성" src="https://github.com/user-attachments/assets/31b451ca-b47b-4699-a7b4-f8b746c664ed" width="700" />
+  <img alt="공부방 생성" src="https://github.com/user-attachments/assets/31b451ca-b47b-4699-a7b4-f8b746c664ed" width="750" />
 
 - **제목**을 입력하고 **카테고리**를 선택하여 공부방을 **생성**할 수 있어요.
 - 비밀방 체크박스를 선택하여 **비밀방**을 생성할 수 있어요.
 
+<br/>
+
 ### 공부방 입장
 
-  <img alt="비밀방 입장" src="https://github.com/user-attachments/assets/2866e297-6e32-4fec-a135-2074f1b838ab" width="700" />
+  <img alt="비밀방 입장" src="https://github.com/user-attachments/assets/2866e297-6e32-4fec-a135-2074f1b838ab" width="750" />
 
 - **공개방**의 경우, **입장하기** 버튼을 클릭해 바로 공부방에 입장할 수 있어요.
 - **비밀방**의 경우, **올바른 비밀번호를 입력**하면 공부방에 입장할 수 있어요.
 
+<br/>
+
 ### 공부방
 
-<img alt="공부방 페이지" src="https://github.com/user-attachments/assets/d61cf86f-1d16-4ba2-ab33-bbee0ef321ef" width="700" />
+<img alt="공부방 페이지" src="https://github.com/user-attachments/assets/d61cf86f-1d16-4ba2-ab33-bbee0ef321ef" width="750" />
 
 - 상단의 스톱워치를 조작해 **공부 시간**을 기록할 수 있어요.
 - 하단의 버튼을 조작해 **카메라**와 **마이크**를 끄고 켤 수 있어요.
