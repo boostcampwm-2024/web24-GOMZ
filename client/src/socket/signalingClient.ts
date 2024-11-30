@@ -22,7 +22,7 @@ type SignalingClientParams = [Configuration, MediaStream, Map<string, WebRTCData
 const requiredKeys = ['peerConnection', 'remoteStream', 'dataChannel', 'nickName'];
 
 const signalingClient = (...[configuration, localStream, webRTCMap]: SignalingClientParams) => {
-  const socket = io(import.meta.env.VITE_SIGNALING_SERVER_URL);
+  const socket = io(import.meta.env.VITE_SIGNALING_SERVER_URL, { transports: ['websocket'] });
   const pendingConnectionsMap = new Map<string, WebRTCData>();
 
   const updatePendingConnection = (socketId: string, data: Partial<WebRTCData>) => {
