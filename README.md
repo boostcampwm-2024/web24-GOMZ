@@ -23,7 +23,7 @@
 
 [팀 노션](https://www.notion.so/GOMZ-128fab6ff8a7807e9f85ee7da4ed2344) | [디자인](https://www.figma.com/design/WUBVqHUPPmhxxHw2aHtOfF/GOMZ) | [프로젝트](https://github.com/orgs/boostcampwm-2024/projects/3) | [위키](https://github.com/boostcampwm-2024/web24-GOMZ/wiki)
 
-<!-- [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fboostcampwm-2024%2Fweb24-GOMZ&count_bg=%23A5DD42&title_bg=%231E1E1E&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com) -->
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fboostcampwm-2024%2Fweb24-GOMZ&count_bg=%23A5DD42&title_bg=%231E1E1E&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 </div>
 
