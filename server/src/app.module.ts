@@ -8,6 +8,7 @@ import { StudyRoomModule } from './study-room/study-room.module';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SfuServerModule } from './sfu-server/sfu-server.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
     SignalingServerModule,
+    SfuServerModule,
     WinstonModule.forRoot(winstonConfig),
     StudyRoomModule,
     UserModule,
