@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { StudyRoom } from './entity/study-room.entity';
 import { StudyRoomRepository } from './repository/study-room.repository';
 import { StudyRoomParticipantRepository } from './repository/study-room-participant.repository';
@@ -16,6 +21,8 @@ export class StudyRoomsService {
     private readonly roomRepository: StudyRoomRepository,
     private readonly participantRepository: StudyRoomParticipantRepository,
   ) {}
+
+  maxParticipant = 8;
 
   /**
    * 새로운 방을 생성합니다.
@@ -94,7 +101,7 @@ export class StudyRoomsService {
       const roomId = roomInfo.room_id;
       const roomParticipants = await this.participantRepository.findParticipantsByRoomId(roomId);
       const curParticipant = roomParticipants.length;
-      const maxParticipant = 8;
+      const maxParticipant = this.maxParticipant;
       const roomInfoResponseDto = new RoomInfoResponseDto(
         roomInfo,
         roomId,
@@ -130,8 +137,15 @@ export class StudyRoomsService {
   async checkAccess(checkAccessRequestDto: CheckAccessRequestDto) {
     const { password, roomId } = checkAccessRequestDto;
     const studyRoom = await this.roomRepository.findRoomById(roomId);
+    const roomParticipants = await this.participantRepository.findParticipantsByRoomId(roomId);
+
+    // 공부방 존재 여부 체크
     if (!studyRoom) {
       throw new NotFoundException('No such study room');
+    }
+
+    if (roomParticipants.length === this.maxParticipant) {
+      throw new ForbiddenException('Room is already full');
     }
 
     // 비밀번호 체크
