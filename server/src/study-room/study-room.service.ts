@@ -19,9 +19,9 @@ export class StudyRoomsService {
 
   /**
    * 새로운 방을 생성합니다.
-   * @param roomName 방 제목
-   * @param password 방 비밀번호
-   * @param categoryName 방 카테고리 명
+   * @param createRoomRequestDto.roomName 방 제목
+   * @param createRoomRequestDto.password 방 비밀번호
+   * @param createRoomRequestDto.categoryName 방 카테고리 명
    * @returns 생성된 방
    */
   async createRoom(createRoomRequestDto: CreateRoomRequestDto): Promise<CreateRoomResponseDto> {
@@ -39,7 +39,7 @@ export class StudyRoomsService {
    */
   async findRoom(roomId: string): Promise<StudyRoom | null> {
     const room = await this.roomRepository.findRoomById(parseInt(roomId, 10));
-    return room || undefined; // null 대신 undefined로 반환
+    return room || undefined; // null 대신 undefined 반환
   }
 
   /**
@@ -110,7 +110,7 @@ export class StudyRoomsService {
   private async isValidRoom(roomId: string): Promise<void> {
     const room = await this.roomRepository.findRoomById(parseInt(roomId, 10));
     if (!room) {
-      this.roomRepository.saveRoom('테스트용 방', null, '#test');
+      await this.roomRepository.saveRoom('테스트용 방', null, '#test');
       // throw new Error('Room not found');
     }
   }
@@ -124,8 +124,8 @@ export class StudyRoomsService {
 
   /**
    * 선택한 방에 입장가능여부 체크
-   * @param password 사용자 입력 패스워드
-   * @param roomId 들어가려는 방 ID
+   * @param checkAccessRequestDto.password 사용자 입력 패스워드
+   * @param checkAccessRequestDto.roomId 들어가려는 방 ID
    */
   async checkAccess(checkAccessRequestDto: CheckAccessRequestDto) {
     const { password, roomId } = checkAccessRequestDto;
