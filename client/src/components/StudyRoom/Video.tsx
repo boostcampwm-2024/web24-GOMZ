@@ -2,9 +2,6 @@ import { useEffect, useRef } from 'react';
 
 interface VideoProps {
   mediaStream: MediaStream;
-  dataChannel?: RTCDataChannel;
-  nickName: string;
-  gridCols: number;
   muted: boolean;
 }
 

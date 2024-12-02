@@ -21,7 +21,6 @@ interface WebRTCData {
 interface VideoGridProps {
   localStream: MediaStream;
   webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
-  participantCount: number;
   grid: Grid;
 }
 
@@ -42,12 +41,7 @@ const VideoGrid = ({ localStream, webRTCMap, grid }: VideoGridProps) => {
           width: `${MAX_WIDTH / grid.cols}px`,
         }}
       >
-        <Video
-          mediaStream={localStream}
-          nickName={localStorage.getItem('nickName')!}
-          gridCols={grid.cols}
-          muted={true}
-        />
+        <Video mediaStream={localStream} muted={true} />
         <VideoOverlay nickName={localStorage.getItem('nickName')!} gridCols={grid.cols} />
       </div>
       {[...webRTCMap.current].map(([id, { remoteStream, dataChannel, nickName }]) => (
@@ -59,13 +53,7 @@ const VideoGrid = ({ localStream, webRTCMap, grid }: VideoGridProps) => {
             width: `${MAX_WIDTH / grid.cols}px`,
           }}
         >
-          <Video
-            mediaStream={remoteStream}
-            dataChannel={dataChannel}
-            nickName={nickName}
-            gridCols={grid.cols}
-            muted={false}
-          />
+          <Video mediaStream={remoteStream} muted={false} />
           <VideoOverlay nickName={nickName} dataChannel={dataChannel} gridCols={grid.cols} />
         </div>
       ))}

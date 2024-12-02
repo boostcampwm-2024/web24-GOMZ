@@ -66,19 +66,12 @@ const StudyRoom = () => {
           maxParticipant={state.maxParticipant}
           webRTCMap={webRTCMap}
         />
-        <VideoGrid
-          localStream={localStream}
-          webRTCMap={webRTCMap}
-          participantCount={participantCount}
-          grid={grid}
-        />
+        <VideoGrid localStream={localStream} webRTCMap={webRTCMap} grid={grid} />
         <ControlBar
           className="mb-10"
           toggleVideo={toggleVideo}
           toggleMic={toggleMic}
-          toggleChat={() => {
-            setIsChatOn(!isChatOn);
-          }}
+          toggleChat={() => setIsChatOn(!isChatOn)}
           exitRoom={() => navigate('/study-room-list')}
           isChatOn={isChatOn}
           getVideoDevices={getVideoDevices}
