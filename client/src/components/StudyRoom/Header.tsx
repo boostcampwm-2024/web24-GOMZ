@@ -2,24 +2,22 @@ import { useState, useEffect } from 'react';
 
 import type { Header as StudyRoomHeaderProps } from '@customTypes/StudyRoom';
 
+import useStopWatch from '@hooks/useStopWatch';
+import useWebRTCStore from '@stores/useWebRTCStore';
 import Header from '@components/common/Header';
 import Icon from '@components/common/Icon';
 import StopWatch from '@components/common/StopWatch';
-import useStopWatch from '@hooks/useStopWatch';
 
-const StudyRoomHeader = ({
-  className,
-  roomName,
-  curParticipant,
-  maxParticipant,
-  webRTCMap,
-}: StudyRoomHeaderProps) => {
+const StudyRoomHeader = ({ className, roomName, maxParticipant }: StudyRoomHeaderProps) => {
   const [isStopWatchRunning, setIsStopWatchRunning] = useState(false);
+
   const elapsedSeconds = useStopWatch(isStopWatchRunning);
+  const curParticipant = useWebRTCStore((state) => state.curParticipant);
+  const { webRTCMap } = useWebRTCStore.getState();
 
   useEffect(() => {
     localStorage.setItem('studyTime', elapsedSeconds.toString());
-    webRTCMap.current.forEach(({ dataChannel }) => {
+    Object.values(webRTCMap).forEach(({ dataChannel }) => {
       dataChannel.send(elapsedSeconds.toString());
     });
   }, [elapsedSeconds]);

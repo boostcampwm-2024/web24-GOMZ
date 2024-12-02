@@ -6,8 +6,6 @@ const Video = ({ mediaStream, muted }: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!mediaStream.active) return;
-
     const handleTrackEvent = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -22,7 +20,7 @@ const Video = ({ mediaStream, muted }: VideoProps) => {
       mediaStream.removeEventListener('addtrack', handleTrackEvent);
       mediaStream.removeEventListener('removetrack', handleTrackEvent);
     };
-  }, [mediaStream]);
+  }, []);
 
   return (
     <video

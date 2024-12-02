@@ -1,42 +1,21 @@
-import { io } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 
-interface WebRTCData {
-  peerConnection: RTCPeerConnection;
-  remoteStream: MediaStream;
-  dataChannel: RTCDataChannel;
-  nickName: string;
-}
+import type { Configuration } from '@customTypes/WebRTC';
 
-interface IceServer {
-  urls: string;
-  username?: string;
-  credential?: string;
-}
+import useWebRTCStore from '@stores/useWebRTCStore';
 
-interface Configuration {
-  iceServers: IceServer[];
-}
+type SignalingClientParams = [Socket, Configuration, MediaStream];
 
-type SignalingClientParams = [Configuration, MediaStream, Map<string, WebRTCData>];
+const signalingClient = (...[socket, configuration, localStream]: SignalingClientParams) => {
+  const { addWebRTCData, removeWebRTCData } = useWebRTCStore.getState();
 
-const requiredKeys = ['peerConnection', 'remoteStream', 'dataChannel', 'nickName'];
+  const handlePeerDisconnection = (targetId: string) => {
+    const { webRTCMap } = useWebRTCStore.getState();
+    const { peerConnection, dataChannel } = webRTCMap[targetId];
 
-const signalingClient = (...[configuration, localStream, webRTCMap]: SignalingClientParams) => {
-  const socket = io(import.meta.env.VITE_SIGNALING_SERVER_URL, { transports: ['websocket'] });
-  const pendingConnectionsMap = new Map<string, WebRTCData>();
-
-  const updatePendingConnection = (socketId: string, data: Partial<WebRTCData>) => {
-    pendingConnectionsMap.set(socketId, { ...pendingConnectionsMap.get(socketId)!, ...data });
-    const currentData = pendingConnectionsMap.get(socketId)!;
-    if (requiredKeys.every((key) => key in currentData)) {
-      webRTCMap.set(socketId, currentData as WebRTCData);
-    }
-  };
-
-  const handlePeerDisconnection = (peerConnection: RTCPeerConnection, targetId: string) => {
-    webRTCMap.delete(targetId);
-    pendingConnectionsMap.delete(targetId);
+    dataChannel.close();
     peerConnection.close();
+    removeWebRTCData(targetId);
   };
 
   socket.on('offerRequest', async ({ users }) => {
@@ -44,10 +23,10 @@ const signalingClient = (...[configuration, localStream, webRTCMap]: SignalingCl
       const peerConnection = new RTCPeerConnection(configuration);
       const dataChannel = peerConnection.createDataChannel('stopWatch');
 
-      updatePendingConnection(oldId, { peerConnection, dataChannel });
+      addWebRTCData(oldId, { peerConnection, dataChannel });
 
       peerConnection.ontrack = ({ streams }) => {
-        updatePendingConnection(oldId, { remoteStream: streams[0] });
+        addWebRTCData(oldId, { remoteStream: streams[0] });
       };
 
       peerConnection.onicecandidate = ({ candidate }) => {
@@ -73,10 +52,11 @@ const signalingClient = (...[configuration, localStream, webRTCMap]: SignalingCl
   });
 
   socket.on('answerRequest', async ({ newId, offer, newRandomId }) => {
-    const isRenegotiation = webRTCMap.has(newId);
+    const { webRTCMap } = useWebRTCStore.getState();
+    const isRenegotiation = newId in webRTCMap;
 
     if (isRenegotiation) {
-      const { peerConnection } = webRTCMap.get(newId)!;
+      const { peerConnection } = webRTCMap[newId];
       await peerConnection.setRemoteDescription(offer);
 
       const answer = await peerConnection.createAnswer();
@@ -84,21 +64,21 @@ const signalingClient = (...[configuration, localStream, webRTCMap]: SignalingCl
       socket.emit('sendAnswer', { newId, answer, oldRandomId: localStorage.getItem('nickName') });
 
       // removeTrack 이벤트 발생 시 화면 갱신을 위한 remoteStream 수동 업데이트
-      updatePendingConnection(newId, { remoteStream: webRTCMap.get(newId)!.remoteStream });
+      addWebRTCData(newId, { remoteStream: webRTCMap[newId].remoteStream });
 
       return;
     }
 
     const peerConnection = new RTCPeerConnection(configuration);
 
-    updatePendingConnection(newId, { peerConnection, nickName: newRandomId });
+    addWebRTCData(newId, { peerConnection, nickName: newRandomId });
 
     peerConnection.ondatachannel = ({ channel }) => {
-      updatePendingConnection(newId, { dataChannel: channel });
+      addWebRTCData(newId, { dataChannel: channel });
     };
 
     peerConnection.ontrack = ({ streams }) => {
-      updatePendingConnection(newId, { remoteStream: streams[0] });
+      addWebRTCData(newId, { remoteStream: streams[0] });
     };
 
     peerConnection.onicecandidate = ({ candidate }) => {
@@ -129,27 +109,25 @@ const signalingClient = (...[configuration, localStream, webRTCMap]: SignalingCl
   });
 
   socket.on('completeConnection', async ({ oldId, answer, oldRandomId }) => {
-    const { peerConnection } = pendingConnectionsMap.get(oldId)!;
+    const { pendingConnectionsMap } = useWebRTCStore.getState();
+    const { peerConnection } = pendingConnectionsMap[oldId];
 
-    updatePendingConnection(oldId, { nickName: oldRandomId });
+    addWebRTCData(oldId, { nickName: oldRandomId });
 
     await peerConnection.setRemoteDescription(answer);
   });
 
   socket.on('setIceCandidate', ({ senderId, iceCandidate }) => {
-    const { peerConnection } = pendingConnectionsMap.get(senderId)!;
+    const { pendingConnectionsMap } = useWebRTCStore.getState();
+    const { peerConnection } = pendingConnectionsMap[senderId];
     if (peerConnection) {
       peerConnection.addIceCandidate(new RTCIceCandidate(iceCandidate));
     }
   });
 
   socket.on('userDisconnected', ({ targetId }) => {
-    const { peerConnection } = webRTCMap.get(targetId)!;
-
-    handlePeerDisconnection(peerConnection, targetId);
+    handlePeerDisconnection(targetId);
   });
-
-  return socket;
 };
 
 export default signalingClient;

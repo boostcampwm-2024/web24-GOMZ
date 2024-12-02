@@ -1,36 +1,33 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import type { ControlBar as ControlBarProps } from '@customTypes/StudyRoom';
 
+import { getVideoDevices, getAudioDevices } from '@utils/media';
+
+import useWebRTCStore from '@stores/useWebRTCStore';
 import Icon from '@components/common/Icon';
 import MediaSelectModal from '@components/StudyRoom/MediaSelectModal';
 
-const ControlBar = ({
-  className,
-  isChatOn,
-  selectedVideoDeviceId,
-  selectedAudioDeviceId,
-  unreadMessagesCount,
-  toggleVideo,
-  toggleMic,
-  toggleChat,
-  exitRoom,
-  getVideoDevices,
-  getAudioDevices,
-  setSelectedVideoDeviceId,
-  setSelectedAudioDeviceId,
-}: ControlBarProps) => {
-  const [isVideoOn, setIsVideoOn] = useState(false);
-  const [isMicOn, setIsMicOn] = useState(false);
+const ControlBar = ({ className, isChatOn, unreadMessagesCount, toggleChat }: ControlBarProps) => {
+  const navigate = useNavigate();
+
   const [isVideoSelectModalOpen, setIsVideoSelectModalOpen] = useState(false);
   const [isAudioSelectModalOpen, setIsAudioSelectModalOpen] = useState(false);
+
+  const { toggleVideo, toggleAudio, setVideoDeviceId, setAudioDeviceId } =
+    useWebRTCStore.getState();
+  const isVideoOn = useWebRTCStore((state) => state.isVideoOn);
+  const isAudioOn = useWebRTCStore((state) => state.isAudioOn);
+  const videoDeviceId = useWebRTCStore((state) => state.videoDeviceId);
+  const audioDeviceId = useWebRTCStore((state) => state.audioDeviceId);
 
   return (
     <div className={`relative flex gap-10 ${className}`}>
       <div className="bg-gomz-gray-300 flex h-10 w-20 items-center rounded-full">
         <button
           className="bg-gomz-black flex h-10 w-12 items-center justify-center rounded-full transition-transform hover:scale-105"
-          onClick={() => toggleVideo().then((result) => setIsVideoOn(result))}
+          onClick={toggleVideo}
         >
           <Icon
             id={isVideoOn ? 'video' : 'video-off'}
@@ -47,9 +44,12 @@ const ControlBar = ({
       <div className="bg-gomz-gray-300 flex h-10 w-20 items-center rounded-full">
         <button
           className="bg-gomz-black flex h-10 w-12 items-center justify-center rounded-full transition-transform hover:scale-105"
-          onClick={() => setIsMicOn(toggleMic())}
+          onClick={toggleAudio}
         >
-          <Icon id={isMicOn ? 'mic' : 'mic-off'} className="text-gomz-white h-6 w-6 fill-current" />
+          <Icon
+            id={isAudioOn ? 'mic' : 'mic-off'}
+            className="text-gomz-white h-6 w-6 fill-current"
+          />
         </button>
         <button
           className="flex h-10 w-6 items-center justify-center rounded-full"
@@ -73,7 +73,7 @@ const ControlBar = ({
         </div>
       </button>
       <button
-        onClick={exitRoom}
+        onClick={() => navigate('/study-room-list')}
         className="bg-gomz-red flex h-10 w-20 items-center justify-center rounded-full transition-transform hover:scale-105"
       >
         <Icon id="call-end" className="text-gomz-white h-7 w-7 fill-current" />
@@ -81,16 +81,16 @@ const ControlBar = ({
       {isVideoSelectModalOpen && (
         <MediaSelectModal
           className="absolute bottom-0 -translate-y-14 translate-x-10"
-          selectedMediaDeviceId={selectedVideoDeviceId}
-          setSelectedMediaDevice={setSelectedVideoDeviceId}
+          mediaDeviceId={videoDeviceId}
+          setMediaDeviceId={setVideoDeviceId}
           getMediaDevices={getVideoDevices}
         />
       )}
       {isAudioSelectModalOpen && (
         <MediaSelectModal
           className="absolute bottom-0 -translate-y-14 translate-x-40"
-          selectedMediaDeviceId={selectedAudioDeviceId}
-          setSelectedMediaDevice={setSelectedAudioDeviceId}
+          mediaDeviceId={audioDeviceId}
+          setMediaDeviceId={setAudioDeviceId}
           getMediaDevices={getAudioDevices}
         />
       )}
