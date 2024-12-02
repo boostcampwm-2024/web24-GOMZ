@@ -1,28 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+
+import type { ResponseData, ItemCard as ItemCardProps } from '@customTypes/StudyRoomList';
+import { API_BASE_URL } from '@constants/API';
+
 import Icon from '@components/common/Icon';
-
-interface ErrorResponse {
-  message: string;
-  error: string;
-  statusCode: number;
-}
-
-interface ResponseData {
-  canAccess: boolean;
-  error?: ErrorResponse;
-}
-
-interface ItemCardProps {
-  roomId: string;
-  roomName: string;
-  categoryName: string;
-  isPrivate: boolean;
-  curParticipant: number;
-  maxParticipant: number;
-  openModal: () => void;
-}
-
-const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
 
 const ItemCard = ({
   roomId,

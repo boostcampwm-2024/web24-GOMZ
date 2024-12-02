@@ -1,9 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-interface VideoProps {
-  mediaStream: MediaStream;
-  muted: boolean;
-}
+import type { Video as VideoProps } from '@customTypes/StudyRoom';
 
 const Video = ({ mediaStream, muted }: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);

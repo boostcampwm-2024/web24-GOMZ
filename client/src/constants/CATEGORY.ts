@@ -30,4 +30,4 @@ const CATEGORY_NAMES: string[] = [
   '편입',
 ];
 
-export default CATEGORY_NAMES;
+export { CATEGORY_NAMES };

@@ -23,9 +23,11 @@ export default defineConfig({
       '@': resolve(dirname, 'src'),
       '@utils': resolve(dirname, 'src/utils'),
       '@hooks': resolve(dirname, 'src/hooks'),
+      '@stores': resolve(dirname, 'src/stroes'),
       '@socket': resolve(dirname, 'src/socket'),
       '@constants': resolve(dirname, 'src/constants'),
       '@components': resolve(dirname, 'src/components'),
+      '@customTypes': resolve(dirname, 'src/types'),
     },
   },
   test: {

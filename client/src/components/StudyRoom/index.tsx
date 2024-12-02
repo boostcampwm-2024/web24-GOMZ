@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
+import type { ChatMessage } from '@customTypes/StudyRoom';
+
 import StudyRoomHeader from '@components/StudyRoom/Header';
 import VideoGrid from '@components/StudyRoom/VideoGrid';
 import ControlBar from '@components/StudyRoom/ControlBar';
 import Chat from '@components/StudyRoom/Chat';
 import useWebRTC from '@hooks/useWebRTC';
-
-interface Message {
-  nickName: string;
-  message: string;
-}
 
 const StudyRoom = () => {
   const navigate = useNavigate();
@@ -18,7 +15,7 @@ const StudyRoom = () => {
   const { roomId } = useParams();
 
   const [isChatOn, setIsChatOn] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [lastReadMessageIndex, setLastReadMessageIndex] = useState(-1);
 

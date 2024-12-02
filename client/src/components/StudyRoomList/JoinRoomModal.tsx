@@ -1,41 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import type { JoinRoomModal as JoinRoomModalProps, ResponseData } from '@customTypes/StudyRoomList';
+import { API_BASE_URL } from '@constants/API';
+import { SAD_EMOTICONS } from '@constants/EMOTICONS';
+
 import shuffle from '@utils/shuffle';
-
-interface Room {
-  roomId: string;
-  roomName: string;
-  categoryName: string;
-  isPrivate: boolean;
-  curParticipant: number;
-  maxParticipant: number;
-}
-
-interface JoinRoomModalProps {
-  currentRoom: Partial<Room>;
-  closeModal: () => void;
-}
-
-interface ErrorResponse {
-  message: string;
-  error: string;
-  statusCode: number;
-}
-
-interface ResponseData {
-  canAccess: boolean;
-  error?: ErrorResponse;
-}
-
-const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
-const SAD_EMOTICONS = [
-  '｡° ૮₍°´ᯅ`°₎ა °',
-  '｡° (ꢳࡇꢳ) °｡',
-  '༼ ༎ຶ ෴ ༎ຶ༽',
-  '꒰ 𖦹ˊᯅˋ𖦹 ꒱',
-  '✘ᴗ✘',
-  'ヽ(●´Д｀●)ﾉﾟ',
-];
 
 const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
   const navigate = useNavigate();

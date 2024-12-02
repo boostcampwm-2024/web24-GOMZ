@@ -1,15 +1,9 @@
 import { useEffect, useState } from 'react';
+
+import type { VideoOverlay as VideoOverlayProps } from '@customTypes/StudyRoom';
+import { MAX_WIDTH } from '@constants/VIDEO';
+
 import StopWatch from '@components/common/StopWatch';
-
-const RATIO = 4 / 3;
-const MAX_HEIGHT = 600;
-const MAX_WIDTH = MAX_HEIGHT * RATIO;
-
-interface VideoOverlayProps {
-  nickName: string;
-  dataChannel?: RTCDataChannel;
-  gridCols: number;
-}
 
 const VideoOverlay = ({ nickName, dataChannel, gridCols }: VideoOverlayProps) => {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);

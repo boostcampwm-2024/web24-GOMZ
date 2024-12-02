@@ -1,23 +1,11 @@
 import { useState, useEffect } from 'react';
+
+import type { Header as StudyRoomHeaderProps } from '@customTypes/StudyRoom';
+
 import Header from '@components/common/Header';
 import Icon from '@components/common/Icon';
 import StopWatch from '@components/common/StopWatch';
 import useStopWatch from '@hooks/useStopWatch';
-
-interface WebRTCData {
-  peerConnection: RTCPeerConnection;
-  remoteStream: MediaStream;
-  dataChannel: RTCDataChannel;
-  nickName: string;
-}
-
-interface StudyRoomHeaderProps {
-  className?: string;
-  roomName: string;
-  curParticipant: number;
-  maxParticipant: number;
-  webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
-}
 
 const StudyRoomHeader = ({
   className,

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PropagateLoader } from 'react-spinners';
-import CATEGORY_NAMES from '@constants/CATEGORY_NAMES';
 
-const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
+import { CATEGORY_NAMES } from '@constants/CATEGORY';
+import { API_BASE_URL } from '@constants/API';
 
 const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
   const navigate = useNavigate();

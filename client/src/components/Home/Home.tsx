@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
+import { API_BASE_URL } from '@constants/API';
 
 const Home = () => {
   const navigate = useNavigate();

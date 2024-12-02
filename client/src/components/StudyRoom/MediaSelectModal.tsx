@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
 import { SyncLoader } from 'react-spinners';
-import Icon from '@components/common/Icon';
 
-interface MediaSelectModalProps {
-  className?: string;
-  selectedMediaDeviceId: string;
-  setSelectedMediaDevice: React.Dispatch<React.SetStateAction<string>>;
-  getMediaDevices: () => Promise<MediaDeviceInfo[]>;
-}
+import type { MediaSelectModal as MediaSelectModalProps } from '@customTypes/StudyRoom';
+
+import Icon from '@components/common/Icon';
 
 const MediaSelectModal = ({
   className,
