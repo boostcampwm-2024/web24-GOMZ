@@ -1,5 +1,15 @@
 import { Socket } from 'socket.io-client';
 
+interface IceServer {
+  urls: string;
+  username?: string;
+  credential?: string;
+}
+
+interface Configuration {
+  iceServers: IceServer[];
+}
+
 interface WebRTCData {
   peerConnection: RTCPeerConnection;
   remoteStream: MediaStream;
@@ -7,25 +17,32 @@ interface WebRTCData {
   nickName: string;
 }
 
-interface WebRTCState {
+type State = {
+  socket: Socket | null;
   localStream: MediaStream;
-  webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
-  participantCount: number;
-  grid: { cols: number; rows: number };
-  selectedVideoDeviceId: string;
-  selectedAudioDeviceId: string;
-}
+  webRTCMap: Record<string, WebRTCData>;
+  pendingConnectionsMap: Record<string, WebRTCData>;
+  curParticipant: number;
+  videoDeviceId: string;
+  audioDeviceId: string;
+  isVideoOn: boolean;
+  isAudioOn: boolean;
+};
 
-interface WebRTCControls {
-  toggleVideo: () => Promise<boolean>;
-  toggleMic: () => boolean;
-  joinRoom: (roomId: string) => Promise<Socket>;
-  exitRoom: () => void;
+type Action = {
+  addWebRTCData: (socketId: string, webRTCData: Partial<WebRTCData>) => void;
+  removeWebRTCData: (socketId: string) => void;
+  joinRoom: (roomId: string) => void;
+  closeAllConnections: () => void;
+
+  toggleVideo: () => Promise<void>;
+  toggleAudio: () => void;
+  changeVideoDevice: () => Promise<void>;
+  changeAudioDevice: () => Promise<void>;
+  setVideoDeviceId: (deviceId: string) => void;
+  setAudioDeviceId: (deviceId: string) => void;
+
   sendMessage: (message: string) => void;
-  getVideoDevices: () => Promise<MediaDeviceInfo[]>;
-  getAudioDevices: () => Promise<MediaDeviceInfo[]>;
-  setSelectedVideoDeviceId: React.Dispatch<React.SetStateAction<string>>;
-  setSelectedAudioDeviceId: React.Dispatch<React.SetStateAction<string>>;
-}
+};
 
-export type { WebRTCData, WebRTCState, WebRTCControls };
+export type { WebRTCData, Configuration, State, Action };
