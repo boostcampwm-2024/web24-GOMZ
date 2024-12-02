@@ -136,14 +136,14 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
               </div>
               <div className="flex gap-4 font-semibold">
                 <button
-                  className="border-gomz-black h-8 w-[4.75rem] rounded-full border bg-white"
+                  className="border-gomz-black h-8 w-[4.75rem] rounded-full border bg-white transition-transform hover:scale-105"
                   onClick={handleCancelAddRoom}
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="bg-gomz-black text-gomz-white h-8 w-[4.75rem] rounded-full"
+                  className="bg-gomz-black text-gomz-white h-8 w-[4.75rem] rounded-full transition-transform hover:scale-105"
                 >
                   생성
                 </button>

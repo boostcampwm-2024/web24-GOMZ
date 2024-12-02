@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
-import StudyRoomHeader from '@components/StudyRoom/StudyRoomHeader';
+import StudyRoomHeader from '@components/StudyRoom/Header';
 import VideoGrid from '@components/StudyRoom/VideoGrid';
 import ControlBar from '@components/StudyRoom/ControlBar';
 import Chat from '@components/StudyRoom/Chat';

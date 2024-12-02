@@ -51,6 +51,7 @@ const StudyRoomHeader = ({
         <div className="flex translate-x-[1.125rem] gap-3 text-xl font-normal">
           <StopWatch elapsedSeconds={elapsedSeconds} isAnimationOn={true} />
           <button
+            className="transition-transform hover:scale-105"
             onClick={() => {
               setIsStopWatchRunning(!isStopWatchRunning);
             }}

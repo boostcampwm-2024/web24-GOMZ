@@ -100,14 +100,14 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
           <div className="text-gomz-red text-sm">{errorMessage}</div>
           <div className="flex gap-4">
             <button
-              className="border-gomz-black h-8 w-[4.75rem] rounded-full border bg-white"
+              className="border-gomz-black h-8 w-[4.75rem] rounded-full border bg-white transition-transform hover:scale-105"
               onClick={handleCancelJoinRoom}
             >
               취소
             </button>
             <button
               type="submit"
-              className="bg-gomz-black text-gomz-white h-8 w-[4.75rem] rounded-full"
+              className="bg-gomz-black text-gomz-white h-8 w-[4.75rem] rounded-full transition-transform hover:scale-105"
             >
               입장
             </button>
