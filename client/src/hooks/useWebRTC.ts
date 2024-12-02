@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import signalingClient from '@socket/signalingClient';
 
 interface WebRTCData {
@@ -33,7 +33,7 @@ interface WebRTCControls {
 const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
 
 const useWebRTC = (): [WebRTCState, WebRTCControls] => {
-  const socket = useRef(io());
+  const socket = useRef<Socket>();
   const webRTCMap = useRef(new Map<string, WebRTCData>());
   const localStreamRef = useRef(new MediaStream());
   const [localStream, setLocalStream] = useState(new MediaStream());
@@ -204,11 +204,11 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
       peerConnection.close();
     });
     localStreamRef.current.getTracks().forEach((track) => track.stop());
-    socket.current.close();
+    socket.current?.close();
   };
 
   const sendMessage = (message: string) => {
-    socket.current.emit('sendMessage', { message });
+    socket.current?.emit('sendMessage', { message });
   };
 
   const getVideoDevices = async () => {

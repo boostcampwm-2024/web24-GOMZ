@@ -85,7 +85,7 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
                 />
               </div>
               <div>
-                <label className="flex gap-2">
+                <label className="flex items-center gap-2">
                   <span className="text-sm">비밀방</span>
                   <input
                     type="checkbox"
