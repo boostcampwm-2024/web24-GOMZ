@@ -42,46 +42,35 @@ export class SfuServerGateway implements OnGatewayDisconnect {
     this.logger.info(`${socketId} 접속, ${JSON.stringify(users)}`);
   }
 
-  @SubscribeMessage('sendMessage')
-  async handleSendMessage(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() sendMessageDto: SendMessageDto,
-  ) {
-    const { message } = sendMessageDto;
-    const clientId = client.id;
-    const userList = await this.sfuServerService.getRoomMemberSocketIdList(clientId);
-
-    this.logger.info(MESSAGE_SENT(clientId, userList, message));
-    client.broadcast.to(userList).emit('receiveMessage', {
-      userId: clientId,
-      message: message,
-    });
-  }
-
   @SubscribeMessage('offer')
-  async offer(@ConnectedSocket() client: Socket, @MessageBody() offer: RTCSessionDescriptionInit) {
-    // 1. peerConnection 작성
-    // 2. peerConnectionList에 저장
-    // 3. peerConnection에 onIceCandidate, ontrack 이벤트 지정(mediaStreams에 저장)
-    // 4. sendAnswer
+  async offer(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() offer: RTCSessionDescriptionInit,
+    @MessageBody() newRandomId: string,
+  ) {
     const { peerConnection } = await this.sfuServerService.makePeerConnection(client.id);
-
+    // 1. newRandomId를 저장하는 로직
+    this.sfuServerService.saveNewRandomId(client.id, newRandomId);
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) client.emit('sendIceCandidate', event.candidate);
     };
 
     peerConnection.ontrack = async (event) => {
-      // mediaStreams && peerConnections?? 정보가 필요함 (service에 있음)
-      await this.sfuServerService.saveMediaStream(client.id, event.streams[0]);
+      this.sfuServerService.saveMediaStream(client.id, event.streams[0]);
       if (this.sfuServerService.hasMultiplePeerConnections()) {
         const offerList: { socketId: string; offer: RTCSessionDescriptionInit }[] =
-          await this.sfuServerService.addTracks();
-        offerList.forEach(({ socketId, offer }) => this.server.to(socketId).emit('offer', offer));
+          await this.sfuServerService.addTracks(client.id);
+        // 2. 방에 있던 기존 참가자의 닉네임을 가져오는 로직(oldRandomId)
+        const oldRandomIds = await this.sfuServerService.getRandomIds(client.id); // 내 닉네임 중복 될듯?
+
+        offerList.forEach(({ socketId, offer }) =>
+          this.server.to(socketId).emit('offer', { offer, oldRandomIds }),
+        );
       }
     };
 
     const { answer } = await this.sfuServerService.makeAnswer(peerConnection, offer);
-    client.emit('answer', answer);
+    client.emit('answer', { answer });
   }
 
   @SubscribeMessage('answer')
@@ -99,5 +88,21 @@ export class SfuServerGateway implements OnGatewayDisconnect {
   ) {
     const socketId = client.id;
     this.sfuServerService.setIceCandidate(socketId, iceCandidate);
+  }
+
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() sendMessageDto: SendMessageDto,
+  ) {
+    const { message } = sendMessageDto;
+    const clientId = client.id;
+    const userList = await this.sfuServerService.getRoomMemberSocketIdList(clientId);
+
+    this.logger.info(MESSAGE_SENT(clientId, userList, message));
+    client.broadcast.to(userList).emit('receiveMessage', {
+      userId: clientId,
+      message: message,
+    });
   }
 }
