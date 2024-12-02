@@ -1,37 +1,24 @@
 import { useState } from 'react';
+
+import type { ControlBar as ControlBarProps } from '@customTypes/StudyRoom';
+
 import Icon from '@components/common/Icon';
 import MediaSelectModal from '@components/StudyRoom/MediaSelectModal';
 
-interface ControlBarProps {
-  className?: string;
-  toggleVideo: () => Promise<boolean>;
-  toggleMic: () => boolean;
-  toggleChat: () => void;
-  exitRoom: () => void;
-  isChatOn: boolean;
-  getVideoDevices: () => Promise<MediaDeviceInfo[]>;
-  getAudioDevices: () => Promise<MediaDeviceInfo[]>;
-  selectedVideoDeviceId: string;
-  selectedAudioDeviceId: string;
-  setSelectedVideoDeviceId: React.Dispatch<React.SetStateAction<string>>;
-  setSelectedAudioDeviceId: React.Dispatch<React.SetStateAction<string>>;
-  unreadMessagesCount: number;
-}
-
 const ControlBar = ({
   className,
+  isChatOn,
+  selectedVideoDeviceId,
+  selectedAudioDeviceId,
+  unreadMessagesCount,
   toggleVideo,
   toggleMic,
   toggleChat,
   exitRoom,
-  isChatOn,
   getVideoDevices,
   getAudioDevices,
-  selectedVideoDeviceId,
-  selectedAudioDeviceId,
   setSelectedVideoDeviceId,
   setSelectedAudioDeviceId,
-  unreadMessagesCount,
 }: ControlBarProps) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);

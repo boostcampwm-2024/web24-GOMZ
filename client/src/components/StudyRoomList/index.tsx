@@ -1,22 +1,14 @@
 import { useEffect, useState } from 'react';
 
+import type { Room } from '@customTypes/StudyRoomList';
+import { API_BASE_URL } from '@constants/API';
+
 import StudyRoomHeader from '@components/StudyRoomList/Header';
 import AddItemCard from '@components/StudyRoomList/AddItemCard';
 import ItemCard from '@components/StudyRoomList/ItemCard';
 import Pagination from '@components/StudyRoomList/Pagination';
 import AddItemModal from '@components/StudyRoomList/AddItemModal';
 import JoinRoomModal from '@components/StudyRoomList/JoinRoomModal';
-
-interface Room {
-  roomId: string;
-  roomName: string;
-  categoryName: string;
-  isPrivate: boolean;
-  curParticipant: number;
-  maxParticipant: number;
-}
-
-const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
 
 const StudyRoomList = () => {
   const [isJoinRoomModalOpen, setIsJoinRoomModalOpen] = useState(false);

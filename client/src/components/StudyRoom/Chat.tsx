@@ -1,29 +1,9 @@
 import { useEffect, useRef } from 'react';
+
+import type { Chat as ChatProps } from '@customTypes/StudyRoom';
+
 import Icon from '@components/common/Icon';
-
-interface Message {
-  nickName: string;
-  message: string;
-}
-
-const ChatMessage = ({ nickName, message }: { nickName: string; message: string }) => {
-  return (
-    <div className="mb-2 rounded-xl">
-      <span className="mr-2 font-semibold">{nickName}</span>
-      <span className="break-words">{message}</span>
-    </div>
-  );
-};
-
-interface ChatProps {
-  className?: string;
-  messages: Message[];
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-  newMessage: string;
-  setNewMessage: React.Dispatch<React.SetStateAction<string>>;
-  sendMessage: (message: string) => void;
-  setLastReadMessageIndex: React.Dispatch<React.SetStateAction<number>>;
-}
+import ChatMessage from '@components/StudyRoom/ChatMessage';
 
 const Chat = ({
   className,

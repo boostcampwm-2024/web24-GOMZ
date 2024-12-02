@@ -1,28 +1,8 @@
+import type { VideoGrid as VideoGridProps } from '@customTypes/StudyRoom';
+import { MAX_HEIGHT, MAX_WIDTH, GAP } from '@constants/VIDEO';
+
 import Video from '@components/StudyRoom/Video';
 import VideoOverlay from '@components/StudyRoom/VideoOverlay';
-
-const RATIO = 4 / 3;
-const MAX_HEIGHT = 600;
-const MAX_WIDTH = MAX_HEIGHT * RATIO;
-const GAP = 8;
-
-interface Grid {
-  cols: number;
-  rows: number;
-}
-
-interface WebRTCData {
-  peerConnection: RTCPeerConnection;
-  remoteStream: MediaStream;
-  dataChannel: RTCDataChannel;
-  nickName: string;
-}
-
-interface VideoGridProps {
-  localStream: MediaStream;
-  webRTCMap: React.MutableRefObject<Map<string, WebRTCData>>;
-  grid: Grid;
-}
 
 const VideoGrid = ({ localStream, webRTCMap, grid }: VideoGridProps) => {
   return (
