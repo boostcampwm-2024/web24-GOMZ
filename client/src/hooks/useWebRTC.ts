@@ -92,7 +92,7 @@ const useWebRTC = (): [WebRTCState, WebRTCControls] => {
 
     const videoTrack = await navigator.mediaDevices
       .getUserMedia({
-        video: { deviceId: { ideal: selectedAudioDeviceId } },
+        video: { deviceId: { ideal: selectedVideoDeviceId } },
       })
       .then((stream) => stream.getVideoTracks()[0]);
 
