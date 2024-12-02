@@ -42,14 +42,19 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = event.target as HTMLFormElement;
+    const form = event.currentTarget;
     sendFormData(form);
   };
 
   const handleOnKeyDown = (event: React.KeyboardEvent<HTMLFormElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      sendFormData(event.currentTarget);
+      const form = event.currentTarget;
+      if (form.checkValidity()) {
+        sendFormData(form);
+      } else {
+        form.reportValidity();
+      }
     }
   };
 

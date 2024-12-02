@@ -67,7 +67,7 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = event.target as HTMLFormElement;
+    const form = event.currentTarget;
     sendFormData(form);
   };
 
@@ -93,16 +93,7 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
             name="password"
             className="border-gomz-black h-8 w-[17.5rem] rounded-lg border px-2 focus:outline-none"
             maxLength={20}
-            minLength={4}
             autoFocus
-            required
-            onInvalid={({ target }: React.InvalidEvent<HTMLInputElement>) => {
-              if (target.validity.valueMissing || target.validity.tooShort) {
-                target.setCustomValidity('비밀번호는 4자 이상 입력해주세요 ｡° ૮₍°´ᯅ`°₎ა °｡');
-              } else {
-                target.setCustomValidity('');
-              }
-            }}
           />
         </div>
         <div className="flex items-center justify-between gap-1 font-semibold">
