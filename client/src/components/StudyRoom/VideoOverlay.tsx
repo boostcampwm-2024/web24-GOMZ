@@ -39,6 +39,7 @@ const VideoOverlay = ({ nickName, dataChannel, gridCols }: VideoOverlayProps) =>
       }}
     >
       <div
+        className="truncate"
         style={{
           fontSize: `${Math.max(1.75 / Math.sqrt(gridCols), 0.625)}rem`,
           maxWidth: `${MAX_WIDTH / gridCols / 2.5}px`,

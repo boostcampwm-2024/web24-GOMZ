@@ -94,6 +94,7 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
             className="border-gomz-black h-8 w-[17.5rem] rounded-lg border px-2 focus:outline-none"
             maxLength={20}
             minLength={4}
+            autoFocus
             required
             onInvalid={({ target }: React.InvalidEvent<HTMLInputElement>) => {
               if (target.validity.valueMissing || target.validity.tooShort) {

@@ -30,6 +30,7 @@ import { SfuServerModule } from './sfu-server/sfu-server.module';
       inject: [ConfigService],
     }),
     SignalingServerModule,
+    SfuServerModule,
     WinstonModule.forRoot(winstonConfig),
     StudyRoomModule,
     UserModule,

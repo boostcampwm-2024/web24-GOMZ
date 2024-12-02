@@ -49,7 +49,6 @@ const ItemCard = ({
 
   const joinRoom = () => {
     sendFormData();
-    navigate(`/study-room/${roomId}`, { state: { roomName, maxParticipant } });
   };
 
   return (
