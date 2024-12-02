@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ChattingService } from 'src/chatting/chatting.service';
 import { StudyRoomsService } from 'src/study-room/study-room.service';
 import wrtc from '@roamhq/wrtc';
+import { Socket } from 'socket.io-client';
 
 @Injectable()
 export class SfuServerService {
@@ -73,16 +74,63 @@ export class SfuServerService {
     return { answer };
   }
 
-  onTrack(clientId: string, peerConnection: RTCPeerConnection) {
+  onTrack(client: Socket, peerConnection: RTCPeerConnection) {
     peerConnection.ontrack = (event) => {
-      this.mediaStreams[clientId] = event.streams[0];
+      this.mediaStreams[client.id] = event.streams[0];
       // if(Object.keys(this.peerConnections).length > 1) sendOffer();
     };
+  }
+
+  saveMediaStream(clientId: string, mediaStream: MediaStream): void {
+    this.mediaStreams[clientId] = mediaStream;
+  }
+
+  hasMultiplePeerConnections() {
+    return Object.keys(this.peerConnections).length > 1;
+  }
+
+  async addTracks(): Promise<{ socketId: string; offer: RTCSessionDescriptionInit }[]> {
+    const offerList = [];
+    // addtrack 트랙 추가
+    // TODO : 같은 방에 있는 클라이언트들의 socketId와 PeerConnection을 가져온다.
+    for (const [socketId1, pc] of Object.entries(this.peerConnections) as [
+      string,
+      RTCPeerConnection,
+    ][]) {
+      // 기존 videoTrack이 존재한다면 해당 videoTrack은 안 넣어도 됨
+      const existingTracks = pc.getSenders().map((sender) => sender.track);
+
+      // 기존의 각 peerConnection마다 videoTrack을 추가하여 재협상하는 로직
+      // TODO : 같은 방에 있는 클라이언트의 socketId와 mediaStreams를 가져온다.
+      for (const [socketId2, mediaStream] of Object.entries(this.mediaStreams) as [
+        string,
+        MediaStream,
+      ][]) {
+        if (socketId1 == socketId2) continue;
+
+        const videoTrack = mediaStream.getTracks()[0];
+        if (existingTracks.includes(videoTrack)) continue;
+        pc.addTrack(videoTrack, mediaStream);
+      }
+
+      // Server.to(socketId1).emit()
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      const socketOffer = { socketId: socketId1, offer: offer };
+      offerList.push(socketOffer);
+      //socket.emit("offer", offer);      // <--- 이 부분을 {socketId, offer}[], 게이트웨이는 이거를 받아서 offer 전달
+    }
+
+    return offerList;
   }
 
   async answerReceived(clientId: string, answer: RTCSessionDescriptionInit) {
     const peerConnection = this.peerConnections[clientId];
     await peerConnection.setRemoteDescription(new wrtc.RTCSessionDescription(answer));
+  }
+
+  async setIceCandidate(socketId: string, iceCandidate: RTCIceCandidateInit) {
+    this.peerConnections[socketId].addIceCandidate(new wrtc.RTCIceCandidate(iceCandidate));
   }
 
   private getOrCreateRoom(roomId: string) {

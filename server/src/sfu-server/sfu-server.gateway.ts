@@ -30,7 +30,7 @@ export class SfuServerGateway implements OnGatewayDisconnect {
     const socketId = client.id;
     const { socketIdList, mediaStreamId } = await this.sfuServerService.exitRoom(socketId);
     this.logger.info(`${socketId}이 SFU 방에서 나갔습니다.`);
-    this.server.to(socketIdList).emit('removeStream', { mediaStreamId });
+    this.server.to(socketIdList).emit('userDisconnected', { targetId: socketId, mediaStreamId });
   }
 
   @SubscribeMessage('joinRoom')
@@ -67,16 +67,21 @@ export class SfuServerGateway implements OnGatewayDisconnect {
     const { peerConnection } = await this.sfuServerService.makePeerConnection(client.id);
 
     peerConnection.onicecandidate = (event) => {
-      if (event.candidate) client.emit('icecandidate', event.candidate);
+      if (event.candidate) client.emit('sendIceCandidate', event.candidate);
     };
 
-    this.sfuServerService.onTrack(client.id, peerConnection);
+    peerConnection.ontrack = async (event) => {
+      // mediaStreams && peerConnections?? 정보가 필요함 (service에 있음)
+      await this.sfuServerService.saveMediaStream(client.id, event.streams[0]);
+      if (this.sfuServerService.hasMultiplePeerConnections()) {
+        const offerList: { socketId: string; offer: RTCSessionDescriptionInit }[] =
+          await this.sfuServerService.addTracks();
+        offerList.forEach(({ socketId, offer }) => this.server.to(socketId).emit('offer', offer));
+      }
+    };
+
     const { answer } = await this.sfuServerService.makeAnswer(peerConnection, offer);
     client.emit('answer', answer);
-    // 1~3 : this.sfuServerService.offer🦈
-    // 4 : this.sfuServerService.sendAnswer
-    // 아 answer를 보내는 것은 controller에서 해야할 것 같아요. 그건 비즈니스 로직이 아니니
-    // makeAnswer로 수정하죠??
   }
 
   @SubscribeMessage('answer')
@@ -85,5 +90,14 @@ export class SfuServerGateway implements OnGatewayDisconnect {
     @MessageBody() answer: RTCSessionDescriptionInit,
   ) {
     await this.sfuServerService.answerReceived(client.id, answer);
+  }
+
+  @SubscribeMessage('sendIceCandidate')
+  handleSendIceCandidate(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() iceCandidate: RTCIceCandidateInit,
+  ) {
+    const socketId = client.id;
+    this.sfuServerService.setIceCandidate(socketId, iceCandidate);
   }
 }
