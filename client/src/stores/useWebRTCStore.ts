@@ -5,7 +5,7 @@ import type { State, Action } from '@customTypes/WebRTC';
 
 import signalingClient from '@socket/signalingClient';
 import { getConfiguration } from '@APIs/StudyRoomAPI';
-import { getVideoDevices, getAudioDevices, createDummyTrack } from '@utils/media';
+import { getVideoDevices, getAudioDevices, createDummyTrack, checkPermission } from '@utils/media';
 
 const requiredWebRTCData = ['peerConnection', 'remoteStream', 'dataChannel', 'nickName'];
 
@@ -19,6 +19,8 @@ const createInitialState = () => ({
   audioDeviceId: 'default',
   isVideoOn: false,
   isAudioOn: true,
+  videoPermission: '',
+  audioPermission: '',
 });
 
 const useWebRTCStore = create<State & Action>((set, get) => ({
@@ -77,10 +79,19 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
         transports: ['websocket'],
       }),
     });
-    const { localStream, setVideoDeviceId, setAudioDeviceId, toggleAudio } = get();
+    const {
+      setVideoDeviceId,
+      setAudioDeviceId,
+      toggleAudio,
+      setVideoPermission,
+      setAudioPermission,
+    } = get();
 
+    const audioPermission = await checkPermission('microphone');
+    setAudioPermission(audioPermission);
     const audioDevices = await getAudioDevices();
-    if (audioDevices.length !== 0) {
+
+    if (audioPermission === 'granted' && audioDevices.length !== 0) {
       const hasDefaultAudioDevice = audioDevices.some(({ deviceId }) => deviceId === 'default');
       setAudioDeviceId(hasDefaultAudioDevice ? 'default' : audioDevices[0].deviceId);
 
@@ -98,8 +109,11 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
 
     toggleAudio();
 
+    const videoPermission = await checkPermission('camera');
+    setVideoPermission(videoPermission);
     const videoDevices = await getVideoDevices();
-    if (videoDevices.length !== 0) {
+
+    if (videoPermission === 'granted' && videoDevices.length !== 0) {
       const hasDefaultVideoDevice = videoDevices.some(({ deviceId }) => deviceId === 'default');
       setVideoDeviceId(hasDefaultVideoDevice ? 'default' : videoDevices[0].deviceId);
     }
@@ -155,6 +169,24 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
 
       set({ isVideoOn: true });
     }
+  },
+
+  startAudio: async () => {
+    const { localStream, webRTCMap, audioDeviceId } = get();
+
+    const audioTrack = await navigator.mediaDevices
+      .getUserMedia({
+        audio: { deviceId: { ideal: audioDeviceId } },
+      })
+      .then((stream) => stream.getAudioTracks()[0]);
+
+    localStream!.addTrack(audioTrack);
+
+    Object.values(webRTCMap).forEach(({ peerConnection }) => {
+      peerConnection.addTrack(audioTrack, localStream!);
+    });
+
+    set({ isAudioOn: true });
   },
 
   toggleAudio: () => {
@@ -219,6 +251,14 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
     const { changeAudioDevice } = get();
     set({ audioDeviceId: deviceId });
     changeAudioDevice();
+  },
+
+  setVideoPermission: (permissionState) => {
+    set({ videoPermission: permissionState });
+  },
+
+  setAudioPermission: (permissionState) => {
+    set({ audioPermission: permissionState });
   },
 
   sendMessage: (message: string) => {

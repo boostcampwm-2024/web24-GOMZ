@@ -27,6 +27,8 @@ type State = {
   audioDeviceId: string;
   isVideoOn: boolean;
   isAudioOn: boolean;
+  videoPermission: string;
+  audioPermission: string;
 };
 
 type Action = {
@@ -37,10 +39,13 @@ type Action = {
 
   toggleVideo: () => Promise<void>;
   toggleAudio: () => void;
+  startAudio: () => void;
   changeVideoDevice: () => Promise<void>;
   changeAudioDevice: () => Promise<void>;
   setVideoDeviceId: (deviceId: string) => void;
   setAudioDeviceId: (deviceId: string) => void;
+  setVideoPermission: (permissionState: string) => void;
+  setAudioPermission: (permissionState: string) => void;
 
   sendMessage: (message: string) => void;
 };
