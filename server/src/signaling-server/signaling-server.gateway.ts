@@ -117,6 +117,17 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
       .emit('setIceCandidate', { senderId: client.id, iceCandidate: iceCandidate });
   }
 
+  @SubscribeMessage('currentUsers')
+  async handleCurrentUser(@ConnectedSocket() client: Socket) {
+    const roomId = await this.studyRoomsService.findUserRoom(client.id);
+    if (roomId === undefined) return;
+    const users = (await this.studyRoomsService.getRoomUsers(roomId)).filter(
+      (user) => user.socketId !== client.id,
+    );
+
+    client.emit('currentUsers', { users });
+  }
+
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
