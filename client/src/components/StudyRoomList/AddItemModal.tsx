@@ -35,7 +35,7 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
 
     const { roomId } = await resonse.json();
 
-    navigate(`/study-room/${roomId}`, {
+    navigate(`/permission/${roomId}`, {
       state: { roomName: jsonData.roomName, maxParticipant: 8 },
     });
   };
