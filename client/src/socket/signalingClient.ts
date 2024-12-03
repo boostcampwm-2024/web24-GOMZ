@@ -9,15 +9,6 @@ type SignalingClientParams = [Socket, Configuration, MediaStream];
 const signalingClient = (...[socket, configuration, localStream]: SignalingClientParams) => {
   const { addWebRTCData, removeWebRTCData } = useWebRTCStore.getState();
 
-  const handlePeerDisconnection = (targetId: string) => {
-    const { webRTCMap } = useWebRTCStore.getState();
-    const { peerConnection, dataChannel } = webRTCMap[targetId];
-
-    dataChannel.close();
-    peerConnection.close();
-    removeWebRTCData(targetId);
-  };
-
   socket.on('offerRequest', async ({ users }) => {
     for (const { socketId: oldId } of users) {
       const peerConnection = new RTCPeerConnection(configuration);
@@ -126,7 +117,13 @@ const signalingClient = (...[socket, configuration, localStream]: SignalingClien
   });
 
   socket.on('userDisconnected', ({ targetId }) => {
-    handlePeerDisconnection(targetId);
+    const { webRTCMap } = useWebRTCStore.getState();
+    const { peerConnection, dataChannel } = webRTCMap[targetId];
+
+    dataChannel.close();
+    peerConnection.close();
+    removeWebRTCData(targetId);
+    delete webRTCMap[targetId];
   });
 };
 
