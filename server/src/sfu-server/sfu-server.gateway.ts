@@ -45,12 +45,13 @@ export class SfuServerGateway implements OnGatewayDisconnect {
   @SubscribeMessage('offer')
   async offer(
     @ConnectedSocket() client: Socket,
-    @MessageBody() offer: RTCSessionDescriptionInit,
-    @MessageBody() newRandomId: string,
+    @MessageBody('offer') offer: RTCSessionDescriptionInit,
+    @MessageBody('newRandomId') newRandomId: string,
   ) {
     const { peerConnection } = await this.sfuServerService.makePeerConnection(client.id);
     // 1. newRandomId를 저장하는 로직
     this.sfuServerService.saveNewRandomId(client.id, newRandomId);
+
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) client.emit('sendIceCandidate', event.candidate);
     };
@@ -58,15 +59,26 @@ export class SfuServerGateway implements OnGatewayDisconnect {
     peerConnection.ontrack = async (event) => {
       this.sfuServerService.saveMediaStream(client.id, event.streams[0]);
       if (this.sfuServerService.hasMultiplePeerConnections()) {
-        const offerList: { socketId: string; offer: RTCSessionDescriptionInit }[] =
-          await this.sfuServerService.addTracks(client.id);
+        await this.sfuServerService.addTracks(client.id);
+        // const offerList: { socketId: string; offer: RTCSessionDescriptionInit }[] = await this.sfuServerService.addTracks(client.id);
         // 2. 방에 있던 기존 참가자의 닉네임을 가져오는 로직(oldRandomId)
-        const oldRandomIds = await this.sfuServerService.getRandomIds(client.id); // 내 닉네임 중복 될듯?
-
-        offerList.forEach(({ socketId, offer }) =>
-          this.server.to(socketId).emit('offer', { offer, oldRandomIds }),
-        );
+        // const oldRandomIds = await this.sfuServerService.getRandomIds(client.id);
+        // offerList.forEach(({ socketId, offer }) =>
+        //   this.server.to(socketId).emit('offer', { offer, oldRandomIds }),
+        // );
       }
+    };
+
+    // addtrack() -> offer -> stable -> answer
+    // addtrack() -> onnegotiationneeded -> stable -> offer -> answer
+
+    peerConnection.onnegotiationneeded = async () => {
+      if (peerConnection.signalingState !== 'stable') return;
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      const streamsNickname = await this.sfuServerService.getStreamNickname(client.id);
+      client.emit('offer', { offer, streamsNickname });
     };
 
     const { answer } = await this.sfuServerService.makeAnswer(peerConnection, offer);

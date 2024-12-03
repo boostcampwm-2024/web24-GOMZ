@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ChattingService } from 'src/chatting/chatting.service';
 import { StudyRoomsService } from 'src/study-room/study-room.service';
-import wrtc from '@roamhq/wrtc';
+import * as wrtc from '@roamhq/wrtc';
 
 @Injectable()
 export class SfuServerService {
@@ -115,14 +115,18 @@ export class SfuServerService {
         if (!roomUserList.some((user) => user.socketId === socketId2)) continue;
         if (socketId1 == socketId2) continue;
 
-        const videoTrack = mediaStream.getTracks()[0];
-        if (existingTracks.includes(videoTrack)) continue;
-        pc.addTrack(videoTrack, mediaStream);
+        mediaStream.getTracks().forEach((track) => {
+          if (existingTracks.includes(track)) return;
+          pc.addTrack(track, mediaStream);
+        });
+        // const videoTrack = mediaStream.getTracks()[0];
+        // if (existingTracks.includes(videoTrack)) continue;
+        // pc.addTrack(videoTrack, mediaStream);
       }
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      const socketOffer = { socketId: socketId1, offer: offer };
-      offerList.push(socketOffer);
+      // const offer = await pc.createOffer();
+      // await pc.setLocalDescription(offer);
+      // const socketOffer = { socketId: socketId1, offer: offer };
+      // offerList.push(socketOffer);
     }
 
     return offerList;
@@ -135,6 +139,20 @@ export class SfuServerService {
 
   async setIceCandidate(socketId: string, iceCandidate: RTCIceCandidateInit) {
     this.peerConnections[socketId].addIceCandidate(new wrtc.RTCIceCandidate(iceCandidate));
+  }
+
+  async getStreamNickname(clientId) {
+    const userRoomId = await this.studyRoomsService.findUserRoom(clientId);
+    const roomUserList = await this.studyRoomsService.getRoomUsers(userRoomId);
+
+    const streamNicknames = {};
+    for (const { socketId } of roomUserList) {
+      const streamId = this.mediaStreams[socketId].id;
+      const nickname = this.nicknameList[socketId];
+      streamNicknames[streamId] = nickname;
+    }
+
+    return streamNicknames;
   }
 
   private getOrCreateRoom(roomId: string) {
