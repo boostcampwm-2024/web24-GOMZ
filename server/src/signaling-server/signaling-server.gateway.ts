@@ -21,7 +21,7 @@ import { SendMessageDto } from 'src/chatting/chatting.dto';
 import { MESSAGE_SENT } from 'src/chatting/chatting.constant';
 import { ChattingService } from 'src/chatting/chatting.service';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: '/mesh' })
 export class SignalingServerGateway implements OnGatewayDisconnect {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER)

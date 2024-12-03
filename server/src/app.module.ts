@@ -34,7 +34,6 @@ import { SfuServerModule } from './sfu-server/sfu-server.module';
     WinstonModule.forRoot(winstonConfig),
     StudyRoomModule,
     UserModule,
-    SfuServerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
