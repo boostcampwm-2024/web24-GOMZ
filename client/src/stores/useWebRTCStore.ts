@@ -72,7 +72,11 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
   },
 
   joinRoom: async (roomId) => {
-    set({ socket: io(import.meta.env.VITE_SIGNALING_SERVER_URL, { transports: ['websocket'] }) });
+    set({
+      socket: io(`${import.meta.env.VITE_SIGNALING_SERVER_URL}/mesh`, {
+        transports: ['websocket'],
+      }),
+    });
     const { localStream, setVideoDeviceId, setAudioDeviceId, toggleAudio } = get();
 
     const audioDevices = await getAudioDevices();
