@@ -16,7 +16,9 @@ const MediaSelectModal = ({
 
   useEffect(() => {
     const init = async () => {
-      const devices = await getMediaDevices();
+      const devices = await getMediaDevices().then((devices) =>
+        devices.filter(({ label }) => label !== ''),
+      );
       setMediaDevices(devices);
       setIsLoading(false);
     };
