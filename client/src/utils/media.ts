@@ -8,7 +8,7 @@ const getAudioDevices = async () => {
   return devices.filter((device) => device.kind === 'audioinput');
 };
 
-const createDummyTrack = () => {
+const createDummyStream = () => {
   const audioContext = new AudioContext();
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
@@ -21,7 +21,7 @@ const createDummyTrack = () => {
 
   oscillator.start();
 
-  return destination.stream.getAudioTracks()[0];
+  return destination.stream;
 };
 
 const checkPermission = async (permissionName: string) => {
@@ -42,4 +42,4 @@ const requestPermission = async (cameraPermission: boolean, micPermission: boole
   }
 };
 
-export { getVideoDevices, getAudioDevices, createDummyTrack, checkPermission, requestPermission };
+export { getVideoDevices, getAudioDevices, createDummyStream, checkPermission, requestPermission };

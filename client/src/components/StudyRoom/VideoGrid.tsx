@@ -7,6 +7,7 @@ import VideoOverlay from '@components/StudyRoom/VideoOverlay';
 const VideoGrid = () => {
   const curParticipant = useWebRTCStore((state) => state.curParticipant);
   const localStream = useWebRTCStore((state) => state.localStream);
+
   const { webRTCMap } = useWebRTCStore.getState();
 
   const cols = Math.ceil(Math.sqrt(curParticipant));
@@ -28,7 +29,7 @@ const VideoGrid = () => {
           width: `${MAX_WIDTH / cols}px`,
         }}
       >
-        <Video mediaStream={localStream} muted={true} />
+        <Video mediaStream={localStream!} muted={true} />
         <VideoOverlay nickName={localStorage.getItem('nickName')!} cols={cols} />
       </div>
       {Object.entries(webRTCMap).map(([id, { remoteStream, dataChannel, nickName }]) => (
