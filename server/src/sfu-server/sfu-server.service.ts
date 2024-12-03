@@ -141,7 +141,7 @@ export class SfuServerService {
     this.peerConnections[socketId].addIceCandidate(new wrtc.RTCIceCandidate(iceCandidate));
   }
 
-  async getStreamNickname(clientId) {
+  async getStreamNickname(clientId: string) {
     const userRoomId = await this.studyRoomsService.findUserRoom(clientId);
     const roomUserList = await this.studyRoomsService.getRoomUsers(userRoomId);
 
@@ -191,17 +191,18 @@ export class SfuServerService {
 
   private async handleRoomTimer(roomId: string): Promise<string[]> {
     const users = await this.studyRoomsService.getRoomUsers(roomId);
-    const room = this.rooms.get(parseInt(roomId, 10));
 
-    if (!users.length && room) {
-      room.timer = setTimeout(
-        () => {
-          this.rooms.delete(parseInt(roomId, 10));
-          this.studyRoomsService.deleteRoom(roomId);
-        },
-        5 * 60 * 1000,
-      );
-    }
+    // SFU 서버는 삭제되지 않도록 수정
+    // const room = this.rooms.get(parseInt(roomId, 10));
+    // if (!users.length && room) {
+    //   room.timer = setTimeout(
+    //     () => {
+    //       this.rooms.delete(parseInt(roomId, 10));
+    //       this.studyRoomsService.deleteRoom(roomId);
+    //     },
+    //     5 * 60 * 1000,
+    //   );
+    // }
 
     return users.map((user) => user.socketId);
   }
