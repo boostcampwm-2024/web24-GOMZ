@@ -19,7 +19,7 @@ interface WebRTCData {
 
 type State = {
   socket: Socket | null;
-  localStream: MediaStream;
+  localStream: MediaStream | null;
   webRTCMap: Record<string, WebRTCData>;
   pendingConnectionsMap: Record<string, WebRTCData>;
   curParticipant: number;

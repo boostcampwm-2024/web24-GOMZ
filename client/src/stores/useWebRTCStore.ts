@@ -5,13 +5,13 @@ import type { State, Action } from '@customTypes/WebRTC';
 
 import signalingClient from '@socket/signalingClient';
 import { getConfiguration } from '@APIs/StudyRoomAPI';
-import { getVideoDevices, getAudioDevices, createDummyTrack, checkPermission } from '@utils/media';
+import { getVideoDevices, getAudioDevices, createDummyStream, checkPermission } from '@utils/media';
 
 const requiredWebRTCData = ['peerConnection', 'remoteStream', 'dataChannel', 'nickName'];
 
 const createInitialState = () => ({
   socket: null,
-  localStream: new MediaStream(),
+  localStream: null,
   webRTCMap: {},
   pendingConnectionsMap: {},
   curParticipant: 1,
@@ -95,16 +95,14 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
       const hasDefaultAudioDevice = audioDevices.some(({ deviceId }) => deviceId === 'default');
       setAudioDeviceId(hasDefaultAudioDevice ? 'default' : audioDevices[0].deviceId);
 
-      const audioTrack = await navigator.mediaDevices
-        .getUserMedia({
-          audio: { deviceId: { ideal: 'default' } },
-        })
-        .then((stream) => stream.getAudioTracks()[0]);
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: { deviceId: { ideal: 'default' } },
+      });
 
-      localStream.addTrack(audioTrack);
+      set({ localStream: mediaStream });
     } else {
-      const dummyTrack = createDummyTrack();
-      localStream.addTrack(dummyTrack);
+      const dummyStream = createDummyStream();
+      set({ localStream: dummyStream });
     }
 
     toggleAudio();
@@ -120,8 +118,8 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
 
     const configuration = await getConfiguration();
 
-    const { socket } = get();
-    signalingClient(socket!, configuration, localStream);
+    const { socket, localStream } = get();
+    signalingClient(socket!, configuration, localStream!);
     socket!.emit('joinRoom', { roomId });
   },
 
@@ -133,7 +131,7 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
       peerConnection.close();
     });
 
-    localStream.getTracks().forEach((track) => track.stop());
+    localStream!.getTracks().forEach((track) => track.stop());
 
     socket!.close();
     set({ ...createInitialState() });
@@ -142,11 +140,11 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
   toggleVideo: async () => {
     const { localStream, webRTCMap, videoDeviceId } = get();
 
-    const currentVideoTrack = localStream.getVideoTracks()[0];
+    const currentVideoTrack = localStream!.getVideoTracks()[0];
 
     if (currentVideoTrack) {
       currentVideoTrack.stop();
-      localStream.removeTrack(currentVideoTrack);
+      localStream!.removeTrack(currentVideoTrack);
 
       Object.values(webRTCMap).forEach(({ peerConnection }) => {
         const sender = peerConnection.getSenders().find(({ track }) => track?.kind === 'video')!;
@@ -161,10 +159,17 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
         })
         .then((stream) => stream.getVideoTracks()[0]);
 
-      localStream.addTrack(videoTrack);
+      if (videoDeviceId === 'default') {
+        const videoDevices = await getVideoDevices();
+        if (videoDevices.every(({ deviceId }) => deviceId !== 'default')) {
+          set({ videoDeviceId: videoDevices[0].deviceId });
+        }
+      }
+
+      localStream!.addTrack(videoTrack);
 
       Object.values(webRTCMap).forEach(({ peerConnection }) => {
-        peerConnection.addTrack(videoTrack, localStream);
+        peerConnection.addTrack(videoTrack, localStream!);
       });
 
       set({ isVideoOn: true });
@@ -191,14 +196,14 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
 
   toggleAudio: () => {
     const { localStream } = get();
-    localStream.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
+    localStream!.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
     set((state) => ({ isAudioOn: !state.isAudioOn }));
   },
 
   changeVideoDevice: async () => {
     const { localStream, webRTCMap, videoDeviceId } = get();
 
-    const currentVideoTrack = localStream.getVideoTracks()[0];
+    const currentVideoTrack = localStream!.getVideoTracks()[0];
 
     if (!currentVideoTrack) return;
 
@@ -214,14 +219,14 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
     });
 
     currentVideoTrack.stop();
-    localStream.removeTrack(currentVideoTrack);
-    localStream.addTrack(videoTrack);
+    localStream!.removeTrack(currentVideoTrack);
+    localStream!.addTrack(videoTrack);
   },
 
   changeAudioDevice: async () => {
     const { localStream, webRTCMap, audioDeviceId } = get();
 
-    const currentAudioTrack = localStream.getAudioTracks()[0];
+    const currentAudioTrack = localStream?.getAudioTracks()[0];
 
     if (!currentAudioTrack) return;
 
@@ -237,8 +242,8 @@ const useWebRTCStore = create<State & Action>((set, get) => ({
     });
 
     currentAudioTrack.stop();
-    localStream.removeTrack(currentAudioTrack);
-    localStream.addTrack(audioTrack);
+    localStream!.removeTrack(currentAudioTrack);
+    localStream!.addTrack(audioTrack);
   },
 
   setVideoDeviceId: (deviceId) => {
