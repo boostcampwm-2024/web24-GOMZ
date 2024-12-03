@@ -117,8 +117,7 @@ export class StudyRoomsService {
   private async isValidRoom(roomId: string): Promise<void> {
     const room = await this.roomRepository.findRoomById(parseInt(roomId, 10));
     if (!room) {
-      await this.roomRepository.saveRoom('테스트용 방', null, '#test');
-      // throw new Error('Room not found');
+      throw new Error('Room not found');
     }
   }
 
