@@ -56,7 +56,7 @@
 
 ### 공부방 생성
 
-  <img alt="공부방 생성" src="https://github.com/user-attachments/assets/31b451ca-b47b-4699-a7b4-f8b746c664ed" width="750" />
+<img alt="공부방 생성" src="https://github.com/user-attachments/assets/31b451ca-b47b-4699-a7b4-f8b746c664ed" width="750" />
 
 - **제목**을 입력하고 **카테고리**를 선택하여 공부방을 **생성**할 수 있어요.
 - 비밀방 체크박스를 선택하여 **비밀방**을 생성할 수 있어요.
@@ -65,10 +65,27 @@
 
 ### 공부방 입장
 
-  <img alt="비밀방 입장" src="https://github.com/user-attachments/assets/2866e297-6e32-4fec-a135-2074f1b838ab" width="750" />
+<img alt="비밀방 입장" src="https://github.com/user-attachments/assets/2866e297-6e32-4fec-a135-2074f1b838ab" width="750" />
 
 - **공개방**의 경우, **입장하기** 버튼을 클릭해 바로 공부방에 입장할 수 있어요.
 - **비밀방**의 경우, **올바른 비밀번호를 입력**하면 공부방에 입장할 수 있어요.
+
+<br/>
+
+### 권한 부여
+
+<img src="https://github.com/user-attachments/assets/baa07f27-a5ea-4b83-bdc0-b8704ea50c0e" width="750" />
+
+- 처음 공부방에 입장하면 **권한 설정 페이지**로 연결돼요.
+- 원하는 **권한을 설정한 후에** 공부방 페이지로 입장할 수 있어요.
+- 입장한 후에도 **권한을 추가 부여**할 수 있어요.
+
+<br/>
+
+<img src="https://github.com/user-attachments/assets/fae1c6b5-9a48-4d4f-bbd1-f31824864811" width="750" />
+
+- 권한을 **거부**하면 공부방 페이지에 입장할 수 없어요.
+- 카메라⋅마이크를 사용하지 않고 공부방에 참여하고 싶다면 **미사용** 버튼을 눌러주세요.
 
 <br/>
 
