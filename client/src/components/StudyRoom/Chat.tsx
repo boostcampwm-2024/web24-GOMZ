@@ -1,41 +1,17 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+import type { Chat as ChatProps } from '@customTypes/StudyRoom';
+
+import useWebRTCStore from '@stores/useWebRTCStore';
 import Icon from '@components/common/Icon';
+import ChatMessage from '@components/StudyRoom/ChatMessage';
 
-interface Message {
-  nickName: string;
-  message: string;
-}
-
-const ChatMessage = ({ nickName, message }: { nickName: string; message: string }) => {
-  return (
-    <div className="mb-2 rounded-xl">
-      <span className="mr-2 font-semibold">{nickName}</span>
-      <span className="break-words">{message}</span>
-    </div>
-  );
-};
-
-interface ChatProps {
-  className?: string;
-  messages: Message[];
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-  newMessage: string;
-  setNewMessage: React.Dispatch<React.SetStateAction<string>>;
-  sendMessage: (message: string) => void;
-  setLastReadMessageIndex: React.Dispatch<React.SetStateAction<number>>;
-}
-
-const Chat = ({
-  className,
-  messages,
-  setMessages,
-  newMessage,
-  setNewMessage,
-  sendMessage,
-  setLastReadMessageIndex,
-}: ChatProps) => {
+const Chat = ({ messages, setMessages, setLastReadMessageIndex }: ChatProps) => {
   const isFirstRender = useRef(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [newMessage, setNewMessage] = useState('');
+
+  const sendMessage = useWebRTCStore((state) => state.sendMessage);
 
   const handleSendMessage = () => {
     if (newMessage !== '') {
@@ -65,9 +41,7 @@ const Chat = ({
   }, [messages]);
 
   return (
-    <div
-      className={`bg-gomz-white border-gomz-black flex h-[44rem] w-[25rem] flex-col justify-between gap-4 rounded-2xl border py-6 opacity-80 shadow-[0.25rem_0.25rem_0.5rem_0_rgba(0,0,0,0.25)] ${className}`}
-    >
+    <div className="bg-gomz-white border-gomz-black flex h-[44rem] w-[25rem] flex-col justify-between gap-4 rounded-2xl border py-6 opacity-80 shadow-[0.25rem_0.25rem_0.5rem_0_rgba(0,0,0,0.25)]">
       <h2 className="mx-auto px-6 text-xl font-bold">🧸 채팅 💬</h2>
       <div className="mx-auto h-[38rem] w-[23rem] overflow-y-auto px-2">
         {messages.map((msg, index) => (

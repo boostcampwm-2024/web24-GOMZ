@@ -1,18 +1,14 @@
 import { useState, useEffect } from 'react';
 import { SyncLoader } from 'react-spinners';
-import Icon from '@components/common/Icon';
 
-interface MediaSelectModalProps {
-  className?: string;
-  selectedMediaDeviceId: string;
-  setSelectedMediaDevice: React.Dispatch<React.SetStateAction<string>>;
-  getMediaDevices: () => Promise<MediaDeviceInfo[]>;
-}
+import type { MediaSelectModal as MediaSelectModalProps } from '@customTypes/StudyRoom';
+
+import Icon from '@components/common/Icon';
 
 const MediaSelectModal = ({
   className,
-  selectedMediaDeviceId,
-  setSelectedMediaDevice,
+  mediaDeviceId,
+  setMediaDeviceId,
   getMediaDevices,
 }: MediaSelectModalProps) => {
   const [mediaDevices, setMediaDevices] = useState<MediaDeviceInfo[]>([]);
@@ -20,7 +16,9 @@ const MediaSelectModal = ({
 
   useEffect(() => {
     const init = async () => {
-      const devices = await getMediaDevices();
+      const devices = await getMediaDevices().then((devices) =>
+        devices.filter(({ label }) => label !== ''),
+      );
       setMediaDevices(devices);
       setIsLoading(false);
     };
@@ -38,17 +36,12 @@ const MediaSelectModal = ({
         <>
           {mediaDevices.map((device) => (
             <div key={device.deviceId} className="flex gap-3">
-              {selectedMediaDeviceId === device.deviceId ? (
+              {mediaDeviceId === device.deviceId ? (
                 <Icon id="check" className="text-gomz-black my-1 h-6 w-6 fill-current" />
               ) : (
                 <div className="my-1 h-6 w-6" />
               )}
-              <button
-                className="truncate py-1"
-                onClick={() => {
-                  setSelectedMediaDevice(device.deviceId);
-                }}
-              >
+              <button className="truncate py-1" onClick={() => setMediaDeviceId(device.deviceId)}>
                 {device.label}
               </button>
             </div>

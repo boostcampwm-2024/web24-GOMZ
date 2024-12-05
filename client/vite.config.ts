@@ -21,11 +21,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(dirname, 'src'),
+      '@APIs': resolve(dirname, 'src/APIs'),
       '@utils': resolve(dirname, 'src/utils'),
       '@hooks': resolve(dirname, 'src/hooks'),
+      '@stores': resolve(dirname, 'src/stores'),
       '@socket': resolve(dirname, 'src/socket'),
       '@constants': resolve(dirname, 'src/constants'),
       '@components': resolve(dirname, 'src/components'),
+      '@customTypes': resolve(dirname, 'src/types'),
     },
   },
   test: {

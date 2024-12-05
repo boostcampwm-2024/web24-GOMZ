@@ -2,7 +2,8 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import ProtectedRoute from '@components/common/ProtectedRoute';
 import Home from '@components/Home/Home';
 import StudyRoomList from '@components/StudyRoomList/index';
-import StudyRoom from '@components/StudyRoom/StudyRoom';
+import StudyRoom from '@components/StudyRoom/index';
+import Permission from '@components/Permission/index';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,14 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     errorElement: <Navigate to="/study-room-list" replace />,
+  },
+  {
+    path: '/permission/:roomId/',
+    element: (
+      <ProtectedRoute>
+        <Permission />
+      </ProtectedRoute>
+    ),
   },
 ]);
 

@@ -21,7 +21,7 @@ import { SendMessageDto } from 'src/chatting/chatting.dto';
 import { MESSAGE_SENT } from 'src/chatting/chatting.constant';
 import { ChattingService } from 'src/chatting/chatting.service';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: '/mesh' })
 export class SignalingServerGateway implements OnGatewayDisconnect {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER)
@@ -115,6 +115,17 @@ export class SignalingServerGateway implements OnGatewayDisconnect {
     this.server
       .to(targetId)
       .emit('setIceCandidate', { senderId: client.id, iceCandidate: iceCandidate });
+  }
+
+  @SubscribeMessage('currentUsers')
+  async handleCurrentUser(@ConnectedSocket() client: Socket) {
+    const roomId = await this.studyRoomsService.findUserRoom(client.id);
+    if (roomId === undefined) return;
+    const users = (await this.studyRoomsService.getRoomUsers(roomId)).filter(
+      (user) => user.socketId !== client.id,
+    );
+
+    client.emit('currentUsers', { users });
   }
 
   @SubscribeMessage('sendMessage')

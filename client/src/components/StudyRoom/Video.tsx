@@ -1,19 +1,12 @@
 import { useEffect, useRef } from 'react';
 
-interface VideoProps {
-  mediaStream: MediaStream;
-  dataChannel?: RTCDataChannel;
-  nickName: string;
-  gridCols: number;
-  muted: boolean;
-}
+import type { Video as VideoProps } from '@customTypes/StudyRoom';
 
 const Video = ({ mediaStream, muted }: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!mediaStream.active) return;
-
+    if (!mediaStream) return;
     const handleTrackEvent = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;

@@ -1,11 +1,4 @@
-import { ReactNode } from 'react';
-
-interface HeaderProps {
-  className?: string;
-  title: ReactNode;
-  stopWatch: ReactNode;
-  userInfo: ReactNode;
-}
+import type { Header as HeaderProps } from '@customTypes/Common';
 
 const Header = ({ className, title, stopWatch, userInfo }: HeaderProps) => {
   return (

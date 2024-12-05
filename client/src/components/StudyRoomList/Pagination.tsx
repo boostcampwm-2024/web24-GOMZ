@@ -1,12 +1,8 @@
 import { useState } from 'react';
 
-import Icon from '@components/common/Icon';
+import type { Pagination as PaginationProps } from '@customTypes/StudyRoomList';
 
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-}
+import Icon from '@components/common/Icon';
 
 const Pagination = ({ currentPage, totalPages, setCurrentPage }: PaginationProps) => {
   const [hoverLeft, setHoverLeft] = useState(false);

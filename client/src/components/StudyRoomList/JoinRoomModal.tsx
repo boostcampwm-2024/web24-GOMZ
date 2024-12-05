@@ -1,41 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import type { JoinRoomModal as JoinRoomModalProps, ResponseData } from '@customTypes/StudyRoomList';
+import { API_BASE_URL } from '@constants/API';
+import { SAD_EMOTICONS } from '@constants/EMOTICONS';
+
 import shuffle from '@utils/shuffle';
-
-interface Room {
-  roomId: string;
-  roomName: string;
-  categoryName: string;
-  isPrivate: boolean;
-  curParticipant: number;
-  maxParticipant: number;
-}
-
-interface JoinRoomModalProps {
-  currentRoom: Partial<Room>;
-  closeModal: () => void;
-}
-
-interface ErrorResponse {
-  message: string;
-  error: string;
-  statusCode: number;
-}
-
-interface ResponseData {
-  canAccess: boolean;
-  error?: ErrorResponse;
-}
-
-const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
-const SAD_EMOTICONS = [
-  '｡° ૮₍°´ᯅ`°₎ა °',
-  '｡° (ꢳࡇꢳ) °｡',
-  '༼ ༎ຶ ෴ ༎ຶ༽',
-  '꒰ 𖦹ˊᯅˋ𖦹 ꒱',
-  '✘ᴗ✘',
-  'ヽ(●´Д｀●)ﾉﾟ',
-];
 
 const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
   const navigate = useNavigate();
@@ -57,7 +27,7 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
 
     const { canAccess, error }: ResponseData = await resonse.json();
     if (canAccess) {
-      navigate(`/study-room/${roomId}`, { state: { roomName, maxParticipant } });
+      navigate(`/permission/${roomId}`, { state: { roomName, maxParticipant } });
     } else if (error?.statusCode === 404) {
       navigate(0);
     } else {
@@ -67,7 +37,7 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = event.target as HTMLFormElement;
+    const form = event.currentTarget;
     sendFormData(form);
   };
 
@@ -93,29 +63,21 @@ const JoinRoomModal = ({ currentRoom, closeModal }: JoinRoomModalProps) => {
             name="password"
             className="border-gomz-black h-8 w-[17.5rem] rounded-lg border px-2 focus:outline-none"
             maxLength={20}
-            minLength={4}
-            required
-            onInvalid={({ target }: React.InvalidEvent<HTMLInputElement>) => {
-              if (target.validity.valueMissing || target.validity.tooShort) {
-                target.setCustomValidity('비밀번호는 4자 이상 입력해주세요 ｡° ૮₍°´ᯅ`°₎ა °｡');
-              } else {
-                target.setCustomValidity('');
-              }
-            }}
+            autoFocus
           />
         </div>
         <div className="flex items-center justify-between gap-1 font-semibold">
           <div className="text-gomz-red text-sm">{errorMessage}</div>
           <div className="flex gap-4">
             <button
-              className="border-gomz-black h-8 w-[4.75rem] rounded-full border bg-white"
+              className="border-gomz-black h-8 w-[4.75rem] rounded-full border bg-white transition-transform hover:scale-105"
               onClick={handleCancelJoinRoom}
             >
               취소
             </button>
             <button
               type="submit"
-              className="bg-gomz-black text-gomz-white h-8 w-[4.75rem] rounded-full"
+              className="bg-gomz-black text-gomz-white h-8 w-[4.75rem] rounded-full transition-transform hover:scale-105"
             >
               입장
             </button>

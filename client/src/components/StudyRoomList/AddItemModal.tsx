@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PropagateLoader } from 'react-spinners';
-import CATEGORY_NAMES from '@constants/CATEGORY_NAMES';
 
-const API_BASE_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_SIGNALING_SERVER_URL;
+import { CATEGORY_NAMES } from '@constants/CATEGORY';
+import { API_BASE_URL } from '@constants/API';
 
 const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
   const navigate = useNavigate();
@@ -35,21 +35,26 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
 
     const { roomId } = await resonse.json();
 
-    navigate(`/study-room/${roomId}`, {
+    navigate(`/permission/${roomId}`, {
       state: { roomName: jsonData.roomName, maxParticipant: 8 },
     });
   };
 
   const handleOnSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = event.target as HTMLFormElement;
+    const form = event.currentTarget;
     sendFormData(form);
   };
 
   const handleOnKeyDown = (event: React.KeyboardEvent<HTMLFormElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      sendFormData(event.currentTarget);
+      const form = event.currentTarget;
+      if (form.checkValidity()) {
+        sendFormData(form);
+      } else {
+        form.reportValidity();
+      }
     }
   };
 
@@ -85,7 +90,7 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
                 />
               </div>
               <div>
-                <label className="flex gap-2">
+                <label className="flex items-center gap-2">
                   <span className="text-sm">비밀방</span>
                   <input
                     type="checkbox"
@@ -131,14 +136,14 @@ const AddItemModal = ({ closeModal }: { closeModal: () => void }) => {
               </div>
               <div className="flex gap-4 font-semibold">
                 <button
-                  className="border-gomz-black h-8 w-[4.75rem] rounded-full border bg-white"
+                  className="border-gomz-black h-8 w-[4.75rem] rounded-full border bg-white transition-transform hover:scale-105"
                   onClick={handleCancelAddRoom}
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="bg-gomz-black text-gomz-white h-8 w-[4.75rem] rounded-full"
+                  className="bg-gomz-black text-gomz-white h-8 w-[4.75rem] rounded-full transition-transform hover:scale-105"
                 >
                   생성
                 </button>
