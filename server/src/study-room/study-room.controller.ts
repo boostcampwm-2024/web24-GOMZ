@@ -48,10 +48,8 @@ export class StudyRoomController {
     hmac.end();
     const password = hmac.read();
 
-    const stunUrls = ['stun:stun.l.google.com:19302'];
     return {
       iceServers: [
-        { urls: stunUrls },
         {
           urls: process.env.COTURN_TURN_URL,
           username: username,
